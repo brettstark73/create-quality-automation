@@ -5,17 +5,21 @@ const path = require('path')
 const { execSync } = require('child_process')
 
 const {
-  defaultDevDependencies,
-  defaultLintStaged,
-  defaultScripts
+  getDefaultDevDependencies,
+  getDefaultLintStaged,
+  getDefaultScripts
 } = require('./config/defaults')
 
-console.log('🚀 Setting up Quality Automation Template...\n')
+// CLI argument parsing
+const args = process.argv.slice(2)
+const isUpdateMode = args.includes('--update')
+
+console.log(`🚀 ${isUpdateMode ? 'Updating' : 'Setting up'} Quality Automation...\n`)
 
 // Check if we're in a git repository
 try {
   execSync('git status', { stdio: 'ignore' })
-} catch (error) {
+} catch {
   console.error('❌ This must be run in a git repository')
   console.log('Run "git init" first, then try again.')
   process.exit(1)
@@ -39,24 +43,44 @@ if (fs.existsSync(packageJsonPath)) {
   }
 }
 
+const hasTypeScriptDependency = Boolean(
+  (packageJson.devDependencies && packageJson.devDependencies.typescript) ||
+    (packageJson.dependencies && packageJson.dependencies.typescript)
+)
+
+const tsconfigCandidates = ['tsconfig.json', 'tsconfig.base.json']
+const hasTypeScriptConfig = tsconfigCandidates.some(file =>
+  fs.existsSync(path.join(process.cwd(), file))
+)
+
+const usesTypeScript = Boolean(hasTypeScriptDependency || hasTypeScriptConfig)
+if (usesTypeScript) {
+  console.log('🔍 Detected TypeScript configuration; enabling TypeScript lint defaults')
+}
+
 // Add quality automation scripts (conservative: do not overwrite existing)
 console.log('📝 Adding quality automation scripts...')
 packageJson.scripts = packageJson.scripts || {}
+const defaultScripts = getDefaultScripts({ typescript: usesTypeScript })
 Object.entries(defaultScripts).forEach(([name, command]) => {
   if (!packageJson.scripts[name]) {
     packageJson.scripts[name] = command
   }
 })
-// prepare: ensure husky install is present
-if (!packageJson.scripts.prepare) {
-  packageJson.scripts.prepare = 'husky install'
-} else if (!packageJson.scripts.prepare.includes('husky install')) {
-  packageJson.scripts.prepare += ' && husky install'
+// prepare: ensure husky command is present
+const prepareScript = packageJson.scripts.prepare
+if (!prepareScript) {
+  packageJson.scripts.prepare = 'husky'
+} else if (prepareScript.includes('husky install')) {
+  packageJson.scripts.prepare = prepareScript.replace(/husky install/g, 'husky')
+} else if (!prepareScript.includes('husky')) {
+  packageJson.scripts.prepare = `${prepareScript} && husky`
 }
 
 // Add devDependencies
 console.log('📦 Adding devDependencies...')
 packageJson.devDependencies = packageJson.devDependencies || {}
+const defaultDevDependencies = getDefaultDevDependencies({ typescript: usesTypeScript })
 Object.entries(defaultDevDependencies).forEach(([dependency, version]) => {
   if (!packageJson.devDependencies[dependency]) {
     packageJson.devDependencies[dependency] = version
@@ -66,6 +90,7 @@ Object.entries(defaultDevDependencies).forEach(([dependency, version]) => {
 // Add lint-staged configuration
 console.log('⚙️ Adding lint-staged configuration...')
 const lintStagedConfig = packageJson['lint-staged'] || {}
+const defaultLintStaged = getDefaultLintStaged({ typescript: usesTypeScript })
 Object.entries(defaultLintStaged).forEach(([pattern, commands]) => {
   if (!lintStagedConfig[pattern]) {
     lintStagedConfig[pattern] = commands
@@ -131,14 +156,31 @@ if (!fs.existsSync(prettierrcPath)) {
 }
 
 // Copy ESLint config if it doesn't exist
-const eslintrcPath = path.join(process.cwd(), '.eslintrc.json')
-if (!fs.existsSync(eslintrcPath)) {
-  const templateEslint = fs.readFileSync(
-    path.join(__dirname, '.eslintrc.json'),
-    'utf8'
+const eslintConfigPath = path.join(process.cwd(), 'eslint.config.cjs')
+const templateEslintPath = path.join(
+  __dirname,
+  usesTypeScript ? 'eslint.config.ts.cjs' : 'eslint.config.cjs'
+)
+const templateEslint = fs.readFileSync(templateEslintPath, 'utf8')
+
+if (!fs.existsSync(eslintConfigPath)) {
+  fs.writeFileSync(eslintConfigPath, templateEslint)
+  console.log(
+    `✅ Added ESLint configuration${usesTypeScript ? ' (TypeScript-aware)' : ''}`
   )
-  fs.writeFileSync(eslintrcPath, templateEslint)
-  console.log('✅ Added ESLint configuration')
+} else if (usesTypeScript) {
+  const existingConfig = fs.readFileSync(eslintConfigPath, 'utf8')
+  if (!existingConfig.includes('@typescript-eslint')) {
+    fs.writeFileSync(eslintConfigPath, templateEslint)
+    console.log('♻️ Updated ESLint configuration with TypeScript support')
+  }
+}
+
+const legacyEslintrcPath = path.join(process.cwd(), '.eslintrc.json')
+if (fs.existsSync(legacyEslintrcPath)) {
+  console.log(
+    'ℹ️ Detected legacy .eslintrc.json; ESLint 9 prefers eslint.config.cjs. Consider removing the legacy file after verifying the new config.'
+  )
 }
 
 // Copy Stylelint config if it doesn't exist
@@ -172,6 +214,17 @@ if (!fs.existsSync(eslintignorePath)) {
   )
   fs.writeFileSync(eslintignorePath, templateEslintIgnore)
   console.log('✅ Added ESLint ignore file')
+}
+
+// Copy .editorconfig if it doesn't exist
+const editorconfigPath = path.join(process.cwd(), '.editorconfig')
+if (!fs.existsSync(editorconfigPath)) {
+  const templateEditorconfig = fs.readFileSync(
+    path.join(__dirname, '.editorconfig'),
+    'utf8'
+  )
+  fs.writeFileSync(editorconfigPath, templateEditorconfig)
+  console.log('✅ Added .editorconfig')
 }
 
 // Ensure Husky pre-commit hook runs lint-staged

@@ -4,44 +4,30 @@ const assert = require('assert')
 const fs = require('fs')
 const os = require('os')
 const path = require('path')
-const { execSync } = require('child_process')
+const { execFileSync, execSync } = require('child_process')
 
 const templateRoot = path.resolve(__dirname, '..')
 const setupScript = path.join(templateRoot, 'setup.js')
 const {
-  defaultDevDependencies,
-  defaultLintStaged,
-  defaultScripts
+  getDefaultDevDependencies,
+  getDefaultLintStaged,
+  getDefaultScripts
 } = require('../config/defaults')
 
-const createTempProject = () => {
+const createTempProject = initialPackageJson => {
   const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'qa-template-'))
   execSync('git init', { cwd: tempDir, stdio: 'ignore' })
 
-  const packageJson = {
-    name: 'fixture-project',
-    version: '0.1.0',
-    scripts: {
-      lint: 'custom lint'
-    },
-    devDependencies: {
-      prettier: '^2.0.0'
-    },
-    'lint-staged': {
-      'package.json': ['custom-command']
-    }
-  }
-
   fs.writeFileSync(
     path.join(tempDir, 'package.json'),
-    JSON.stringify(packageJson, null, 2)
+    JSON.stringify(initialPackageJson, null, 2)
   )
 
-  return { tempDir, initialPackageJson: packageJson }
+  return { tempDir, initialPackageJson }
 }
 
 const runSetup = cwd => {
-  execSync(`node ${setupScript}`, { cwd, stdio: 'ignore' })
+  execFileSync(process.execPath, [setupScript], { cwd, stdio: 'ignore' })
 }
 
 const readJson = filePath =>
@@ -57,63 +43,200 @@ const cleanup = cwd => {
   fs.rmSync(cwd, { recursive: true, force: true })
 }
 
-const { tempDir: projectDir, initialPackageJson } = createTempProject()
+const normalizeArray = value => {
+  const arr = Array.isArray(value) ? value : [value]
+  return [...new Set(arr)].sort()
+}
 
-try {
-  runSetup(projectDir)
-
-  const pkg = readJson(path.join(projectDir, 'package.json'))
-
-  // Scripts: existing entries remain, missing defaults are added
+const mergeScripts = (initialScripts = {}, defaultScripts) => {
+  const scripts = { ...initialScripts }
   Object.entries(defaultScripts).forEach(([name, command]) => {
-    if (name in initialPackageJson.scripts) {
-      assert.strictEqual(pkg.scripts[name], initialPackageJson.scripts[name])
-    } else {
-      assert.strictEqual(pkg.scripts[name], command)
+    if (!scripts[name]) {
+      scripts[name] = command
     }
   })
 
-  // Dev dependencies: preserve existing versions, add missing defaults
-  Object.entries(defaultDevDependencies).forEach(([dependency, version]) => {
-    if (dependency in initialPackageJson.devDependencies) {
-      assert.strictEqual(
-        pkg.devDependencies[dependency],
-        initialPackageJson.devDependencies[dependency]
-      )
-    } else {
-      assert.strictEqual(pkg.devDependencies[dependency], version)
-    }
-  })
-
-  // lint-staged: merge commands without duplicates
-  const lintStagedPkg = pkg['lint-staged']
-  const expectedLintStaged = {
-    ...defaultLintStaged,
-    'package.json': [
-      ...initialPackageJson['lint-staged']['package.json'],
-      ...defaultLintStaged['package.json']
-    ]
+  const prepareScript = scripts.prepare
+  if (!prepareScript) {
+    scripts.prepare = 'husky'
+  } else if (prepareScript.includes('husky install')) {
+    scripts.prepare = prepareScript.replace(/husky install/g, 'husky')
+  } else if (!prepareScript.includes('husky')) {
+    scripts.prepare = `${prepareScript} && husky`
   }
 
-  Object.entries(expectedLintStaged).forEach(([pattern, commands]) => {
-    const value = lintStagedPkg[pattern]
-    assert.ok(Array.isArray(value), `${pattern} should be an array`)
-    const sortedActual = [...new Set(value)].sort()
-    const sortedExpected = [...new Set(commands)].sort()
-    assert.deepStrictEqual(sortedActual, sortedExpected)
+  return scripts
+}
+
+const mergeDevDependencies = (initialDevDeps = {}, defaultDevDeps) => {
+  const devDeps = { ...initialDevDeps }
+  Object.entries(defaultDevDeps).forEach(([dependency, version]) => {
+    if (!devDeps[dependency]) {
+      devDeps[dependency] = version
+    }
   })
+  return devDeps
+}
 
-  // Template files copied
-  expectFile(projectDir, '.prettierrc')
-  expectFile(projectDir, '.eslintrc.json')
-  expectFile(projectDir, '.stylelintrc.json')
-  expectFile(projectDir, '.prettierignore')
-  expectFile(projectDir, '.eslintignore')
-  expectFile(projectDir, '.github/workflows/quality.yml')
+const mergeLintStaged = (initialLintStaged = {}, defaultLintStaged) => {
+  const lintStaged = { ...initialLintStaged }
+  Object.entries(defaultLintStaged).forEach(([pattern, commands]) => {
+    if (!lintStaged[pattern]) {
+      lintStaged[pattern] = commands
+      return
+    }
+    const existing = Array.isArray(lintStaged[pattern])
+      ? [...lintStaged[pattern]]
+      : [lintStaged[pattern]]
+    const merged = [...existing]
+    commands.forEach(command => {
+      if (!merged.includes(command)) {
+        merged.push(command)
+      }
+    })
+    lintStaged[pattern] = merged
+  })
+  return lintStaged
+}
 
-  // Husky hook generated
-  expectFile(projectDir, '.husky/pre-commit')
+const assertLintStagedEqual = (actual, expected) => {
+  const actualKeys = Object.keys(actual).sort()
+  const expectedKeys = Object.keys(expected).sort()
+  assert.deepStrictEqual(actualKeys, expectedKeys)
+
+  expectedKeys.forEach(key => {
+    assert.deepStrictEqual(normalizeArray(actual[key]), normalizeArray(expected[key]))
+  })
+}
+
+// JavaScript project baseline
+const jsInitialPackageJson = {
+  name: 'fixture-project',
+  version: '0.1.0',
+  scripts: {
+    lint: 'custom lint'
+  },
+  devDependencies: {
+    prettier: '^2.0.0'
+  },
+  'lint-staged': {
+    'package.json': ['custom-command']
+  }
+}
+
+const { tempDir: jsProjectDir, initialPackageJson: jsInitial } =
+  createTempProject(jsInitialPackageJson)
+
+try {
+  runSetup(jsProjectDir)
+
+  const pkg = readJson(path.join(jsProjectDir, 'package.json'))
+  const expectedScripts = mergeScripts(
+    jsInitial.scripts,
+    getDefaultScripts({ typescript: false })
+  )
+  const expectedDevDependencies = mergeDevDependencies(
+    jsInitial.devDependencies,
+    getDefaultDevDependencies({ typescript: false })
+  )
+  const expectedLintStaged = mergeLintStaged(
+    jsInitial['lint-staged'],
+    getDefaultLintStaged({ typescript: false })
+  )
+
+  assert.deepStrictEqual(pkg.scripts, expectedScripts)
+  assert.deepStrictEqual(pkg.devDependencies, expectedDevDependencies)
+  assertLintStagedEqual(pkg['lint-staged'], expectedLintStaged)
+
+  expectFile(jsProjectDir, '.prettierrc')
+  const eslintConfigPathJs = expectFile(jsProjectDir, 'eslint.config.cjs')
+  expectFile(jsProjectDir, '.stylelintrc.json')
+  expectFile(jsProjectDir, '.prettierignore')
+  expectFile(jsProjectDir, '.eslintignore')
+  expectFile(jsProjectDir, '.editorconfig')
+  expectFile(jsProjectDir, '.github/workflows/quality.yml')
+
+  const huskyHookPath = expectFile(jsProjectDir, '.husky/pre-commit')
+  const huskyHookContents = fs.readFileSync(huskyHookPath, 'utf8')
+  const eslintConfigContentsJs = fs.readFileSync(eslintConfigPathJs, 'utf8')
+
+  // Idempotency check
+  runSetup(jsProjectDir)
+  const pkgSecond = readJson(path.join(jsProjectDir, 'package.json'))
+  const lintStagedSecond = pkgSecond['lint-staged']
+  const huskyHookContentsSecond = fs.readFileSync(huskyHookPath, 'utf8')
+  const eslintConfigContentsJsSecond = fs.readFileSync(eslintConfigPathJs, 'utf8')
+
+  assert.deepStrictEqual(pkgSecond.scripts, expectedScripts)
+  assert.deepStrictEqual(pkgSecond.devDependencies, expectedDevDependencies)
+  assertLintStagedEqual(lintStagedSecond, expectedLintStaged)
+  assert.strictEqual(huskyHookContentsSecond, huskyHookContents)
+  assert.strictEqual(eslintConfigContentsJsSecond, eslintConfigContentsJs)
 } finally {
-  cleanup(projectDir)
+  cleanup(jsProjectDir)
+}
+
+// TypeScript project baseline
+const tsInitialPackageJson = {
+  name: 'fixture-project-ts',
+  version: '0.1.0',
+  scripts: {},
+  devDependencies: {
+    typescript: '^5.4.0'
+  },
+  'lint-staged': {
+    'src/**/*.ts': ['custom-ts']
+  }
+}
+
+const { tempDir: tsProjectDir, initialPackageJson: tsInitial } =
+  createTempProject(tsInitialPackageJson)
+
+// Ensure TypeScript config is present for detection as well
+fs.writeFileSync(
+  path.join(tsProjectDir, 'tsconfig.json'),
+  JSON.stringify({ extends: './tsconfig.base.json' }, null, 2)
+)
+
+try {
+  runSetup(tsProjectDir)
+
+  const pkg = readJson(path.join(tsProjectDir, 'package.json'))
+  const expectedScripts = mergeScripts(
+    tsInitial.scripts,
+    getDefaultScripts({ typescript: true })
+  )
+  const expectedDevDependencies = mergeDevDependencies(
+    tsInitial.devDependencies,
+    getDefaultDevDependencies({ typescript: true })
+  )
+  const expectedLintStaged = mergeLintStaged(
+    tsInitial['lint-staged'],
+    getDefaultLintStaged({ typescript: true })
+  )
+
+  assert.deepStrictEqual(pkg.scripts, expectedScripts)
+  assert.strictEqual(pkg.scripts.lint.includes('.ts'), true)
+  assert.deepStrictEqual(pkg.devDependencies, expectedDevDependencies)
+  assertLintStagedEqual(pkg['lint-staged'], expectedLintStaged)
+  assert.ok(pkg['lint-staged']['src/**/*.ts'].includes('custom-ts'))
+
+  const eslintConfigPathTs = expectFile(tsProjectDir, 'eslint.config.cjs')
+  const eslintConfigContentsTs = fs.readFileSync(eslintConfigPathTs, 'utf8')
+  assert.ok(eslintConfigContentsTs.includes('@typescript-eslint'))
+  expectFile(tsProjectDir, '.editorconfig')
+
+  // Idempotency check (also validates TypeScript paths stay stable)
+  runSetup(tsProjectDir)
+  const pkgSecond = readJson(path.join(tsProjectDir, 'package.json'))
+  const lintStagedSecond = pkgSecond['lint-staged']
+  const eslintConfigContentsTsSecond = fs.readFileSync(eslintConfigPathTs, 'utf8')
+
+  assert.deepStrictEqual(pkgSecond.scripts, expectedScripts)
+  assert.deepStrictEqual(pkgSecond.devDependencies, expectedDevDependencies)
+  assertLintStagedEqual(lintStagedSecond, expectedLintStaged)
+  assert.strictEqual(eslintConfigContentsTsSecond, eslintConfigContentsTs)
+} finally {
+  cleanup(tsProjectDir)
 }
 

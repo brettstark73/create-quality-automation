@@ -1,6 +1,6 @@
-# Quality Automation Template 🚀
+# Create Quality Automation 🚀
 
-A comprehensive, reusable template for setting up quality automation in any project with GitHub Actions, Husky pre-commit hooks, lint-staged, and Prettier formatting.
+Bootstrap quality automation in any project with GitHub Actions, Husky pre-commit hooks, lint-staged, and Prettier formatting. Modern ESLint 9 flat config with automatic TypeScript support.
 
 ## ✨ Features
 
@@ -8,51 +8,59 @@ A comprehensive, reusable template for setting up quality automation in any proj
 - **🪝 Husky Pre-commit Hooks** - Automatic quality checks before commits
 - **⚡ Lint-staged Processing** - Only process changed files for speed
 - **🤖 GitHub Actions** - Automated quality checks in CI/CD
-- **📦 Easy Setup** - One command installation script
-- **🔄 Configurable** - Easily customize for your project needs
+- **📦 One Command Setup** - `npx create-quality-automation@latest`
+- **🔄 TypeScript Smart** - Auto-detects and configures TypeScript projects
+- **🆕 Modern Tooling** - ESLint 9 flat config, Husky 9, latest dependencies
 
 ## 🚀 Quick Start
 
-### Option 1: Interactive Setup (Recommended)
+### For Any Project (Recommended)
 
-1. **Clone or download** this template to your machine (Node 20+)
-2. **Navigate to your project** directory (must be a git repository)
-3. **Run the setup script:**
-   ```bash
-   node /path/to/quality-automation-template/setup.js
-   ```
-4. **Install dependencies (Node 20 recommended):**
-   ```bash
-   npm install
-   ```
-5. **Initialize Husky:**
-   ```bash
-   npm run prepare
-   ```
+```bash
+# Navigate to your project (must be a git repository)
+cd your-project/
 
-### Option 2: Manual Setup
+# Bootstrap quality automation
+npx create-quality-automation@latest
 
-1. **Copy template files** to your project:
-   ```bash
-   cp -r quality-automation-template/.github ./
-   cp quality-automation-template/.prettierrc ./
-   cp quality-automation-template/.prettierignore ./
-   cp quality-automation-template/.eslintrc.json ./
-   cp quality-automation-template/.eslintignore ./
-   cp quality-automation-template/.stylelintrc.json ./
-   cp quality-automation-template/.nvmrc ./
-   cp quality-automation-template/.npmrc ./
-   ```
+# Install new dependencies
+npm install
 
-2. **Update your package.json**
-   - Add the scripts (`format`, `format:check`, `lint`, `lint:fix`)
-   - Add `lint-staged` with ESLint/Stylelint as shown below
+# Set up pre-commit hooks
+npm run prepare
+```
 
-3. **Install and setup:**
-   ```bash
-   npm install --save-dev prettier eslint stylelint stylelint-config-standard husky lint-staged
-   npm run prepare
-   ```
+**That's it!** Your project now has comprehensive quality automation.
+
+### Update Existing Setup
+
+```bash
+# Update to latest configurations
+npx create-quality-automation@latest --update
+
+# Install any new dependencies
+npm install
+
+# Verify everything works
+npm run lint
+```
+
+### New Project from Scratch
+
+```bash
+# Create new project
+mkdir my-awesome-project && cd my-awesome-project
+git init
+npm init -y
+
+# Add quality automation
+npx create-quality-automation@latest
+npm install && npm run prepare
+
+# Start coding with quality tools active!
+echo "console.log('Hello, quality world!')" > index.js
+git add . && git commit -m "feat: initial commit with quality tools"
+```
 
 ## 📁 What Gets Added to Your Project
 
@@ -61,8 +69,10 @@ your-project/
 ├── .github/
 │   └── workflows/
 │       └── quality.yml          # GitHub Actions workflow
-├── .prettierrc                  # Prettier configuration
-├── .prettierignore             # Files to ignore in formatting
+├── .editorconfig              # Editor defaults
+├── eslint.config.cjs          # ESLint flat config (JS)
+├── .prettierrc               # Prettier configuration
+├── .prettierignore            # Files to ignore in formatting
 ├── .husky/                     # Pre-commit hooks (created after setup)
 └── package.json                # Updated with scripts and dependencies
 ```
@@ -99,23 +109,33 @@ Conservative behavior:
 {
   "lint-staged": {
     "package.json": ["prettier --write"],
-    "**/*.{js,jsx,ts,tsx,html}": ["eslint --fix", "prettier --write"],
+    "**/*.{js,jsx,mjs,cjs,html}": ["eslint --fix", "prettier --write"],
     "**/*.{css,scss}": ["stylelint --fix", "prettier --write"],
     "**/*.{json,md,yml,yaml}": ["prettier --write"]
   }
 }
 ```
 
+If the setup script detects TypeScript (via a `typescript` dependency or a `tsconfig` file), the `**/*.{js,jsx,mjs,cjs,html}` pattern automatically expands to include `.ts` and `.tsx`.
+
 ## 🔧 Customization
 
 ### Extending ESLint/Stylelint
-- ESLint rules live in `.eslintrc.json`; example to enforce no-console:
-  ```json
-  {
-    "extends": ["eslint:recommended"],
-    "rules": { "no-console": "warn" }
-  }
+- ESLint flat config lives in `eslint.config.cjs`. Adjust the exported array to tweak rules—for example, update the final rule block to warn on console usage:
+  ```js
+  // eslint.config.cjs
+  module.exports = [
+    /* ...existing entries... */
+    {
+      files: ['**/*.{js,jsx,mjs,cjs,html}'],
+      rules: {
+        // existing rules...
+        'no-console': 'warn'
+      }
+    }
+  ]
   ```
+  When TypeScript is detected the script writes a variant with `@typescript-eslint`; customize the `files: ['**/*.{ts,tsx}']` block in the same way.
 - Stylelint rules live in `.stylelintrc.json`; example to relax specificity:
   ```json
   {
@@ -125,8 +145,9 @@ Conservative behavior:
   ```
 
 ### Adding TypeScript Support
-1. Install TypeScript: `npm install --save-dev typescript`
-2. Update workflow to include type checking:
+1. Add TypeScript to your project: `npm install --save-dev typescript`
+2. Re-run the setup script (`npm run setup` or `node setup.js`) to enable `@typescript-eslint` linting and TypeScript-aware lint-staged patterns.
+3. Update workflow to include type checking:
    ```yaml
    - name: TypeScript Check
      run: npx tsc --noEmit
@@ -144,6 +165,7 @@ After setup, your project will have these scripts:
 - `npm run format` - Format all files with Prettier
 - `npm run format:check` - Check if files are formatted (used in CI)
 - `npm run prepare` - Set up Husky hooks (run after npm install)
+- `npm run lint` / `npm run lint:fix` - ESLint flat config (auto-extending to TS) + Stylelint
 - `npm test` - Runs the bootstrap regression test (customize per project)
 
 ## 🤖 GitHub Actions Workflow
@@ -174,12 +196,15 @@ Ensure your repository has Actions enabled in Settings > Actions.
 - Avoid hard‑coding a `runtime` value in `vercel.json` unless confirmed against current Vercel docs — incorrect values can break deploys.
 - The template pins Node 20 for local/CI via `.nvmrc`, `engines`, and optional Volta; this is independent of Vercel’s runtime.
 
-## 🔄 Updating the Template
+## 🔄 Updating
 
-To update an existing project with new template features:
-1. Re-run the setup script
-2. Review and merge any conflicts
-3. Update dependencies: `npm update`
+To update an existing project:
+```bash
+npx create-quality-automation@latest --update
+npm install
+```
+
+The tool safely merges new configurations without overwriting your customizations.
 
 ## 🤝 Contributing
 

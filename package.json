@@ -1,14 +1,17 @@
 {
-  "name": "quality-automation-template",
+  "name": "create-quality-automation",
   "version": "1.0.0",
-  "description": "Reusable quality automation setup with GitHub Actions, Husky, lint-staged, and Prettier",
-  "main": "index.js",
+  "description": "Bootstrap quality automation with GitHub Actions, Husky, lint-staged, and Prettier for any project",
+  "main": "setup.js",
+  "bin": {
+    "create-quality-automation": "./setup.js"
+  },
   "scripts": {
-    "prepare": "husky install",
+    "prepare": "husky",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "lint": "eslint . --ext .js,.jsx,.ts,.tsx,.html && stylelint \"**/*.{css,scss}\" --allow-empty-input",
-    "lint:fix": "eslint . --ext .js,.jsx,.ts,.tsx,.html --fix && stylelint \"**/*.{css,scss}\" --fix --allow-empty-input",
+    "lint": "eslint . --ext .js,.jsx,.mjs,.cjs,.html && stylelint \"**/*.{css,scss}\" --allow-empty-input",
+    "lint:fix": "eslint . --ext .js,.jsx,.mjs,.cjs,.html --fix && stylelint \"**/*.{css,scss}\" --fix --allow-empty-input",
     "test": "node tests/setup.test.js",
     "setup": "node setup.js"
   },
@@ -19,20 +22,45 @@
     "husky",
     "lint-staged",
     "github-actions",
-    "template"
+    "template",
+    "bootstrap",
+    "scaffold"
   ],
   "author": "Brett Stark",
   "license": "MIT",
+  "files": [
+    "setup.js",
+    "config/",
+    ".github/",
+    ".prettierrc",
+    ".prettierignore",
+    "eslint.config.cjs",
+    "eslint.config.ts.cjs",
+    ".eslintignore",
+    ".stylelintrc.json",
+    ".editorconfig",
+    ".nvmrc",
+    ".npmrc"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/brettstark/create-quality-automation.git"
+  },
+  "bugs": {
+    "url": "https://github.com/brettstark/create-quality-automation/issues"
+  },
+  "homepage": "https://github.com/brettstark/create-quality-automation#readme",
   "engines": {
     "node": ">=20"
   },
   "devDependencies": {
-    "husky": "^8.0.0",
-    "lint-staged": "^15.0.0",
-    "prettier": "^3.0.0",
-    "eslint": "^8.57.0",
-    "stylelint": "^16.2.1",
-    "stylelint-config-standard": "^36.0.0"
+    "husky": "^9.1.4",
+    "lint-staged": "^15.2.10",
+    "prettier": "^3.3.3",
+    "eslint": "^9.12.0",
+    "stylelint": "^16.8.0",
+    "stylelint-config-standard": "^37.0.0",
+    "globals": "^15.9.0"
   },
   "volta": {
     "node": "20.11.1",
@@ -42,15 +70,15 @@
     "package.json": [
       "prettier --write"
     ],
-    "**/*.{js,jsx,ts,tsx,html}": [
-      "eslint --fix",
-      "prettier --write"
-    ],
-    "**/*.{css,scss}": [
+    "!(node_modules)/**/*.{css,scss}": [
       "stylelint --fix",
       "prettier --write"
     ],
-    "**/*.{json,md,yml,yaml}": [
+    "!(node_modules)/**/*.{json,md,yml,yaml}": [
+      "prettier --write"
+    ],
+    "!(node_modules)/**/*.{js,jsx,mjs,cjs,html}": [
+      "eslint --fix",
       "prettier --write"
     ]
   }
