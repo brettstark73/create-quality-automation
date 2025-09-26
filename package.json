@@ -9,7 +9,7 @@
     "format:check": "prettier --check .",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx,.html && stylelint \"**/*.{css,scss}\" --allow-empty-input",
     "lint:fix": "eslint . --ext .js,.jsx,.ts,.tsx,.html --fix && stylelint \"**/*.{css,scss}\" --fix --allow-empty-input",
-    "test": "echo 'Add your testing command here'",
+    "test": "node tests/setup.test.js",
     "setup": "node setup.js"
   },
   "keywords": [

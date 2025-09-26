@@ -4,6 +4,12 @@ const fs = require('fs')
 const path = require('path')
 const { execSync } = require('child_process')
 
+const {
+  defaultDevDependencies,
+  defaultLintStaged,
+  defaultScripts
+} = require('./config/defaults')
+
 console.log('🚀 Setting up Quality Automation Template...\n')
 
 // Check if we're in a git repository
@@ -36,47 +42,47 @@ if (fs.existsSync(packageJsonPath)) {
 // Add quality automation scripts (conservative: do not overwrite existing)
 console.log('📝 Adding quality automation scripts...')
 packageJson.scripts = packageJson.scripts || {}
+Object.entries(defaultScripts).forEach(([name, command]) => {
+  if (!packageJson.scripts[name]) {
+    packageJson.scripts[name] = command
+  }
+})
 // prepare: ensure husky install is present
 if (!packageJson.scripts.prepare) {
   packageJson.scripts.prepare = 'husky install'
 } else if (!packageJson.scripts.prepare.includes('husky install')) {
   packageJson.scripts.prepare += ' && husky install'
 }
-// format scripts
-if (!packageJson.scripts['format']) {
-  packageJson.scripts['format'] = 'prettier --write .'
-}
-if (!packageJson.scripts['format:check']) {
-  packageJson.scripts['format:check'] = 'prettier --check .'
-}
-// lint scripts with allow-empty-input
-if (!packageJson.scripts['lint']) {
-  packageJson.scripts['lint'] = 'eslint . --ext .js,.jsx,.ts,.tsx,.html && stylelint "**/*.{css,scss}" --allow-empty-input'
-}
-if (!packageJson.scripts['lint:fix']) {
-  packageJson.scripts['lint:fix'] = 'eslint . --ext .js,.jsx,.ts,.tsx,.html --fix && stylelint "**/*.{css,scss}" --fix --allow-empty-input'
-}
 
 // Add devDependencies
 console.log('📦 Adding devDependencies...')
-packageJson.devDependencies = {
-  ...packageJson.devDependencies,
-  husky: '^8.0.0',
-  'lint-staged': '^15.0.0',
-  prettier: '^3.0.0',
-  eslint: '^8.57.0',
-  stylelint: '^16.2.1',
-  'stylelint-config-standard': '^36.0.0'
-}
+packageJson.devDependencies = packageJson.devDependencies || {}
+Object.entries(defaultDevDependencies).forEach(([dependency, version]) => {
+  if (!packageJson.devDependencies[dependency]) {
+    packageJson.devDependencies[dependency] = version
+  }
+})
 
 // Add lint-staged configuration
 console.log('⚙️ Adding lint-staged configuration...')
-packageJson['lint-staged'] = {
-  'package.json': ['prettier --write'],
-  '**/*.{js,jsx,ts,tsx,html}': ['eslint --fix', 'prettier --write'],
-  '**/*.{css,scss}': ['stylelint --fix', 'prettier --write'],
-  '**/*.{json,md,yml,yaml}': ['prettier --write']
-}
+const lintStagedConfig = packageJson['lint-staged'] || {}
+Object.entries(defaultLintStaged).forEach(([pattern, commands]) => {
+  if (!lintStagedConfig[pattern]) {
+    lintStagedConfig[pattern] = commands
+    return
+  }
+  const existing = Array.isArray(lintStagedConfig[pattern])
+    ? [...lintStagedConfig[pattern]]
+    : [lintStagedConfig[pattern]]
+  const merged = [...existing]
+  commands.forEach(command => {
+    if (!merged.includes(command)) {
+      merged.push(command)
+    }
+  })
+  lintStagedConfig[pattern] = merged
+})
+packageJson['lint-staged'] = lintStagedConfig
 
 // Write updated package.json
 fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2))
@@ -121,7 +127,7 @@ if (!fs.existsSync(prettierrcPath)) {
     'utf8'
   )
   fs.writeFileSync(prettierrcPath, templatePrettierrc)
-console.log('✅ Added Prettier configuration')
+  console.log('✅ Added Prettier configuration')
 }
 
 // Copy ESLint config if it doesn't exist
@@ -165,7 +171,7 @@ if (!fs.existsSync(eslintignorePath)) {
     'utf8'
   )
   fs.writeFileSync(eslintignorePath, templateEslintIgnore)
-console.log('✅ Added ESLint ignore file')
+  console.log('✅ Added ESLint ignore file')
 }
 
 // Ensure Husky pre-commit hook runs lint-staged
@@ -176,7 +182,8 @@ try {
   }
   const preCommitPath = path.join(huskyDir, 'pre-commit')
   if (!fs.existsSync(preCommitPath)) {
-    const hook = '#!/bin/sh\n. "$(dirname "$0")/_/husky.sh"\n\n# Run lint-staged on staged files\n npx --no -- lint-staged\n'
+    const hook =
+      '#!/bin/sh\n. "$(dirname "$0")/_/husky.sh"\n\n# Run lint-staged on staged files\nnpx --no -- lint-staged\n'
     fs.writeFileSync(preCommitPath, hook)
     fs.chmodSync(preCommitPath, 0o755)
     console.log('✅ Added Husky pre-commit hook (lint-staged)')

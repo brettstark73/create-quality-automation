@@ -133,8 +133,9 @@ Conservative behavior:
    ```
 
 ### Adding Testing
-1. Update the `test` script in `package.json`
-2. The GitHub Actions workflow will automatically run your tests
+- The template ships with an integration smoke test (`npm test`) that exercises `setup.js` end-to-end.
+- Replace or extend `tests/setup.test.js` with your project’s preferred test runner (Jest, Vitest, Playwright, etc.).
+- Keep the `test` script aligned with your chosen framework so CI executes the same checks.
 
 ## 📜 Available Scripts
 
@@ -143,6 +144,7 @@ After setup, your project will have these scripts:
 - `npm run format` - Format all files with Prettier
 - `npm run format:check` - Check if files are formatted (used in CI)
 - `npm run prepare` - Set up Husky hooks (run after npm install)
+- `npm test` - Runs the bootstrap regression test (customize per project)
 
 ## 🤖 GitHub Actions Workflow
 
