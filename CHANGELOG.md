@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+- Broadened Stylelint coverage to include Sass, Less, and PostCSS files while scoping globs to detected CSS directories.
+- Relaxed the default Stylelint ignore list so committed build or public assets are no longer excluded automatically.
+
+### Fixed
+- Preserve existing `lint-staged` CSS patterns so updates avoid replacing custom Stylelint setups.
+
+---
+
 ## [1.0.0] - 2024-09-25
 
 ### Added

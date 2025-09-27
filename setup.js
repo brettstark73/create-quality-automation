@@ -5,10 +5,129 @@ const path = require('path')
 const { execSync } = require('child_process')
 
 const {
+  STYLELINT_EXTENSIONS,
   getDefaultDevDependencies,
   getDefaultLintStaged,
   getDefaultScripts
 } = require('./config/defaults')
+
+const STYLELINT_EXTENSION_SET = new Set(STYLELINT_EXTENSIONS)
+const STYLELINT_DEFAULT_TARGET = `**/*.{${STYLELINT_EXTENSIONS.join(',')}}`
+const STYLELINT_EXTENSION_GLOB = `*.{${STYLELINT_EXTENSIONS.join(',')}}`
+const STYLELINT_SCAN_EXCLUDES = new Set([
+  '.git',
+  '.github',
+  '.husky',
+  '.next',
+  '.nuxt',
+  '.output',
+  '.turbo',
+  '.vercel',
+  '.cache',
+  '.pnpm-store',
+  'coverage',
+  'node_modules'
+])
+const MAX_STYLELINT_SCAN_DEPTH = 4
+
+const safeReadDir = dir => {
+  try {
+    return fs.readdirSync(dir, { withFileTypes: true })
+  } catch {
+    return []
+  }
+}
+
+const isStylelintFile = fileName => {
+  const ext = path.extname(fileName).slice(1).toLowerCase()
+  return STYLELINT_EXTENSION_SET.has(ext)
+}
+
+const directoryContainsStylelintFiles = (dir, depth = 0) => {
+  if (depth > MAX_STYLELINT_SCAN_DEPTH) {
+    return false
+  }
+
+  const entries = safeReadDir(dir)
+  for (const entry of entries) {
+    if (entry.isSymbolicLink()) {
+      continue
+    }
+
+    const entryPath = path.join(dir, entry.name)
+
+    if (entry.isFile() && isStylelintFile(entry.name)) {
+      return true
+    }
+
+    if (entry.isDirectory()) {
+      if (STYLELINT_SCAN_EXCLUDES.has(entry.name)) {
+        continue
+      }
+      if (directoryContainsStylelintFiles(entryPath, depth + 1)) {
+        return true
+      }
+    }
+  }
+
+  return false
+}
+
+const findStylelintTargets = rootDir => {
+  const entries = safeReadDir(rootDir)
+  const targets = new Set()
+  let hasRootCss = false
+
+  for (const entry of entries) {
+    if (entry.isSymbolicLink()) {
+      continue
+    }
+
+    const entryPath = path.join(rootDir, entry.name)
+
+    if (entry.isFile()) {
+      if (isStylelintFile(entry.name)) {
+        hasRootCss = true
+      }
+      continue
+    }
+
+    if (!entry.isDirectory()) {
+      continue
+    }
+
+    if (STYLELINT_SCAN_EXCLUDES.has(entry.name)) {
+      continue
+    }
+
+    if (directoryContainsStylelintFiles(entryPath)) {
+      targets.add(entry.name)
+    }
+  }
+
+  const resolvedTargets = []
+
+  if (hasRootCss) {
+    resolvedTargets.push(STYLELINT_EXTENSION_GLOB)
+  }
+
+  Array.from(targets)
+    .sort()
+    .forEach(dir => {
+      resolvedTargets.push(`${dir}/**/${STYLELINT_EXTENSION_GLOB}`)
+    })
+
+  if (!resolvedTargets.length) {
+    return [STYLELINT_DEFAULT_TARGET]
+  }
+
+  return resolvedTargets
+}
+
+const patternIncludesStylelintExtension = pattern => {
+  const lower = pattern.toLowerCase()
+  return STYLELINT_EXTENSIONS.some(ext => lower.includes(`.${ext}`))
+}
 
 // CLI argument parsing
 const args = process.argv.slice(2)
@@ -58,10 +177,20 @@ if (usesTypeScript) {
   console.log('🔍 Detected TypeScript configuration; enabling TypeScript lint defaults')
 }
 
+const stylelintTargets = findStylelintTargets(process.cwd())
+const usingDefaultStylelintTarget =
+  stylelintTargets.length === 1 && stylelintTargets[0] === STYLELINT_DEFAULT_TARGET
+if (!usingDefaultStylelintTarget) {
+  console.log(`🔍 Detected stylelint targets: ${stylelintTargets.join(', ')}`)
+}
+
 // Add quality automation scripts (conservative: do not overwrite existing)
 console.log('📝 Adding quality automation scripts...')
 packageJson.scripts = packageJson.scripts || {}
-const defaultScripts = getDefaultScripts({ typescript: usesTypeScript })
+const defaultScripts = getDefaultScripts({
+  typescript: usesTypeScript,
+  stylelintTargets
+})
 Object.entries(defaultScripts).forEach(([name, command]) => {
   if (!packageJson.scripts[name]) {
     packageJson.scripts[name] = command
@@ -90,8 +219,26 @@ Object.entries(defaultDevDependencies).forEach(([dependency, version]) => {
 // Add lint-staged configuration
 console.log('⚙️ Adding lint-staged configuration...')
 const lintStagedConfig = packageJson['lint-staged'] || {}
-const defaultLintStaged = getDefaultLintStaged({ typescript: usesTypeScript })
+const defaultLintStaged = getDefaultLintStaged({
+  typescript: usesTypeScript,
+  stylelintTargets
+})
+const stylelintTargetSet = new Set(stylelintTargets)
+const hasExistingCssPatterns = Object.keys(lintStagedConfig).some(
+  patternIncludesStylelintExtension
+)
+
+if (hasExistingCssPatterns) {
+  console.log(
+    'ℹ️ Detected existing lint-staged CSS globs; preserving current CSS targets'
+  )
+}
+
 Object.entries(defaultLintStaged).forEach(([pattern, commands]) => {
+  const isStylelintPattern = stylelintTargetSet.has(pattern)
+  if (isStylelintPattern && hasExistingCssPatterns) {
+    return
+  }
   if (!lintStagedConfig[pattern]) {
     lintStagedConfig[pattern] = commands
     return

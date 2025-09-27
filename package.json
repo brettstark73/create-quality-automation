@@ -10,8 +10,8 @@
     "prepare": "husky",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "lint": "eslint . --ext .js,.jsx,.mjs,.cjs,.html && stylelint \"**/*.{css,scss}\" --allow-empty-input",
-    "lint:fix": "eslint . --ext .js,.jsx,.mjs,.cjs,.html --fix && stylelint \"**/*.{css,scss}\" --fix --allow-empty-input",
+    "lint": "eslint . --ext .js,.jsx,.mjs,.cjs,.html && stylelint \"**/*.{css,scss,sass,less,pcss}\" --allow-empty-input",
+    "lint:fix": "eslint . --ext .js,.jsx,.mjs,.cjs,.html --fix && stylelint \"**/*.{css,scss,sass,less,pcss}\" --fix --allow-empty-input",
     "test": "node tests/setup.test.js",
     "setup": "node setup.js"
   },
@@ -44,12 +44,12 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/brettstark/create-quality-automation.git"
+    "url": "git+https://github.com/brettstark73/create-quality-automation.git"
   },
   "bugs": {
-    "url": "https://github.com/brettstark/create-quality-automation/issues"
+    "url": "https://github.com/brettstark73/create-quality-automation/issues"
   },
-  "homepage": "https://github.com/brettstark/create-quality-automation#readme",
+  "homepage": "https://github.com/brettstark73/create-quality-automation#readme",
   "engines": {
     "node": ">=20"
   },
@@ -70,7 +70,7 @@
     "package.json": [
       "prettier --write"
     ],
-    "!(node_modules)/**/*.{css,scss}": [
+    "!(node_modules)/**/*.{css,scss,sass,less,pcss}": [
       "stylelint --fix",
       "prettier --write"
     ],

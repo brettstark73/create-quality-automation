@@ -11,7 +11,8 @@ const setupScript = path.join(templateRoot, 'setup.js')
 const {
   getDefaultDevDependencies,
   getDefaultLintStaged,
-  getDefaultScripts
+  getDefaultScripts,
+  STYLELINT_EXTENSIONS
 } = require('../config/defaults')
 
 const createTempProject = initialPackageJson => {
@@ -48,6 +49,16 @@ const normalizeArray = value => {
   return [...new Set(arr)].sort()
 }
 
+const STYLELINT_EXTENSION_GLOB = `*.{${STYLELINT_EXTENSIONS.join(',')}}`
+const DEFAULT_STYLELINT_TARGET = `**/*.{${STYLELINT_EXTENSIONS.join(',')}}`
+
+const makeStylelintTarget = dir => `${dir}/**/${STYLELINT_EXTENSION_GLOB}`
+
+const patternIncludesStylelintExtension = pattern => {
+  const lower = pattern.toLowerCase()
+  return STYLELINT_EXTENSIONS.some(ext => lower.includes(`.${ext}`))
+}
+
 const mergeScripts = (initialScripts = {}, defaultScripts) => {
   const scripts = { ...initialScripts }
   Object.entries(defaultScripts).forEach(([name, command]) => {
@@ -78,9 +89,22 @@ const mergeDevDependencies = (initialDevDeps = {}, defaultDevDeps) => {
   return devDeps
 }
 
-const mergeLintStaged = (initialLintStaged = {}, defaultLintStaged) => {
+const mergeLintStaged = (
+  initialLintStaged = {},
+  defaultLintStaged,
+  stylelintTargets = [DEFAULT_STYLELINT_TARGET]
+) => {
   const lintStaged = { ...initialLintStaged }
+  const stylelintTargetSet = new Set(stylelintTargets)
+  const hasExistingCssPatterns = Object.keys(lintStaged).some(
+    patternIncludesStylelintExtension
+  )
+
   Object.entries(defaultLintStaged).forEach(([pattern, commands]) => {
+    const isStylelintPattern = stylelintTargetSet.has(pattern)
+    if (isStylelintPattern && hasExistingCssPatterns) {
+      return
+    }
     if (!lintStaged[pattern]) {
       lintStaged[pattern] = commands
       return
@@ -240,3 +264,39 @@ try {
   cleanup(tsProjectDir)
 }
 
+// Preserve existing CSS lint-staged globs without adding conflicting defaults
+const cssInitialPackageJson = {
+  name: 'fixture-css-targets',
+  version: '0.1.0',
+  scripts: {},
+  'lint-staged': {
+    'public/**/*.css': ['stylelint --fix']
+  }
+}
+
+const { tempDir: cssProjectDir, initialPackageJson: cssInitial } =
+  createTempProject(cssInitialPackageJson)
+
+fs.mkdirSync(path.join(cssProjectDir, 'public'), { recursive: true })
+fs.writeFileSync(
+  path.join(cssProjectDir, 'public', 'styles.css'),
+  'body { color: #c00; }\n'
+)
+
+try {
+  runSetup(cssProjectDir)
+
+  const pkg = readJson(path.join(cssProjectDir, 'package.json'))
+  const publicStylelintTarget = makeStylelintTarget('public')
+  const expectedLintStaged = mergeLintStaged(
+    cssInitial['lint-staged'],
+    getDefaultLintStaged({ stylelintTargets: [publicStylelintTarget] }),
+    [publicStylelintTarget]
+  )
+
+  assertLintStagedEqual(pkg['lint-staged'], expectedLintStaged)
+  assert.ok(!pkg['lint-staged'][DEFAULT_STYLELINT_TARGET])
+  assert.deepStrictEqual(pkg['lint-staged']['public/**/*.css'], ['stylelint --fix'])
+} finally {
+  cleanup(cssProjectDir)
+}

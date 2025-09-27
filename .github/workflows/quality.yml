@@ -36,7 +36,7 @@ jobs:
       run: npx eslint . --ext .js,.jsx,.ts,.tsx,.html --max-warnings=0
 
     - name: Stylelint
-      run: npx stylelint "**/*.{css,scss}" --allow-empty-input
+      run: npx stylelint "**/*.{css,scss,sass,less,pcss}" --allow-empty-input
 
     - name: Security audit (non-blocking)
       run: npm audit --audit-level=high || true

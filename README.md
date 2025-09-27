@@ -110,13 +110,15 @@ Conservative behavior:
   "lint-staged": {
     "package.json": ["prettier --write"],
     "**/*.{js,jsx,mjs,cjs,html}": ["eslint --fix", "prettier --write"],
-    "**/*.{css,scss}": ["stylelint --fix", "prettier --write"],
+    "**/*.{css,scss,sass,less,pcss}": ["stylelint --fix", "prettier --write"],
     "**/*.{json,md,yml,yaml}": ["prettier --write"]
   }
 }
 ```
 
 If the setup script detects TypeScript (via a `typescript` dependency or a `tsconfig` file), the `**/*.{js,jsx,mjs,cjs,html}` pattern automatically expands to include `.ts` and `.tsx`.
+
+The CLI scans your repository for existing CSS, Sass, Less, and PostCSS files so Stylelint targets only the directories you already use. If you have custom CSS globs in `lint-staged`, the setup script keeps them instead of overwriting them with broad defaults.
 
 ## 🔧 Customization
 
