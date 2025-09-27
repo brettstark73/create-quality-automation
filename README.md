@@ -80,6 +80,7 @@ your-project/
 ## ⚙️ Configuration
 
 ### Node Version
+
 - This template pins Node to version 20 for local dev and CI.
 - Tools included:
   - `.nvmrc` → auto-switch with `nvm use`
@@ -87,11 +88,12 @@ your-project/
   - `.npmrc` → `engine-strict = true` to enforce engine checks
 
 Conservative behavior:
+
 - The setup script adds engines/Volta pins if they are missing, but does not overwrite your existing values.
 - This avoids unexpectedly changing repos already pinned to another Node version.
 
-
 ### Prettier Configuration (`.prettierrc`)
+
 ```json
 {
   "semi": false,
@@ -105,6 +107,7 @@ Conservative behavior:
 ```
 
 ### Lint-staged Configuration (in `package.json`)
+
 ```json
 {
   "lint-staged": {
@@ -123,6 +126,7 @@ The CLI scans your repository for existing CSS, Sass, Less, and PostCSS files so
 ## 🔧 Customization
 
 ### Extending ESLint/Stylelint
+
 - ESLint flat config lives in `eslint.config.cjs`. Adjust the exported array to tweak rules—for example, update the final rule block to warn on console usage:
   ```js
   // eslint.config.cjs
@@ -132,9 +136,9 @@ The CLI scans your repository for existing CSS, Sass, Less, and PostCSS files so
       files: ['**/*.{js,jsx,mjs,cjs,html}'],
       rules: {
         // existing rules...
-        'no-console': 'warn'
-      }
-    }
+        'no-console': 'warn',
+      },
+    },
   ]
   ```
   When TypeScript is detected the script writes a variant with `@typescript-eslint`; customize the `files: ['**/*.{ts,tsx}']` block in the same way.
@@ -147,6 +151,7 @@ The CLI scans your repository for existing CSS, Sass, Less, and PostCSS files so
   ```
 
 ### Adding TypeScript Support
+
 1. Add TypeScript to your project: `npm install --save-dev typescript`
 2. Re-run the setup script (`npm run setup` or `node setup.js`) to enable `@typescript-eslint` linting and TypeScript-aware lint-staged patterns.
 3. Update workflow to include type checking:
@@ -156,6 +161,7 @@ The CLI scans your repository for existing CSS, Sass, Less, and PostCSS files so
    ```
 
 ### Adding Testing
+
 - The template ships with an integration smoke test (`npm test`) that exercises `setup.js` end-to-end.
 - Replace or extend `tests/setup.test.js` with your project’s preferred test runner (Jest, Vitest, Playwright, etc.).
 - Keep the `test` script aligned with your chosen framework so CI executes the same checks.
@@ -173,27 +179,33 @@ After setup, your project will have these scripts:
 ## 🤖 GitHub Actions Workflow
 
 The workflow runs on:
+
 - Push to `main`, `master`, or `develop` branches
 - Pull requests to those branches
 
 It performs:
+
 - ✅ Prettier formatting check
 - ✅ Linting (if configured)
-- ✅ Testing (if configured)  
+- ✅ Testing (if configured)
 - ✅ Security audit
 
 ## 🛠️ Troubleshooting
 
 ### "husky not found" Error
+
 Run `npm run prepare` after installing dependencies.
 
 ### Prettier Conflicts with Other Formatters
+
 Add conflicting formatters to `.prettierignore` or configure them to work together.
 
 ### GitHub Actions Not Running
+
 Ensure your repository has Actions enabled in Settings > Actions.
 
 ### Vercel Runtime (Note)
+
 - Prefer auto‑detection of Node from `package.json` `engines` when deploying to Vercel.
 - Avoid hard‑coding a `runtime` value in `vercel.json` unless confirmed against current Vercel docs — incorrect values can break deploys.
 - The template pins Node 20 for local/CI via `.nvmrc`, `engines`, and optional Volta; this is independent of Vercel’s runtime.
@@ -201,6 +213,7 @@ Ensure your repository has Actions enabled in Settings > Actions.
 ## 🔄 Updating
 
 To update an existing project:
+
 ```bash
 npx create-quality-automation@latest --update
 npm install
@@ -211,6 +224,7 @@ The tool safely merges new configurations without overwriting your customization
 ## 🤝 Contributing
 
 Want to improve this template?
+
 1. Fork the repository
 2. Make your changes
 3. Test with a sample project
@@ -223,6 +237,7 @@ MIT License - feel free to use in any project!
 ## 🙋‍♂️ Support
 
 If you run into issues:
+
 1. Check the troubleshooting section above
 2. Review the GitHub Actions logs
 3. Open an issue in this repository

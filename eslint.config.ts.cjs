@@ -12,7 +12,7 @@ try {
 
 const configs = [
   {
-    ignores: ['**/node_modules/**', '**/dist/**', '**/build/**']
+    ignores: ['**/node_modules/**', '**/dist/**', '**/build/**'],
   },
   js.configs.recommended,
   {
@@ -22,11 +22,11 @@ const configs = [
       sourceType: 'module',
       globals: {
         ...globals.browser,
-        ...globals.node
-      }
+        ...globals.node,
+      },
     },
-    rules: {}
-  }
+    rules: {},
+  },
 ]
 
 if (tsPlugin && tsParser) {
@@ -36,19 +36,19 @@ if (tsPlugin && tsParser) {
       parser: tsParser,
       parserOptions: {
         ecmaVersion: 2022,
-        sourceType: 'module'
+        sourceType: 'module',
       },
       globals: {
         ...globals.browser,
-        ...globals.node
-      }
+        ...globals.node,
+      },
     },
     plugins: {
-      '@typescript-eslint': tsPlugin
+      '@typescript-eslint': tsPlugin,
     },
     rules: {
-      ...tsPlugin.configs.recommended.rules
-    }
+      ...tsPlugin.configs.recommended.rules,
+    },
   })
 }
 

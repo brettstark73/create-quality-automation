@@ -3,7 +3,7 @@ const globals = require('globals')
 
 module.exports = [
   {
-    ignores: ['**/node_modules/**', '**/dist/**', '**/build/**']
+    ignores: ['**/node_modules/**', '**/dist/**', '**/build/**'],
   },
   js.configs.recommended,
   {
@@ -13,9 +13,9 @@ module.exports = [
       sourceType: 'module',
       globals: {
         ...globals.browser,
-        ...globals.node
-      }
+        ...globals.node,
+      },
     },
-    rules: {}
-  }
+    rules: {},
+  },
 ]

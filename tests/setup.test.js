@@ -12,7 +12,7 @@ const {
   getDefaultDevDependencies,
   getDefaultLintStaged,
   getDefaultScripts,
-  STYLELINT_EXTENSIONS
+  STYLELINT_EXTENSIONS,
 } = require('../config/defaults')
 
 const createTempProject = initialPackageJson => {
@@ -129,7 +129,10 @@ const assertLintStagedEqual = (actual, expected) => {
   assert.deepStrictEqual(actualKeys, expectedKeys)
 
   expectedKeys.forEach(key => {
-    assert.deepStrictEqual(normalizeArray(actual[key]), normalizeArray(expected[key]))
+    assert.deepStrictEqual(
+      normalizeArray(actual[key]),
+      normalizeArray(expected[key])
+    )
   })
 }
 
@@ -138,14 +141,14 @@ const jsInitialPackageJson = {
   name: 'fixture-project',
   version: '0.1.0',
   scripts: {
-    lint: 'custom lint'
+    lint: 'custom lint',
   },
   devDependencies: {
-    prettier: '^2.0.0'
+    prettier: '^2.0.0',
   },
   'lint-staged': {
-    'package.json': ['custom-command']
-  }
+    'package.json': ['custom-command'],
+  },
 }
 
 const { tempDir: jsProjectDir, initialPackageJson: jsInitial } =
@@ -189,7 +192,10 @@ try {
   const pkgSecond = readJson(path.join(jsProjectDir, 'package.json'))
   const lintStagedSecond = pkgSecond['lint-staged']
   const huskyHookContentsSecond = fs.readFileSync(huskyHookPath, 'utf8')
-  const eslintConfigContentsJsSecond = fs.readFileSync(eslintConfigPathJs, 'utf8')
+  const eslintConfigContentsJsSecond = fs.readFileSync(
+    eslintConfigPathJs,
+    'utf8'
+  )
 
   assert.deepStrictEqual(pkgSecond.scripts, expectedScripts)
   assert.deepStrictEqual(pkgSecond.devDependencies, expectedDevDependencies)
@@ -206,11 +212,11 @@ const tsInitialPackageJson = {
   version: '0.1.0',
   scripts: {},
   devDependencies: {
-    typescript: '^5.4.0'
+    typescript: '^5.4.0',
   },
   'lint-staged': {
-    'src/**/*.ts': ['custom-ts']
-  }
+    'src/**/*.ts': ['custom-ts'],
+  },
 }
 
 const { tempDir: tsProjectDir, initialPackageJson: tsInitial } =
@@ -254,7 +260,10 @@ try {
   runSetup(tsProjectDir)
   const pkgSecond = readJson(path.join(tsProjectDir, 'package.json'))
   const lintStagedSecond = pkgSecond['lint-staged']
-  const eslintConfigContentsTsSecond = fs.readFileSync(eslintConfigPathTs, 'utf8')
+  const eslintConfigContentsTsSecond = fs.readFileSync(
+    eslintConfigPathTs,
+    'utf8'
+  )
 
   assert.deepStrictEqual(pkgSecond.scripts, expectedScripts)
   assert.deepStrictEqual(pkgSecond.devDependencies, expectedDevDependencies)
@@ -270,8 +279,8 @@ const cssInitialPackageJson = {
   version: '0.1.0',
   scripts: {},
   'lint-staged': {
-    'public/**/*.css': ['stylelint --fix']
-  }
+    'public/**/*.css': ['stylelint --fix'],
+  },
 }
 
 const { tempDir: cssProjectDir, initialPackageJson: cssInitial } =
@@ -296,7 +305,9 @@ try {
 
   assertLintStagedEqual(pkg['lint-staged'], expectedLintStaged)
   assert.ok(!pkg['lint-staged'][DEFAULT_STYLELINT_TARGET])
-  assert.deepStrictEqual(pkg['lint-staged']['public/**/*.css'], ['stylelint --fix'])
+  assert.deepStrictEqual(pkg['lint-staged']['public/**/*.css'], [
+    'stylelint --fix',
+  ])
 } finally {
   cleanup(cssProjectDir)
 }

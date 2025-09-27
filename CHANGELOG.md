@@ -7,18 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Changed
-- Broadened Stylelint coverage to include Sass, Less, and PostCSS files while scoping globs to detected CSS directories.
-- Relaxed the default Stylelint ignore list so committed build or public assets are no longer excluded automatically.
+---
 
-### Fixed
-- Preserve existing `lint-staged` CSS patterns so updates avoid replacing custom Stylelint setups.
+## [1.0.1] - 2025-09-27
+
+### Changed
+
+- Enhanced GitHub repository discoverability with comprehensive topic tags
+- Updated repository metadata and documentation alignment
+
+### Improved
+
+- Repository now includes 14 relevant topics for better npm package discovery
+- Homepage URL properly configured for GitHub repository
+
+### Documentation
+
+- Maintained comprehensive README with current feature set
+- CHANGELOG format consistency improvements
 
 ---
 
 ## [1.0.0] - 2024-09-25
 
 ### Added
+
 - 🎉 Initial release as npm package `create-quality-automation`
 - ESLint 9 flat config support (`eslint.config.cjs`)
 - Automatic TypeScript detection and configuration
@@ -33,6 +46,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Idempotent operation - safe to run multiple times
 
 ### Features
+
 - **Smart TypeScript Support**: Automatically detects TypeScript projects and configures `@typescript-eslint`
 - **Modern Tooling**: ESLint 9 flat config, Husky 9, latest Prettier/Stylelint
 - **Graceful Merging**: Preserves existing scripts, dependencies, and lint-staged configs
@@ -40,6 +54,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Update Support**: Re-run with `--update` flag for configuration updates
 
 ### Technical
+
 - Migrated from legacy `.eslintrc.json` to modern `eslint.config.cjs`
 - Replaced deprecated `husky install` with `husky` command
 - Added comprehensive test coverage including idempotency checks
@@ -50,12 +65,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Future Releases
 
 ### Planned for v1.1.0
+
 - commitlint integration for conventional commits
 - Jest/Vitest testing templates
 - React/Vue framework presets
 - Workspace/monorepo support
 
 ### Planned for v1.2.0
+
 - Custom rule presets (strict, relaxed, enterprise)
 - Plugin ecosystem for extended functionality
 - Integration with popular CI providers (CircleCI, GitLab)
@@ -65,9 +82,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Migration Notes
 
 ### From Pre-1.0 Template
+
 If you were using the template repository directly:
 
 1. **New Installation Method**:
+
    ```bash
    # Old way
    node /path/to/template/setup.js

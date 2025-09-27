@@ -2,41 +2,41 @@ name: Quality Checks
 
 on:
   push:
-    branches: [ main, master, develop ]
+    branches: [main, master, develop]
   pull_request:
-    branches: [ main, master, develop ]
+    branches: [main, master, develop]
 
 jobs:
   quality:
     runs-on: ubuntu-latest
-    
+
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
-        cache: 'npm'
-        
-    - name: Install dependencies
-      run: |
-        if [ -f package-lock.json ]; then
-          npm ci
-        else
-          echo "No package-lock.json found; running npm install"
-          npm install
-        fi
-      
-    - name: Prettier check
-      run: npm run format:check
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: ESLint
-      run: npx eslint . --ext .js,.jsx,.ts,.tsx,.html --max-warnings=0
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
 
-    - name: Stylelint
-      run: npx stylelint "**/*.{css,scss,sass,less,pcss}" --allow-empty-input
+      - name: Install dependencies
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci
+          else
+            echo "No package-lock.json found; running npm install"
+            npm install
+          fi
 
-    - name: Security audit (non-blocking)
-      run: npm audit --audit-level=high || true
+      - name: Prettier check
+        run: npm run format:check
+
+      - name: ESLint
+        run: npx eslint . --ext .js,.jsx,.ts,.tsx,.html --max-warnings=0
+
+      - name: Stylelint
+        run: npx stylelint "**/*.{css,scss,sass,less,pcss}" --allow-empty-input
+
+      - name: Security audit (non-blocking)
+        run: npm audit --audit-level=high || true

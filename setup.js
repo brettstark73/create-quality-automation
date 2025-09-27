@@ -8,7 +8,7 @@ const {
   STYLELINT_EXTENSIONS,
   getDefaultDevDependencies,
   getDefaultLintStaged,
-  getDefaultScripts
+  getDefaultScripts,
 } = require('./config/defaults')
 
 const STYLELINT_EXTENSION_SET = new Set(STYLELINT_EXTENSIONS)
@@ -26,7 +26,7 @@ const STYLELINT_SCAN_EXCLUDES = new Set([
   '.cache',
   '.pnpm-store',
   'coverage',
-  'node_modules'
+  'node_modules',
 ])
 const MAX_STYLELINT_SCAN_DEPTH = 4
 
@@ -133,7 +133,9 @@ const patternIncludesStylelintExtension = pattern => {
 const args = process.argv.slice(2)
 const isUpdateMode = args.includes('--update')
 
-console.log(`🚀 ${isUpdateMode ? 'Updating' : 'Setting up'} Quality Automation...\n`)
+console.log(
+  `🚀 ${isUpdateMode ? 'Updating' : 'Setting up'} Quality Automation...\n`
+)
 
 // Check if we're in a git repository
 try {
@@ -158,7 +160,7 @@ if (fs.existsSync(packageJsonPath)) {
     version: '1.0.0',
     description: '',
     main: 'index.js',
-    scripts: {}
+    scripts: {},
   }
 }
 
@@ -174,12 +176,15 @@ const hasTypeScriptConfig = tsconfigCandidates.some(file =>
 
 const usesTypeScript = Boolean(hasTypeScriptDependency || hasTypeScriptConfig)
 if (usesTypeScript) {
-  console.log('🔍 Detected TypeScript configuration; enabling TypeScript lint defaults')
+  console.log(
+    '🔍 Detected TypeScript configuration; enabling TypeScript lint defaults'
+  )
 }
 
 const stylelintTargets = findStylelintTargets(process.cwd())
 const usingDefaultStylelintTarget =
-  stylelintTargets.length === 1 && stylelintTargets[0] === STYLELINT_DEFAULT_TARGET
+  stylelintTargets.length === 1 &&
+  stylelintTargets[0] === STYLELINT_DEFAULT_TARGET
 if (!usingDefaultStylelintTarget) {
   console.log(`🔍 Detected stylelint targets: ${stylelintTargets.join(', ')}`)
 }
@@ -189,7 +194,7 @@ console.log('📝 Adding quality automation scripts...')
 packageJson.scripts = packageJson.scripts || {}
 const defaultScripts = getDefaultScripts({
   typescript: usesTypeScript,
-  stylelintTargets
+  stylelintTargets,
 })
 Object.entries(defaultScripts).forEach(([name, command]) => {
   if (!packageJson.scripts[name]) {
@@ -209,7 +214,9 @@ if (!prepareScript) {
 // Add devDependencies
 console.log('📦 Adding devDependencies...')
 packageJson.devDependencies = packageJson.devDependencies || {}
-const defaultDevDependencies = getDefaultDevDependencies({ typescript: usesTypeScript })
+const defaultDevDependencies = getDefaultDevDependencies({
+  typescript: usesTypeScript,
+})
 Object.entries(defaultDevDependencies).forEach(([dependency, version]) => {
   if (!packageJson.devDependencies[dependency]) {
     packageJson.devDependencies[dependency] = version
@@ -221,7 +228,7 @@ console.log('⚙️ Adding lint-staged configuration...')
 const lintStagedConfig = packageJson['lint-staged'] || {}
 const defaultLintStaged = getDefaultLintStaged({
   typescript: usesTypeScript,
-  stylelintTargets
+  stylelintTargets,
 })
 const stylelintTargetSet = new Set(stylelintTargets)
 const hasExistingCssPatterns = Object.keys(lintStagedConfig).some(
