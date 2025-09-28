@@ -1,6 +1,6 @@
 {
   "name": "create-quality-automation",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Bootstrap quality automation with GitHub Actions, Husky, lint-staged, and Prettier for any project",
   "main": "setup.js",
   "bin": {
@@ -12,6 +12,8 @@
     "format:check": "prettier --check .",
     "lint": "eslint . --ext .js,.jsx,.mjs,.cjs,.html && stylelint \"**/*.{css,scss,sass,less,pcss}\" --allow-empty-input",
     "lint:fix": "eslint . --ext .js,.jsx,.mjs,.cjs,.html --fix && stylelint \"**/*.{css,scss,sass,less,pcss}\" --fix --allow-empty-input",
+    "security:audit": "npm audit --audit-level high",
+    "security:secrets": "node -e \"const fs=require('fs');const content=fs.readFileSync('package.json','utf8');if(/[\\\"\\'][a-zA-Z0-9+/]{20,}[\\\"\\']/.test(content)){console.error('❌ Potential hardcoded secrets in package.json');process.exit(1)}else{console.log('✅ No secrets detected in package.json')}\"",
     "test": "node tests/setup.test.js",
     "setup": "node setup.js"
   },
@@ -54,13 +56,14 @@
     "node": ">=20"
   },
   "devDependencies": {
+    "eslint": "^9.12.0",
+    "eslint-plugin-security": "^3.0.1",
+    "globals": "^15.9.0",
     "husky": "^9.1.4",
     "lint-staged": "^15.2.10",
     "prettier": "^3.3.3",
-    "eslint": "^9.12.0",
     "stylelint": "^16.8.0",
-    "stylelint-config-standard": "^37.0.0",
-    "globals": "^15.9.0"
+    "stylelint-config-standard": "^37.0.0"
   },
   "volta": {
     "node": "20.11.1",

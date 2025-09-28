@@ -9,6 +9,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.1.0] - 2025-09-27
+
+### Added
+
+- **🔒 Enhanced Security Automation**: Comprehensive security scanning in GitHub Actions workflow
+- **Blocking Security Audit**: npm audit now fails CI on high-severity vulnerabilities (removed `|| true`)
+- **Hardcoded Secrets Detection**: Automated scanning for exposed passwords, API keys, and private keys
+- **Improved CI Security**: Pattern matching for common secret formats and cryptographic keys
+
+### Changed
+
+- Updated GitHub Actions workflow template to enforce security standards
+- Security checks now block deployments when vulnerabilities or secrets are detected
+
+### Security
+
+- Eliminated security bypass in npm audit (previously non-blocking)
+- Added comprehensive secret pattern detection including:
+  - Password/token/key assignments with long values
+  - PEM-formatted private keys
+  - Configurable exclusions for node_modules and .git directories
+
+---
+
 ## [1.0.1] - 2025-09-27
 
 ### Changed

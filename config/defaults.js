@@ -9,6 +9,9 @@ const DEFAULT_STYLELINT_TARGET = `**/*.{${STYLELINT_EXTENSIONS.join(',')}}`
 const baseScripts = {
   format: 'prettier --write .',
   'format:check': 'prettier --check .',
+  'security:audit': 'npm audit --audit-level high',
+  'security:secrets':
+    "node -e \"const fs=require('fs');const content=fs.readFileSync('package.json','utf8');if(/[\\\"\\'][a-zA-Z0-9+/]{20,}[\\\"\\']/.test(content)){console.error('❌ Potential hardcoded secrets in package.json');process.exit(1)}else{console.log('✅ No secrets detected in package.json')}\"",
 }
 
 const normalizeStylelintTargets = stylelintTargets => {
@@ -42,6 +45,7 @@ const baseDevDependencies = {
   'lint-staged': '^15.2.10',
   prettier: '^3.3.3',
   eslint: '^9.12.0',
+  'eslint-plugin-security': '^3.0.1',
   globals: '^15.9.0',
   stylelint: '^16.8.0',
   'stylelint-config-standard': '^37.0.0',

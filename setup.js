@@ -129,9 +129,41 @@ const patternIncludesStylelintExtension = pattern => {
   return STYLELINT_EXTENSIONS.some(ext => lower.includes(`.${ext}`))
 }
 
-// CLI argument parsing
+// Input validation and sanitization functions from WFHroulette patterns
+const validateAndSanitizeInput = input => {
+  if (typeof input !== 'string') {
+    throw new Error('Input must be a string')
+  }
+  // Normalize and trim input
+  const normalized = input.trim()
+  if (normalized.length === 0) {
+    return null
+  }
+  // Basic sanitization - remove potentially dangerous characters
+  const sanitized = normalized.replace(/[<>'"&]/g, '')
+  return sanitized
+}
+
+// Keeping validateDirectory for future use and security best practices
+// eslint-disable-next-line no-unused-vars
+const validateDirectory = dirPath => {
+  if (!dirPath || typeof dirPath !== 'string') {
+    throw new Error('Directory path must be a valid string')
+  }
+  // Prevent path traversal attacks
+  const normalized = path.normalize(dirPath)
+  if (normalized.includes('..') || normalized.startsWith('/')) {
+    throw new Error('Invalid directory path: path traversal detected')
+  }
+  return normalized
+}
+
+// CLI argument parsing with validation
 const args = process.argv.slice(2)
-const isUpdateMode = args.includes('--update')
+const sanitizedArgs = args
+  .map(arg => validateAndSanitizeInput(arg))
+  .filter(Boolean)
+const isUpdateMode = sanitizedArgs.includes('--update')
 
 console.log(
   `🚀 ${isUpdateMode ? 'Updating' : 'Setting up'} Quality Automation...\n`
@@ -146,17 +178,48 @@ try {
   process.exit(1)
 }
 
-// Check if package.json exists
+// Check if package.json exists with validation
 const packageJsonPath = path.join(process.cwd(), 'package.json')
 let packageJson = {}
 
 if (fs.existsSync(packageJsonPath)) {
-  packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'))
-  console.log('✅ Found existing package.json')
+  try {
+    const packageJsonContent = fs.readFileSync(packageJsonPath, 'utf8')
+    // Validate JSON content before parsing
+    if (packageJsonContent.trim().length === 0) {
+      console.error('❌ package.json is empty')
+      console.log('Please add valid JSON content to package.json and try again.')
+      process.exit(1)
+    }
+
+    packageJson = JSON.parse(packageJsonContent)
+
+    // Validate package.json structure
+    if (typeof packageJson !== 'object' || packageJson === null) {
+      console.error('❌ package.json must contain a valid JSON object')
+      console.log('Please fix the package.json structure and try again.')
+      process.exit(1)
+    }
+
+    // Sanitize package name if present
+    if (packageJson.name && typeof packageJson.name === 'string') {
+      packageJson.name =
+        validateAndSanitizeInput(packageJson.name) || 'my-project'
+    }
+
+    console.log('✅ Found existing package.json')
+  } catch (error) {
+    console.error(`❌ Error parsing package.json: ${error.message}`)
+    console.log('Please fix the JSON syntax in package.json and try again.')
+    console.log('Common issues: trailing commas, missing quotes, unclosed brackets')
+    process.exit(1)
+  }
 } else {
   console.log('📦 Creating new package.json')
+  const projectName =
+    validateAndSanitizeInput(path.basename(process.cwd())) || 'my-project'
   packageJson = {
-    name: path.basename(process.cwd()),
+    name: projectName,
     version: '1.0.0',
     description: '',
     main: 'index.js',
@@ -263,9 +326,19 @@ Object.entries(defaultLintStaged).forEach(([pattern, commands]) => {
 })
 packageJson['lint-staged'] = lintStagedConfig
 
-// Write updated package.json
-fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2))
-console.log('✅ Updated package.json')
+// Write updated package.json with validation
+try {
+  const jsonString = JSON.stringify(packageJson, null, 2)
+  // Validate the JSON string before writing
+  if (jsonString.length === 0) {
+    throw new Error('Generated package.json is empty')
+  }
+  fs.writeFileSync(packageJsonPath, jsonString)
+  console.log('✅ Updated package.json')
+} catch (error) {
+  console.error(`❌ Error writing package.json: ${error.message}`)
+  process.exit(1)
+}
 
 // Ensure Node toolchain pinning in target project
 const nvmrcPath = path.join(process.cwd(), '.nvmrc')

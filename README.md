@@ -11,6 +11,7 @@ Bootstrap quality automation in any project with GitHub Actions, Husky pre-commi
 - **📦 One Command Setup** - `npx create-quality-automation@latest`
 - **🔄 TypeScript Smart** - Auto-detects and configures TypeScript projects
 - **🆕 Modern Tooling** - ESLint 9 flat config, Husky 9, latest dependencies
+- **🔒 Security Automation** - Blocking npm audit and hardcoded secrets scanning
 
 ## 🚀 Quick Start
 
@@ -186,9 +187,9 @@ The workflow runs on:
 It performs:
 
 - ✅ Prettier formatting check
-- ✅ Linting (if configured)
-- ✅ Testing (if configured)
-- ✅ Security audit
+- ✅ ESLint and Stylelint checks
+- ✅ Blocking security audit (npm audit)
+- ✅ Hardcoded secrets scanning
 
 ## 🛠️ Troubleshooting
 
