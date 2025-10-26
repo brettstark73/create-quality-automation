@@ -1,4 +1,6 @@
 #!/usr/bin/env node
+/* eslint-disable security/detect-object-injection */
+/* eslint-disable security/detect-non-literal-fs-filename */
 
 const fs = require('fs')
 const path = require('path')
@@ -188,7 +190,9 @@ if (fs.existsSync(packageJsonPath)) {
     // Validate JSON content before parsing
     if (packageJsonContent.trim().length === 0) {
       console.error('❌ package.json is empty')
-      console.log('Please add valid JSON content to package.json and try again.')
+      console.log(
+        'Please add valid JSON content to package.json and try again.'
+      )
       process.exit(1)
     }
 
@@ -211,7 +215,9 @@ if (fs.existsSync(packageJsonPath)) {
   } catch (error) {
     console.error(`❌ Error parsing package.json: ${error.message}`)
     console.log('Please fix the JSON syntax in package.json and try again.')
-    console.log('Common issues: trailing commas, missing quotes, unclosed brackets')
+    console.log(
+      'Common issues: trailing commas, missing quotes, unclosed brackets'
+    )
     process.exit(1)
   }
 } else {
@@ -242,6 +248,26 @@ if (usesTypeScript) {
   console.log(
     '🔍 Detected TypeScript configuration; enabling TypeScript lint defaults'
   )
+}
+
+// Python detection
+const pythonCandidates = [
+  'pyproject.toml',
+  'setup.py',
+  'requirements.txt',
+  'poetry.lock',
+]
+const hasPythonConfig = pythonCandidates.some(file =>
+  fs.existsSync(path.join(process.cwd(), file))
+)
+
+const hasPythonFiles = safeReadDir(process.cwd()).some(
+  dirent => dirent.isFile() && dirent.name.endsWith('.py')
+)
+
+const usesPython = Boolean(hasPythonConfig || hasPythonFiles)
+if (usesPython) {
+  console.log('🐍 Detected Python project; enabling Python quality automation')
 }
 
 const stylelintTargets = findStylelintTargets(process.cwd())
@@ -434,11 +460,12 @@ if (!fs.existsSync(prettierignorePath)) {
 
 // Copy ESLint ignore if it doesn't exist
 const eslintignorePath = path.join(process.cwd(), '.eslintignore')
-if (!fs.existsSync(eslintignorePath)) {
-  const templateEslintIgnore = fs.readFileSync(
-    path.join(__dirname, '.eslintignore'),
-    'utf8'
-  )
+const templateEslintIgnorePath = path.join(__dirname, '.eslintignore')
+if (
+  !fs.existsSync(eslintignorePath) &&
+  fs.existsSync(templateEslintIgnorePath)
+) {
+  const templateEslintIgnore = fs.readFileSync(templateEslintIgnorePath, 'utf8')
   fs.writeFileSync(eslintignorePath, templateEslintIgnore)
   console.log('✅ Added ESLint ignore file')
 }
@@ -483,11 +510,112 @@ try {
   console.warn('⚠️ Could not update engines/volta in package.json:', e.message)
 }
 
+// Python quality automation setup
+if (usesPython) {
+  console.log('\n🐍 Setting up Python quality automation...')
+
+  // Copy pyproject.toml if it doesn't exist
+  const pyprojectPath = path.join(process.cwd(), 'pyproject.toml')
+  if (!fs.existsSync(pyprojectPath)) {
+    const templatePyproject = fs.readFileSync(
+      path.join(__dirname, 'config/pyproject.toml'),
+      'utf8'
+    )
+    fs.writeFileSync(pyprojectPath, templatePyproject)
+    console.log('✅ Added pyproject.toml with Black, Ruff, isort, mypy config')
+  }
+
+  // Copy pre-commit config
+  const preCommitPath = path.join(process.cwd(), '.pre-commit-config.yaml')
+  if (!fs.existsSync(preCommitPath)) {
+    const templatePreCommit = fs.readFileSync(
+      path.join(__dirname, 'config/.pre-commit-config.yaml'),
+      'utf8'
+    )
+    fs.writeFileSync(preCommitPath, templatePreCommit)
+    console.log('✅ Added .pre-commit-config.yaml')
+  }
+
+  // Copy requirements-dev.txt
+  const requirementsDevPath = path.join(process.cwd(), 'requirements-dev.txt')
+  if (!fs.existsSync(requirementsDevPath)) {
+    const templateRequirements = fs.readFileSync(
+      path.join(__dirname, 'config/requirements-dev.txt'),
+      'utf8'
+    )
+    fs.writeFileSync(requirementsDevPath, templateRequirements)
+    console.log('✅ Added requirements-dev.txt')
+  }
+
+  // Copy Python workflow
+  const pythonWorkflowFile = path.join(workflowDir, 'quality-python.yml')
+  if (!fs.existsSync(pythonWorkflowFile)) {
+    const templatePythonWorkflow = fs.readFileSync(
+      path.join(__dirname, 'config/quality-python.yml'),
+      'utf8'
+    )
+    fs.writeFileSync(pythonWorkflowFile, templatePythonWorkflow)
+    console.log('✅ Added Python GitHub Actions workflow')
+  }
+
+  // Create tests directory if it doesn't exist
+  const testsDir = path.join(process.cwd(), 'tests')
+  if (!fs.existsSync(testsDir)) {
+    fs.mkdirSync(testsDir)
+    fs.writeFileSync(path.join(testsDir, '__init__.py'), '')
+    console.log('✅ Created tests directory')
+  }
+
+  // Add Python helper scripts to package.json if it exists and is a JS/TS project too
+  if (fs.existsSync(packageJsonPath)) {
+    try {
+      const pkg = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'))
+      const pythonScripts = {
+        'python:format': 'black .',
+        'python:format:check': 'black --check .',
+        'python:lint': 'ruff check .',
+        'python:lint:fix': 'ruff check --fix .',
+        'python:type-check': 'mypy .',
+        'python:quality':
+          'black --check . && ruff check . && isort --check-only . && mypy .',
+        'python:test': 'pytest',
+      }
+
+      pkg.scripts = { ...pkg.scripts, ...pythonScripts }
+      fs.writeFileSync(packageJsonPath, JSON.stringify(pkg, null, 2))
+      console.log('✅ Added Python helper scripts to package.json')
+    } catch (e) {
+      console.warn(
+        '⚠️ Could not add Python scripts to package.json:',
+        e.message
+      )
+    }
+  }
+}
+
 console.log('\n🎉 Quality automation setup complete!')
+
+// Dynamic next steps based on detected languages
 console.log('\n📋 Next steps:')
-console.log('1. Run: npm install')
-console.log('2. Run: npm run prepare')
-console.log('3. Commit your changes to activate the workflow')
+
+if (usesPython && fs.existsSync(packageJsonPath)) {
+  console.log('JavaScript/TypeScript setup:')
+  console.log('1. Run: npm install')
+  console.log('2. Run: npm run prepare')
+  console.log('\nPython setup:')
+  console.log('3. Run: python3 -m pip install -r requirements-dev.txt')
+  console.log('4. Run: pre-commit install')
+  console.log('\n5. Commit your changes to activate both workflows')
+} else if (usesPython) {
+  console.log('Python setup:')
+  console.log('1. Run: python3 -m pip install -r requirements-dev.txt')
+  console.log('2. Run: pre-commit install')
+  console.log('3. Commit your changes to activate the workflow')
+} else {
+  console.log('1. Run: npm install')
+  console.log('2. Run: npm run prepare')
+  console.log('3. Commit your changes to activate the workflow')
+}
 console.log('\n✨ Your project now has:')
 console.log('  • Prettier code formatting')
 console.log('  • Pre-commit hooks via Husky')

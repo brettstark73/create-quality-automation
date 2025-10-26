@@ -1,7 +1,7 @@
 {
   "name": "create-quality-automation",
-  "version": "1.1.1",
-  "description": "Bootstrap quality automation with GitHub Actions, Husky, lint-staged, and Prettier for any project",
+  "version": "2.0.0",
+  "description": "Bootstrap quality automation for JavaScript/TypeScript and Python projects with GitHub Actions, pre-commit hooks, linting, and formatting",
   "main": "setup.js",
   "bin": {
     "create-quality-automation": "./setup.js"
@@ -26,7 +26,14 @@
     "github-actions",
     "template",
     "bootstrap",
-    "scaffold"
+    "scaffold",
+    "python",
+    "javascript",
+    "typescript",
+    "black",
+    "ruff",
+    "mypy",
+    "pre-commit"
   ],
   "author": "Brett Stark",
   "license": "MIT",
@@ -38,7 +45,6 @@
     ".prettierignore",
     "eslint.config.cjs",
     "eslint.config.ts.cjs",
-    ".eslintignore",
     ".stylelintrc.json",
     ".editorconfig",
     ".nvmrc",
@@ -46,12 +52,12 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/brettstark73/create-quality-automation.git"
+    "url": "git+https://github.com/brettstark73/quality-automation-template.git"
   },
   "bugs": {
-    "url": "https://github.com/brettstark73/create-quality-automation/issues"
+    "url": "https://github.com/brettstark73/quality-automation-template/issues"
   },
-  "homepage": "https://github.com/brettstark73/create-quality-automation#readme",
+  "homepage": "https://github.com/brettstark73/quality-automation-template#readme",
   "engines": {
     "node": ">=20"
   },
@@ -82,6 +88,17 @@
     ],
     "!(node_modules)/**/*.{js,jsx,mjs,cjs,html}": [
       "eslint --fix",
+      "prettier --write"
+    ],
+    "**/*.{js,jsx,mjs,cjs,html}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "**/*.{json,md,yml,yaml}": [
+      "prettier --write"
+    ],
+    "**/*.{css,scss,sass,less,pcss}": [
+      "stylelint --fix",
       "prettier --write"
     ]
   }
