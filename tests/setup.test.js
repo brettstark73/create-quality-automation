@@ -428,6 +428,29 @@ try {
     'Should have python:lint script'
   )
 
+  // Check lint-staged includes Python files
+  assert.strictEqual(
+    '**/*.py' in pythonPackageJson['lint-staged'],
+    true,
+    'Should have lint-staged config for Python files'
+  )
+  const pythonLintStaged = pythonPackageJson['lint-staged']['**/*.py']
+  assert.strictEqual(
+    Array.isArray(pythonLintStaged),
+    true,
+    'Python lint-staged should be array'
+  )
+  assert.strictEqual(
+    pythonLintStaged.includes('black --check --diff'),
+    true,
+    'Should include black'
+  )
+  assert.strictEqual(
+    pythonLintStaged.includes('ruff check --fix'),
+    true,
+    'Should include ruff'
+  )
+
   console.log('✅ Python project setup working correctly!')
 } catch (error) {
   console.error('❌ Python setup test failed:', error.message)
