@@ -1,4 +1,6 @@
 'use strict'
+/* eslint-disable security/detect-object-injection */
+/* eslint-disable security/detect-non-literal-fs-filename */
 
 const assert = require('assert')
 const fs = require('fs')
@@ -243,7 +245,7 @@ try {
   const eslintConfigPathJs = expectFile(jsProjectDir, 'eslint.config.cjs')
   expectFile(jsProjectDir, '.stylelintrc.json')
   expectFile(jsProjectDir, '.prettierignore')
-  expectFile(jsProjectDir, '.eslintignore')
+  // .eslintignore is optional (ignores are in eslint.config.cjs)
   expectFile(jsProjectDir, '.editorconfig')
   expectFile(jsProjectDir, '.github/workflows/quality.yml')
 
@@ -374,6 +376,67 @@ try {
   ])
 } finally {
   cleanup(cssProjectDir)
+}
+
+// Test Python project setup
+console.log('\n🐍 Testing Python project setup...')
+
+const pythonProjectDir = path.join(os.tmpdir(), 'test-python-setup')
+try {
+  fs.mkdirSync(pythonProjectDir, { recursive: true })
+
+  // Create a Python file to trigger detection
+  fs.writeFileSync(
+    path.join(pythonProjectDir, 'main.py'),
+    'print("hello world")'
+  )
+
+  // Initialize git (required by setup script)
+  execSync('git init', { cwd: pythonProjectDir, stdio: 'ignore' })
+
+  // Run setup script
+  execFileSync('node', [setupScript], {
+    cwd: pythonProjectDir,
+    stdio: 'ignore',
+  })
+
+  // Check Python-specific files were created
+  expectFile(pythonProjectDir, 'pyproject.toml')
+  expectFile(pythonProjectDir, '.pre-commit-config.yaml')
+  expectFile(pythonProjectDir, 'requirements-dev.txt')
+  expectFile(pythonProjectDir, '.github/workflows/quality-python.yml')
+  expectFile(pythonProjectDir, 'tests/__init__.py')
+
+  // Check package.json has Python scripts
+  const pythonPackageJsonPath = path.join(pythonProjectDir, 'package.json')
+  assert.strictEqual(
+    fs.existsSync(pythonPackageJsonPath),
+    true,
+    'package.json should exist'
+  )
+  const pythonPackageJson = JSON.parse(
+    fs.readFileSync(pythonPackageJsonPath, 'utf8')
+  )
+  assert.strictEqual(
+    'python:format' in pythonPackageJson.scripts,
+    true,
+    'Should have python:format script'
+  )
+  assert.strictEqual(
+    'python:lint' in pythonPackageJson.scripts,
+    true,
+    'Should have python:lint script'
+  )
+
+  console.log('✅ Python project setup working correctly!')
+} catch (error) {
+  console.error('❌ Python setup test failed:', error.message)
+  process.exit(1)
+} finally {
+  // Clean up
+  if (fs.existsSync(pythonProjectDir)) {
+    execSync(`rm -rf "${pythonProjectDir}"`, { stdio: 'ignore' })
+  }
 }
 
 // Security pattern tests

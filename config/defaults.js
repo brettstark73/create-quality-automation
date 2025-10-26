@@ -1,4 +1,5 @@
 'use strict'
+/* eslint-disable security/detect-object-injection */
 
 const JS_LINT_EXTENSIONS = '.js,.jsx,.mjs,.cjs,.html'
 const TS_LINT_EXTENSIONS = '.js,.jsx,.mjs,.cjs,.ts,.tsx,.html'
