@@ -57,7 +57,7 @@ const typeScriptDevDependencies = {
   '@typescript-eslint/parser': '^8.9.0',
 }
 
-const baseLintStaged = (patterns, stylelintTargets) => {
+const baseLintStaged = (patterns, stylelintTargets, usesPython = false) => {
   const lintStaged = {
     'package.json': ['prettier --write'],
     [patterns]: ['eslint --fix', 'prettier --write'],
@@ -67,6 +67,15 @@ const baseLintStaged = (patterns, stylelintTargets) => {
   normalizeStylelintTargets(stylelintTargets).forEach(target => {
     lintStaged[target] = ['stylelint --fix', 'prettier --write']
   })
+
+  // Add Python lint-staged support if Python is detected
+  if (usesPython) {
+    lintStaged['**/*.py'] = [
+      'black --check --diff',
+      'ruff check --fix',
+      'isort --check-only --diff',
+    ]
+  }
 
   return lintStaged
 }
@@ -92,9 +101,9 @@ function getDefaultDevDependencies({ typescript } = {}) {
   return devDeps
 }
 
-function getDefaultLintStaged({ typescript, stylelintTargets } = {}) {
+function getDefaultLintStaged({ typescript, stylelintTargets, python } = {}) {
   const pattern = typescript ? TS_LINT_STAGED_PATTERN : JS_LINT_STAGED_PATTERN
-  return clone(baseLintStaged(pattern, stylelintTargets))
+  return clone(baseLintStaged(pattern, stylelintTargets, python))
 }
 
 module.exports = {

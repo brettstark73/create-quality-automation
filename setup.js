@@ -318,6 +318,7 @@ const lintStagedConfig = packageJson['lint-staged'] || {}
 const defaultLintStaged = getDefaultLintStaged({
   typescript: usesTypeScript,
   stylelintTargets,
+  python: usesPython,
 })
 const stylelintTargetSet = new Set(stylelintTargets)
 const hasExistingCssPatterns = Object.keys(lintStagedConfig).some(
