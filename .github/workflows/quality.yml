@@ -102,3 +102,14 @@ jobs:
 
           # Clean up temp file
           rm -f /tmp/unvalidated_inputs.txt
+
+      - name: Lighthouse CI
+        run: |
+          # Only run Lighthouse CI if configuration exists
+          if [ -f ".lighthouserc.js" ] || [ -f ".lighthouserc.json" ] || [ -f "lighthouserc.js" ]; then
+            echo "🚢 Running Lighthouse CI..."
+            npx lhci autorun
+          else
+            echo "⏭️ No Lighthouse CI configuration found, skipping"
+          fi
+        continue-on-error: true

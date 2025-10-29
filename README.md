@@ -1,6 +1,6 @@
 # Create Quality Automation 🚀
 
-Bootstrap quality automation in any project with GitHub Actions, Husky pre-commit hooks, lint-staged, and Prettier formatting. Modern ESLint 9 flat config with automatic TypeScript support.
+Bootstrap quality automation in any project with GitHub Actions, Husky pre-commit hooks, lint-staged, and Prettier formatting. Modern ESLint 9 flat config with automatic TypeScript and Python support.
 
 ## ✨ Features
 
@@ -10,6 +10,8 @@ Bootstrap quality automation in any project with GitHub Actions, Husky pre-commi
 - **🤖 GitHub Actions** - Automated quality checks in CI/CD
 - **📦 One Command Setup** - `npx create-quality-automation@latest`
 - **🔄 TypeScript Smart** - Auto-detects and configures TypeScript projects
+- **🐍 Python Support** - Complete Python toolchain with Black, Ruff, isort, mypy, pytest
+- **🚢 Lighthouse CI** - SEO and performance checking with configurable thresholds
 - **🆕 Modern Tooling** - ESLint 9 flat config, Husky 9, latest dependencies
 - **🔒 Security Automation** - Blocking npm audit and hardcoded secrets scanning
 
@@ -65,6 +67,8 @@ git add . && git commit -m "feat: initial commit with quality tools"
 
 ## 📁 What Gets Added to Your Project
 
+### JavaScript/TypeScript Projects
+
 ```
 your-project/
 ├── .github/
@@ -74,8 +78,22 @@ your-project/
 ├── eslint.config.cjs          # ESLint flat config (JS)
 ├── .prettierrc               # Prettier configuration
 ├── .prettierignore            # Files to ignore in formatting
+├── .lighthouserc.js           # Lighthouse CI configuration (SEO/performance)
 ├── .husky/                     # Pre-commit hooks (created after setup)
 └── package.json                # Updated with scripts and dependencies
+```
+
+### Python Projects (additional files)
+
+```
+your-project/
+├── .github/
+│   └── workflows/
+│       └── quality-python.yml   # Python-specific GitHub Actions
+├── .pre-commit-config.yaml     # Python pre-commit hooks
+├── pyproject.toml              # Python project configuration
+├── requirements-dev.txt        # Python development dependencies
+└── package.json                # Python helper scripts (for hybrid projects)
 ```
 
 ## ⚙️ Configuration
@@ -161,6 +179,27 @@ The CLI scans your repository for existing CSS, Sass, Less, and PostCSS files so
      run: npx tsc --noEmit
    ```
 
+### Python Project Configuration
+
+The tool automatically detects Python projects and configures appropriate tooling:
+
+**Detection criteria** (any of these):
+
+- `.py` files in the project
+- `pyproject.toml` file exists
+- `requirements.txt` or `requirements-dev.txt` exists
+
+**Python tools configured**:
+
+- **Black** - Code formatting
+- **Ruff** - Fast linting and import sorting
+- **isort** - Import statement organization
+- **mypy** - Static type checking
+- **pytest** - Testing framework
+
+**For Python-only projects**: Uses `.pre-commit-config.yaml` with Python hooks
+**For hybrid JS/Python projects**: Adds Python patterns to lint-staged configuration
+
 ### Adding Testing
 
 - The template ships with an integration smoke test (`npm test`) that exercises `setup.js` end-to-end.
@@ -171,11 +210,23 @@ The CLI scans your repository for existing CSS, Sass, Less, and PostCSS files so
 
 After setup, your project will have these scripts:
 
+### JavaScript/TypeScript
+
 - `npm run format` - Format all files with Prettier
 - `npm run format:check` - Check if files are formatted (used in CI)
 - `npm run prepare` - Set up Husky hooks (run after npm install)
 - `npm run lint` / `npm run lint:fix` - ESLint flat config (auto-extending to TS) + Stylelint
+- `npm run security:audit` - Check for security vulnerabilities
+- `npm run security:secrets` - Scan for hardcoded secrets
+- `npm run lighthouse:ci` - Run Lighthouse CI performance/SEO checks
 - `npm test` - Runs the bootstrap regression test (customize per project)
+
+### Python (added to hybrid projects)
+
+- `npm run python:format` - Format Python code with Black
+- `npm run python:lint` - Lint Python code with Ruff
+- `npm run python:type-check` - Type check with mypy
+- `npm run python:test` - Run Python tests with pytest
 
 ## 🤖 GitHub Actions Workflow
 
@@ -184,12 +235,23 @@ The workflow runs on:
 - Push to `main`, `master`, or `develop` branches
 - Pull requests to those branches
 
-It performs:
+### JavaScript/TypeScript Projects (`quality.yml`)
 
 - ✅ Prettier formatting check
 - ✅ ESLint and Stylelint checks
 - ✅ Blocking security audit (npm audit)
 - ✅ Hardcoded secrets scanning
+- ✅ XSS vulnerability pattern detection
+- ✅ Input validation checks
+- ✅ Lighthouse CI (SEO and performance)
+
+### Python Projects (`quality-python.yml`)
+
+- ✅ Black code formatting check
+- ✅ Ruff linting and import sorting
+- ✅ mypy type checking
+- ✅ pytest test execution
+- ✅ Security scanning for Python-specific patterns
 
 ## 🛠️ Troubleshooting
 
