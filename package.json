@@ -14,9 +14,13 @@
     "lint:fix": "eslint . --ext .js,.jsx,.mjs,.cjs,.html --fix && stylelint \"**/*.{css,scss,sass,less,pcss}\" --fix --allow-empty-input",
     "security:audit": "npm audit --audit-level high",
     "security:secrets": "node -e \"const fs=require('fs');const content=fs.readFileSync('package.json','utf8');if(/[\\\"\\'][a-zA-Z0-9+/]{20,}[\\\"\\']/.test(content)){console.error('❌ Potential hardcoded secrets in package.json');process.exit(1)}else{console.log('✅ No secrets detected in package.json')}\"",
+    "security:config": "node setup.js --security-config",
+    "validate:docs": "node setup.js --validate-docs",
+    "validate:comprehensive": "node setup.js --comprehensive",
+    "validate:all": "npm run validate:comprehensive && npm run security:audit",
     "test": "node tests/setup.test.js",
     "docs:check": "bash scripts/check-docs.sh",
-    "prerelease": "npm run docs:check && npm test",
+    "prerelease": "npm run docs:check && npm run validate:comprehensive && npm test",
     "setup": "node setup.js"
   },
   "keywords": [
