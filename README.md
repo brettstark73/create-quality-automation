@@ -1,6 +1,6 @@
 # Create Quality Automation 🚀
 
-Bootstrap quality automation in any project with GitHub Actions, Husky pre-commit hooks, lint-staged, and Prettier formatting. Modern ESLint 9 flat config with automatic TypeScript and Python support.
+Bootstrap quality automation in JavaScript/TypeScript and Python projects with comprehensive tooling. Features GitHub Actions, pre-commit hooks, lint-staged processing, security scanning, SEO validation, and multi-language support with smart project detection.
 
 ## ✨ Features
 
@@ -67,7 +67,7 @@ git add . && git commit -m "feat: initial commit with quality tools"
 
 ## 📁 What Gets Added to Your Project
 
-### JavaScript/TypeScript Projects
+### All Projects (Base Configuration)
 
 ```
 your-project/
@@ -75,12 +75,24 @@ your-project/
 │   └── workflows/
 │       └── quality.yml          # GitHub Actions workflow
 ├── .editorconfig              # Editor defaults
-├── eslint.config.cjs          # ESLint flat config (JS)
+├── .eslintignore              # ESLint ignore patterns
+├── .nvmrc                     # Node version pinning
+├── .npmrc                     # npm configuration (engine-strict)
 ├── .prettierrc               # Prettier configuration
 ├── .prettierignore            # Files to ignore in formatting
+├── .stylelintrc.json          # Stylelint CSS/SCSS rules
 ├── .lighthouserc.js           # Lighthouse CI configuration (SEO/performance)
-├── .husky/                     # Pre-commit hooks (created after setup)
+├── eslint.config.cjs          # ESLint flat config (JavaScript)
+├── .husky/                     # Pre-commit hooks (created after npm run prepare)
 └── package.json                # Updated with scripts and dependencies
+```
+
+### TypeScript Projects (additional files)
+
+```
+your-project/
+├── eslint.config.ts.cjs       # ESLint flat config with TypeScript support
+└── package.json                # Enhanced with TypeScript-aware lint-staged patterns
 ```
 
 ### Python Projects (additional files)
@@ -93,6 +105,8 @@ your-project/
 ├── .pre-commit-config.yaml     # Python pre-commit hooks
 ├── pyproject.toml              # Python project configuration
 ├── requirements-dev.txt        # Python development dependencies
+├── tests/
+│   └── __init__.py             # Python test package marker
 └── package.json                # Python helper scripts (for hybrid projects)
 ```
 
@@ -200,6 +214,53 @@ The tool automatically detects Python projects and configures appropriate toolin
 **For Python-only projects**: Uses `.pre-commit-config.yaml` with Python hooks
 **For hybrid JS/Python projects**: Adds Python patterns to lint-staged configuration
 
+### Lighthouse CI Configuration
+
+Lighthouse CI provides automated SEO and performance monitoring:
+
+**Features configured**:
+
+- **SEO Score Validation** - Minimum 90% SEO score requirement
+- **Performance Budgets** - Core Web Vitals monitoring (FCP, LCP, CLS)
+- **Accessibility Checks** - Color contrast, alt text, HTML structure
+- **Best Practices** - Meta descriptions, canonical URLs, structured data
+
+**Configuration** (`.lighthouserc.js`):
+
+```javascript
+// Performance thresholds
+'categories:performance': ['warn', { minScore: 0.8 }]
+'categories:seo': ['error', { minScore: 0.9 }]
+'first-contentful-paint': ['warn', { maxNumericValue: 2000 }]
+'largest-contentful-paint': ['warn', { maxNumericValue: 4000 }]
+```
+
+**Usage**: Lighthouse CI runs automatically in GitHub Actions when `.lighthouserc.js` exists
+
+### Security Automation Features
+
+Comprehensive security scanning built into the workflow:
+
+**Vulnerability Detection**:
+
+- **npm audit** - Blocks deployment on high-severity vulnerabilities
+- **Hardcoded secrets** - Scans for exposed passwords, API keys, tokens
+- **XSS patterns** - Detects dangerous innerHTML, eval, document.write usage
+- **Input validation** - Warns about unvalidated user inputs
+
+**Security patterns checked**:
+
+```bash
+# XSS vulnerability patterns
+innerHTML.*\${  # Template literal injection
+eval\(.*\${     # Code injection via eval
+onclick.*\${    # Event handler injection
+
+# Secret detection patterns
+password|secret|key|token.*[=:].*['"][^'"]{8,}  # Long credential values
+-----BEGIN.*KEY-----                            # PEM private keys
+```
+
 ### Adding Testing
 
 - The template ships with an integration smoke test (`npm test`) that exercises `setup.js` end-to-end.
@@ -228,30 +289,50 @@ After setup, your project will have these scripts:
 - `npm run python:type-check` - Type check with mypy
 - `npm run python:test` - Run Python tests with pytest
 
-## 🤖 GitHub Actions Workflow
+## 🤖 GitHub Actions Workflows
 
-The workflow runs on:
+### Trigger Conditions
+
+Both workflows run on:
 
 - Push to `main`, `master`, or `develop` branches
 - Pull requests to those branches
 
-### JavaScript/TypeScript Projects (`quality.yml`)
+### JavaScript/TypeScript Workflow (`quality.yml`)
 
-- ✅ Prettier formatting check
-- ✅ ESLint and Stylelint checks
-- ✅ Blocking security audit (npm audit)
-- ✅ Hardcoded secrets scanning
-- ✅ XSS vulnerability pattern detection
-- ✅ Input validation checks
-- ✅ Lighthouse CI (SEO and performance)
+**Code Quality Steps**:
 
-### Python Projects (`quality-python.yml`)
+- ✅ **Node.js Setup** - Uses Node 20 with npm caching
+- ✅ **Dependency Installation** - Smart npm ci/install detection
+- ✅ **Prettier Check** - Enforces consistent formatting
+- ✅ **ESLint** - JavaScript/TypeScript linting with zero warnings
+- ✅ **Stylelint** - CSS/SCSS/Sass/Less/PostCSS validation
 
-- ✅ Black code formatting check
-- ✅ Ruff linting and import sorting
-- ✅ mypy type checking
-- ✅ pytest test execution
-- ✅ Security scanning for Python-specific patterns
+**Security Steps**:
+
+- ✅ **Security Audit** - npm audit with high-severity blocking
+- ✅ **Hardcoded Secrets Detection** - Pattern matching for exposed credentials
+- ✅ **XSS Vulnerability Scanning** - innerHTML, eval, document.write patterns
+- ✅ **Input Validation Analysis** - Unvalidated user input warnings
+
+**Performance & SEO** (when configured):
+
+- ✅ **Lighthouse CI** - Automated SEO score validation and Core Web Vitals
+
+### Python Workflow (`quality-python.yml`)
+
+**Code Quality Steps**:
+
+- ✅ **Python Setup** - Uses Python 3.9+ with pip caching
+- ✅ **Dependency Installation** - Installs from requirements-dev.txt
+- ✅ **Black Formatting** - Code style enforcement
+- ✅ **Ruff Linting** - Fast Python linting and import sorting
+- ✅ **mypy Type Checking** - Static type validation
+- ✅ **pytest Execution** - Test suite validation
+
+**Security Steps**:
+
+- ✅ **Python Security Patterns** - Python-specific vulnerability detection
 
 ## 🛠️ Troubleshooting
 
