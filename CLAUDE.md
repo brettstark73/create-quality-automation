@@ -40,6 +40,21 @@ This project uses Brett Stark's global Claude Code configuration with specific a
 - Supports Node.js ≥20 with Volta configuration
 - Package is published to npm as an unscoped CLI (`create-quality-automation`)
 
+## Release Process
+
+**CRITICAL**: Before any version bump or npm publish, ALWAYS run:
+
+```bash
+npm run prerelease  # Runs docs:check + tests
+```
+
+This catches documentation gaps that manual review misses. Also reference:
+
+- `.github/RELEASE_CHECKLIST.md` - Comprehensive pre-release checklist
+- `scripts/check-docs.sh` - Automated documentation consistency verification
+
+**Why this matters**: Documentation gaps weren't caught in v2.1.0 release because we relied on manual memory instead of systematic verification.
+
 ---
 
 _Inherits all global preferences from Brett Stark's universal Claude Code configuration_
