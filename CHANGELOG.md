@@ -9,6 +9,49 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.2.0] - 2025-10-29
+
+### Added
+
+- **🔍 Configuration Security Scanner**: Detects client-side secret exposure in Next.js and Vite configs
+- **📖 Documentation Accuracy Validator**: Ensures README file references and npm scripts actually exist
+- **🎯 Enhanced CLI Commands**: New validation-only commands for targeted checks
+- **🔧 Enhanced npm Scripts**: Template projects get comprehensive validation scripts
+
+### New CLI Commands
+
+- `npx create-quality-automation@latest --security-config` - Run configuration security scan
+- `npx create-quality-automation@latest --validate-docs` - Validate documentation accuracy
+- `npx create-quality-automation@latest --comprehensive` - Run all validation checks
+
+### Enhanced GitHub Actions
+
+- Configuration security validation in CI/CD pipeline
+- Documentation accuracy checks for pull requests
+- Fallback security checks for projects without setup.js
+
+### Security Features
+
+- **Next.js Security**: Detects secrets in `env` blocks that expose to client bundle
+- **Vite Security**: Identifies `VITE_` prefixed secrets that are client-exposed
+- **Docker Security**: Scans Dockerfiles for hardcoded secrets in ENV statements
+- **Environment Security**: Validates .env file .gitignore patterns
+
+### Documentation Features
+
+- **File Reference Validation**: Checks that referenced files actually exist
+- **Script Reference Validation**: Ensures documented npm scripts are available
+- **Version Consistency**: Validates package.json version appears in CHANGELOG
+- **Technology Alignment**: Checks description accuracy with detected technologies
+
+### Testing
+
+- **Comprehensive Test Suite**: Full test coverage for all validation features
+- **Integration Tests**: End-to-end validation of security and documentation checks
+- **Error Case Testing**: Validates that insecure configurations are properly caught
+
+---
+
 ## [2.1.0] - 2025-10-28
 
 ### Added

@@ -567,3 +567,10 @@ assert.strictEqual(
 )
 
 console.log('✅ Input validation detection working correctly!')
+
+// Run enhanced validation tests
+const { testValidation } = require('./validation.test.js')
+testValidation().catch(error => {
+  console.error('❌ Enhanced validation tests failed:', error.message)
+  process.exit(1)
+})
