@@ -9,6 +9,80 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.1.0] - 2025-10-28
+
+### Added
+
+- **🚢 Lighthouse CI Integration**: SEO and performance checking with configurable thresholds
+- **SEO Validation**: Automated checking for meta descriptions, document titles, canonical URLs, and structured data
+- **Performance Budgets**: Configurable thresholds for Core Web Vitals and accessibility scores
+
+### Changed
+
+- Enhanced GitHub Actions workflow with Lighthouse CI support
+- Added `@lhci/cli` dependency for SEO and performance automation
+- Setup script now creates `.lighthouserc.js` configuration automatically
+
+### Documentation
+
+- Updated README.md with comprehensive Python and Lighthouse CI documentation
+- Added complete v2.0.0 and v2.0.1 release notes to CHANGELOG.md
+- Enhanced feature documentation for multi-language support
+
+---
+
+## [2.0.1] - 2025-10-26
+
+### Fixed
+
+- **🐍 Enhanced Python lint-staged Integration**: Python files now get automatic quality checks on commit
+- **Restored .eslintignore**: Added back for consistency (even though deprecated in ESLint 9)
+- **Standardized Python Dependencies**: Using `~=` version pinning instead of `>=` for better stability
+
+### Added
+
+- Python lint-staged support for `.py` files with Black, Ruff, and isort
+- Enhanced test coverage for Python lint-staged functionality
+
+### Improved
+
+- Python files now work with both Husky + lint-staged (JS/TS projects) and pre-commit hooks (Python-only)
+- Better version consistency across Python toolchain dependencies
+
+---
+
+## [2.0.0] - 2025-10-26
+
+### Added
+
+- **🐍 Complete Python Support**: Full Python project detection and automation
+- **Python Toolchain**: Black, Ruff, isort, mypy, pytest integration
+- **Pre-commit Hooks**: Python-specific `.pre-commit-config.yaml` for Python projects
+- **Dedicated Python Workflow**: `quality-python.yml` GitHub Actions workflow
+- **Multi-language Projects**: Support for full-stack JavaScript + Python projects
+- **Python Helper Scripts**: Additional package.json scripts for hybrid projects
+
+### Infrastructure
+
+- **Updated GitHub Actions**: Latest action versions (checkout@v5, setup-node@v6)
+- **Enhanced Security**: Python-specific security pattern detection
+- **Repository URLs**: Fixed package.json repository URLs
+- **Comprehensive Testing**: Test coverage for Python functionality
+
+### Technical
+
+- **Project Detection**: Automatic detection via `.py` files, `pyproject.toml`, `requirements.txt`
+- **Smart Configuration**: Python tooling only added to Python projects
+- **Template Files**: `pyproject.toml`, `.pre-commit-config.yaml`, `requirements-dev.txt`
+- **Workflow Integration**: Python quality checks run alongside JavaScript checks
+
+### Breaking Changes
+
+- **Removed Deprecated Files**: `.eslintignore` removed (restored in 2.0.1)
+- **Enhanced Detection**: More comprehensive project type detection
+
+---
+
 ## [1.1.0] - 2025-09-27
 
 ### Added
@@ -88,14 +162,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Future Releases
 
-### Planned for v1.1.0
+### Planned for v2.1.0
 
 - commitlint integration for conventional commits
 - Jest/Vitest testing templates
 - React/Vue framework presets
 - Workspace/monorepo support
 
-### Planned for v1.2.0
+### Planned for v2.2.0
 
 - Custom rule presets (strict, relaxed, enterprise)
 - Plugin ecosystem for extended functionality

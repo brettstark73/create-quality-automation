@@ -459,6 +459,17 @@ if (!fs.existsSync(prettierignorePath)) {
   console.log('✅ Added Prettier ignore file')
 }
 
+// Copy Lighthouse CI config if it doesn't exist
+const lighthousercPath = path.join(process.cwd(), '.lighthouserc.js')
+if (!fs.existsSync(lighthousercPath)) {
+  const templateLighthouserc = fs.readFileSync(
+    path.join(__dirname, 'config', '.lighthouserc.js'),
+    'utf8'
+  )
+  fs.writeFileSync(lighthousercPath, templateLighthouserc)
+  console.log('✅ Added Lighthouse CI configuration')
+}
+
 // Copy ESLint ignore if it doesn't exist
 const eslintignorePath = path.join(process.cwd(), '.eslintignore')
 const templateEslintIgnorePath = path.join(__dirname, '.eslintignore')
