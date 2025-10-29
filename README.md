@@ -48,6 +48,25 @@ npm install
 npm run lint
 ```
 
+### Validation Commands (v2.2.0+)
+
+```bash
+# Validate configuration security (detects Next.js/Vite secret exposure)
+npx create-quality-automation@latest --security-config
+
+# Validate documentation accuracy (README file references, npm scripts)
+npx create-quality-automation@latest --validate-docs
+
+# Run comprehensive validation (security + documentation + more)
+npx create-quality-automation@latest --comprehensive
+
+# For existing projects with setup, use npm scripts:
+npm run security:config        # Configuration security check
+npm run validate:docs          # Documentation validation
+npm run validate:comprehensive # Full validation suite
+npm run validate:all          # Validation + security audit
+```
+
 ### New Project from Scratch
 
 ```bash
@@ -279,8 +298,15 @@ After setup, your project will have these scripts:
 - `npm run lint` / `npm run lint:fix` - ESLint flat config (auto-extending to TS) + Stylelint
 - `npm run security:audit` - Check for security vulnerabilities
 - `npm run security:secrets` - Scan for hardcoded secrets
+- `npm run security:config` - Check configuration security (Next.js/Vite secret exposure)
 - `npm run lighthouse:ci` - Run Lighthouse CI performance/SEO checks
 - `npm test` - Runs the bootstrap regression test (customize per project)
+
+### Enhanced Validation (v2.2.0+)
+
+- `npm run validate:docs` - Validate documentation accuracy (README file references, npm scripts)
+- `npm run validate:comprehensive` - Run all validation checks (security + documentation)
+- `npm run validate:all` - Full validation suite including security audit
 
 ### Python (added to hybrid projects)
 

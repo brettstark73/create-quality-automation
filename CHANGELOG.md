@@ -205,18 +205,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Future Releases
 
-### Planned for v2.1.0
+### Planned for v2.3.0
+
+- Runtime validation framework (selective implementation)
+- Build process validation
+- Template compilation checks
+- Enhanced CI/CD integration
+
+### Planned for v2.4.0
 
 - commitlint integration for conventional commits
 - Jest/Vitest testing templates
 - React/Vue framework presets
 - Workspace/monorepo support
 
-### Planned for v2.2.0
+### Planned for v3.0.0
 
 - Custom rule presets (strict, relaxed, enterprise)
 - Plugin ecosystem for extended functionality
 - Integration with popular CI providers (CircleCI, GitLab)
+- Quality metrics dashboard
 
 ---
 
