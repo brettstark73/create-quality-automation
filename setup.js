@@ -13,6 +13,9 @@ const {
   getDefaultScripts,
 } = require('./config/defaults')
 
+// Enhanced validation capabilities
+const { ValidationRunner } = require('./lib/validation')
+
 const STYLELINT_EXTENSION_SET = new Set(STYLELINT_EXTENSIONS)
 const STYLELINT_DEFAULT_TARGET = `**/*.{${STYLELINT_EXTENSIONS.join(',')}}`
 const STYLELINT_EXTENSION_GLOB = `*.{${STYLELINT_EXTENSIONS.join(',')}}`
@@ -166,470 +169,544 @@ const sanitizedArgs = args
   .map(arg => validateAndSanitizeInput(arg))
   .filter(Boolean)
 const isUpdateMode = sanitizedArgs.includes('--update')
+const isValidationMode = sanitizedArgs.includes('--validate')
+const isConfigSecurityMode = sanitizedArgs.includes('--security-config')
+const isDocsValidationMode = sanitizedArgs.includes('--validate-docs')
+const isComprehensiveMode = sanitizedArgs.includes('--comprehensive')
 
 console.log(
   `🚀 ${isUpdateMode ? 'Updating' : 'Setting up'} Quality Automation...\n`
 )
 
-// Check if we're in a git repository
-try {
-  execSync('git status', { stdio: 'ignore' })
-} catch {
-  console.error('❌ This must be run in a git repository')
-  console.log('Run "git init" first, then try again.')
-  process.exit(1)
-}
+// Handle validation-only commands
+async function handleValidationCommands() {
+  const validator = new ValidationRunner()
 
-// Check if package.json exists with validation
-const packageJsonPath = path.join(process.cwd(), 'package.json')
-let packageJson = {}
-
-if (fs.existsSync(packageJsonPath)) {
-  try {
-    const packageJsonContent = fs.readFileSync(packageJsonPath, 'utf8')
-    // Validate JSON content before parsing
-    if (packageJsonContent.trim().length === 0) {
-      console.error('❌ package.json is empty')
-      console.log(
-        'Please add valid JSON content to package.json and try again.'
+  if (isConfigSecurityMode) {
+    try {
+      await validator.runConfigSecurity()
+      process.exit(0)
+    } catch (error) {
+      console.error(
+        `\n❌ Configuration security validation failed:\n${error.message}`
       )
       process.exit(1)
     }
+  }
 
-    packageJson = JSON.parse(packageJsonContent)
-
-    // Validate package.json structure
-    if (typeof packageJson !== 'object' || packageJson === null) {
-      console.error('❌ package.json must contain a valid JSON object')
-      console.log('Please fix the package.json structure and try again.')
+  if (isDocsValidationMode) {
+    try {
+      await validator.runDocumentationValidation()
+      process.exit(0)
+    } catch (error) {
+      console.error(`\n❌ Documentation validation failed:\n${error.message}`)
       process.exit(1)
     }
+  }
 
-    // Sanitize package name if present
-    if (packageJson.name && typeof packageJson.name === 'string') {
-      packageJson.name =
-        validateAndSanitizeInput(packageJson.name) || 'my-project'
+  if (isComprehensiveMode || isValidationMode) {
+    try {
+      await validator.runComprehensiveCheck()
+      process.exit(0)
+    } catch (error) {
+      console.error(`\n❌ Comprehensive validation failed:\n${error.message}`)
+      process.exit(1)
     }
+  }
+}
 
-    console.log('✅ Found existing package.json')
-  } catch (error) {
-    console.error(`❌ Error parsing package.json: ${error.message}`)
-    console.log('Please fix the JSON syntax in package.json and try again.')
-    console.log(
-      'Common issues: trailing commas, missing quotes, unclosed brackets'
-    )
+// Run validation commands if requested
+if (
+  isValidationMode ||
+  isConfigSecurityMode ||
+  isDocsValidationMode ||
+  isComprehensiveMode
+) {
+  // Handle validation commands and exit
+  ;(async () => {
+    try {
+      await handleValidationCommands()
+    } catch (error) {
+      console.error('Validation error:', error.message)
+      process.exit(1)
+    }
+  })()
+} else {
+  // Normal setup flow
+
+  // Check if we're in a git repository
+  try {
+    execSync('git status', { stdio: 'ignore' })
+  } catch {
+    console.error('❌ This must be run in a git repository')
+    console.log('Run "git init" first, then try again.')
     process.exit(1)
   }
-} else {
-  console.log('📦 Creating new package.json')
-  const projectName =
-    validateAndSanitizeInput(path.basename(process.cwd())) || 'my-project'
-  packageJson = {
-    name: projectName,
-    version: '1.0.0',
-    description: '',
-    main: 'index.js',
-    scripts: {},
-  }
-}
 
-const hasTypeScriptDependency = Boolean(
-  (packageJson.devDependencies && packageJson.devDependencies.typescript) ||
-    (packageJson.dependencies && packageJson.dependencies.typescript)
-)
+  // Check if package.json exists with validation
+  const packageJsonPath = path.join(process.cwd(), 'package.json')
+  let packageJson = {}
 
-const tsconfigCandidates = ['tsconfig.json', 'tsconfig.base.json']
-const hasTypeScriptConfig = tsconfigCandidates.some(file =>
-  fs.existsSync(path.join(process.cwd(), file))
-)
-
-const usesTypeScript = Boolean(hasTypeScriptDependency || hasTypeScriptConfig)
-if (usesTypeScript) {
-  console.log(
-    '🔍 Detected TypeScript configuration; enabling TypeScript lint defaults'
-  )
-}
-
-// Python detection
-const pythonCandidates = [
-  'pyproject.toml',
-  'setup.py',
-  'requirements.txt',
-  'poetry.lock',
-]
-const hasPythonConfig = pythonCandidates.some(file =>
-  fs.existsSync(path.join(process.cwd(), file))
-)
-
-const hasPythonFiles = safeReadDir(process.cwd()).some(
-  dirent => dirent.isFile() && dirent.name.endsWith('.py')
-)
-
-const usesPython = Boolean(hasPythonConfig || hasPythonFiles)
-if (usesPython) {
-  console.log('🐍 Detected Python project; enabling Python quality automation')
-}
-
-const stylelintTargets = findStylelintTargets(process.cwd())
-const usingDefaultStylelintTarget =
-  stylelintTargets.length === 1 &&
-  stylelintTargets[0] === STYLELINT_DEFAULT_TARGET
-if (!usingDefaultStylelintTarget) {
-  console.log(`🔍 Detected stylelint targets: ${stylelintTargets.join(', ')}`)
-}
-
-// Add quality automation scripts (conservative: do not overwrite existing)
-console.log('📝 Adding quality automation scripts...')
-packageJson.scripts = packageJson.scripts || {}
-const defaultScripts = getDefaultScripts({
-  typescript: usesTypeScript,
-  stylelintTargets,
-})
-Object.entries(defaultScripts).forEach(([name, command]) => {
-  if (!packageJson.scripts[name]) {
-    packageJson.scripts[name] = command
-  }
-})
-// prepare: ensure husky command is present
-const prepareScript = packageJson.scripts.prepare
-if (!prepareScript) {
-  packageJson.scripts.prepare = 'husky'
-} else if (prepareScript.includes('husky install')) {
-  packageJson.scripts.prepare = prepareScript.replace(/husky install/g, 'husky')
-} else if (!prepareScript.includes('husky')) {
-  packageJson.scripts.prepare = `${prepareScript} && husky`
-}
-
-// Add devDependencies
-console.log('📦 Adding devDependencies...')
-packageJson.devDependencies = packageJson.devDependencies || {}
-const defaultDevDependencies = getDefaultDevDependencies({
-  typescript: usesTypeScript,
-})
-Object.entries(defaultDevDependencies).forEach(([dependency, version]) => {
-  if (!packageJson.devDependencies[dependency]) {
-    packageJson.devDependencies[dependency] = version
-  }
-})
-
-// Add lint-staged configuration
-console.log('⚙️ Adding lint-staged configuration...')
-const lintStagedConfig = packageJson['lint-staged'] || {}
-const defaultLintStaged = getDefaultLintStaged({
-  typescript: usesTypeScript,
-  stylelintTargets,
-  python: usesPython,
-})
-const stylelintTargetSet = new Set(stylelintTargets)
-const hasExistingCssPatterns = Object.keys(lintStagedConfig).some(
-  patternIncludesStylelintExtension
-)
-
-if (hasExistingCssPatterns) {
-  console.log(
-    'ℹ️ Detected existing lint-staged CSS globs; preserving current CSS targets'
-  )
-}
-
-Object.entries(defaultLintStaged).forEach(([pattern, commands]) => {
-  const isStylelintPattern = stylelintTargetSet.has(pattern)
-  if (isStylelintPattern && hasExistingCssPatterns) {
-    return
-  }
-  if (!lintStagedConfig[pattern]) {
-    lintStagedConfig[pattern] = commands
-    return
-  }
-  const existing = Array.isArray(lintStagedConfig[pattern])
-    ? [...lintStagedConfig[pattern]]
-    : [lintStagedConfig[pattern]]
-  const merged = [...existing]
-  commands.forEach(command => {
-    if (!merged.includes(command)) {
-      merged.push(command)
-    }
-  })
-  lintStagedConfig[pattern] = merged
-})
-packageJson['lint-staged'] = lintStagedConfig
-
-// Write updated package.json with validation
-try {
-  const jsonString = JSON.stringify(packageJson, null, 2)
-  // Validate the JSON string before writing
-  if (jsonString.length === 0) {
-    throw new Error('Generated package.json is empty')
-  }
-  fs.writeFileSync(packageJsonPath, jsonString)
-  console.log('✅ Updated package.json')
-} catch (error) {
-  console.error(`❌ Error writing package.json: ${error.message}`)
-  process.exit(1)
-}
-
-// Ensure Node toolchain pinning in target project
-const nvmrcPath = path.join(process.cwd(), '.nvmrc')
-if (!fs.existsSync(nvmrcPath)) {
-  fs.writeFileSync(nvmrcPath, '20\n')
-  console.log('✅ Added .nvmrc (Node 20)')
-}
-
-const npmrcPath = path.join(process.cwd(), '.npmrc')
-if (!fs.existsSync(npmrcPath)) {
-  fs.writeFileSync(npmrcPath, 'engine-strict = true\n')
-  console.log('✅ Added .npmrc (engine-strict)')
-}
-
-// Create .github/workflows directory if it doesn't exist
-const workflowDir = path.join(process.cwd(), '.github', 'workflows')
-if (!fs.existsSync(workflowDir)) {
-  fs.mkdirSync(workflowDir, { recursive: true })
-  console.log('📁 Created .github/workflows directory')
-}
-
-// Copy workflow file if it doesn't exist
-const workflowFile = path.join(workflowDir, 'quality.yml')
-if (!fs.existsSync(workflowFile)) {
-  const templateWorkflow = fs.readFileSync(
-    path.join(__dirname, '.github/workflows/quality.yml'),
-    'utf8'
-  )
-  fs.writeFileSync(workflowFile, templateWorkflow)
-  console.log('✅ Added GitHub Actions workflow')
-}
-
-// Copy Prettier config if it doesn't exist
-const prettierrcPath = path.join(process.cwd(), '.prettierrc')
-if (!fs.existsSync(prettierrcPath)) {
-  const templatePrettierrc = fs.readFileSync(
-    path.join(__dirname, '.prettierrc'),
-    'utf8'
-  )
-  fs.writeFileSync(prettierrcPath, templatePrettierrc)
-  console.log('✅ Added Prettier configuration')
-}
-
-// Copy ESLint config if it doesn't exist
-const eslintConfigPath = path.join(process.cwd(), 'eslint.config.cjs')
-const templateEslintPath = path.join(
-  __dirname,
-  usesTypeScript ? 'eslint.config.ts.cjs' : 'eslint.config.cjs'
-)
-const templateEslint = fs.readFileSync(templateEslintPath, 'utf8')
-
-if (!fs.existsSync(eslintConfigPath)) {
-  fs.writeFileSync(eslintConfigPath, templateEslint)
-  console.log(
-    `✅ Added ESLint configuration${usesTypeScript ? ' (TypeScript-aware)' : ''}`
-  )
-} else if (usesTypeScript) {
-  const existingConfig = fs.readFileSync(eslintConfigPath, 'utf8')
-  if (!existingConfig.includes('@typescript-eslint')) {
-    fs.writeFileSync(eslintConfigPath, templateEslint)
-    console.log('♻️ Updated ESLint configuration with TypeScript support')
-  }
-}
-
-const legacyEslintrcPath = path.join(process.cwd(), '.eslintrc.json')
-if (fs.existsSync(legacyEslintrcPath)) {
-  console.log(
-    'ℹ️ Detected legacy .eslintrc.json; ESLint 9 prefers eslint.config.cjs. Consider removing the legacy file after verifying the new config.'
-  )
-}
-
-// Copy Stylelint config if it doesn't exist
-const stylelintrcPath = path.join(process.cwd(), '.stylelintrc.json')
-if (!fs.existsSync(stylelintrcPath)) {
-  const templateStylelint = fs.readFileSync(
-    path.join(__dirname, '.stylelintrc.json'),
-    'utf8'
-  )
-  fs.writeFileSync(stylelintrcPath, templateStylelint)
-  console.log('✅ Added Stylelint configuration')
-}
-
-// Copy .prettierignore if it doesn't exist
-const prettierignorePath = path.join(process.cwd(), '.prettierignore')
-if (!fs.existsSync(prettierignorePath)) {
-  const templatePrettierignore = fs.readFileSync(
-    path.join(__dirname, '.prettierignore'),
-    'utf8'
-  )
-  fs.writeFileSync(prettierignorePath, templatePrettierignore)
-  console.log('✅ Added Prettier ignore file')
-}
-
-// Copy Lighthouse CI config if it doesn't exist
-const lighthousercPath = path.join(process.cwd(), '.lighthouserc.js')
-if (!fs.existsSync(lighthousercPath)) {
-  const templateLighthouserc = fs.readFileSync(
-    path.join(__dirname, 'config', '.lighthouserc.js'),
-    'utf8'
-  )
-  fs.writeFileSync(lighthousercPath, templateLighthouserc)
-  console.log('✅ Added Lighthouse CI configuration')
-}
-
-// Copy ESLint ignore if it doesn't exist
-const eslintignorePath = path.join(process.cwd(), '.eslintignore')
-const templateEslintIgnorePath = path.join(__dirname, '.eslintignore')
-if (
-  !fs.existsSync(eslintignorePath) &&
-  fs.existsSync(templateEslintIgnorePath)
-) {
-  const templateEslintIgnore = fs.readFileSync(templateEslintIgnorePath, 'utf8')
-  fs.writeFileSync(eslintignorePath, templateEslintIgnore)
-  console.log('✅ Added ESLint ignore file')
-}
-
-// Copy .editorconfig if it doesn't exist
-const editorconfigPath = path.join(process.cwd(), '.editorconfig')
-if (!fs.existsSync(editorconfigPath)) {
-  const templateEditorconfig = fs.readFileSync(
-    path.join(__dirname, '.editorconfig'),
-    'utf8'
-  )
-  fs.writeFileSync(editorconfigPath, templateEditorconfig)
-  console.log('✅ Added .editorconfig')
-}
-
-// Ensure Husky pre-commit hook runs lint-staged
-try {
-  const huskyDir = path.join(process.cwd(), '.husky')
-  if (!fs.existsSync(huskyDir)) {
-    fs.mkdirSync(huskyDir, { recursive: true })
-  }
-  const preCommitPath = path.join(huskyDir, 'pre-commit')
-  if (!fs.existsSync(preCommitPath)) {
-    const hook =
-      '#!/bin/sh\n. "$(dirname "$0")/_/husky.sh"\n\n# Run lint-staged on staged files\nnpx --no -- lint-staged\n'
-    fs.writeFileSync(preCommitPath, hook)
-    fs.chmodSync(preCommitPath, 0o755)
-    console.log('✅ Added Husky pre-commit hook (lint-staged)')
-  }
-} catch (e) {
-  console.warn('⚠️ Could not create Husky pre-commit hook:', e.message)
-}
-
-// Ensure engines/volta pins in target package.json (non-destructive)
-try {
-  const pkg = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'))
-  pkg.engines = { node: '>=20', ...(pkg.engines || {}) }
-  pkg.volta = { node: '20.11.1', npm: '10.2.4', ...(pkg.volta || {}) }
-  fs.writeFileSync(packageJsonPath, JSON.stringify(pkg, null, 2))
-  console.log('✅ Ensured engines and Volta pins in package.json')
-} catch (e) {
-  console.warn('⚠️ Could not update engines/volta in package.json:', e.message)
-}
-
-// Python quality automation setup
-if (usesPython) {
-  console.log('\n🐍 Setting up Python quality automation...')
-
-  // Copy pyproject.toml if it doesn't exist
-  const pyprojectPath = path.join(process.cwd(), 'pyproject.toml')
-  if (!fs.existsSync(pyprojectPath)) {
-    const templatePyproject = fs.readFileSync(
-      path.join(__dirname, 'config/pyproject.toml'),
-      'utf8'
-    )
-    fs.writeFileSync(pyprojectPath, templatePyproject)
-    console.log('✅ Added pyproject.toml with Black, Ruff, isort, mypy config')
-  }
-
-  // Copy pre-commit config
-  const preCommitPath = path.join(process.cwd(), '.pre-commit-config.yaml')
-  if (!fs.existsSync(preCommitPath)) {
-    const templatePreCommit = fs.readFileSync(
-      path.join(__dirname, 'config/.pre-commit-config.yaml'),
-      'utf8'
-    )
-    fs.writeFileSync(preCommitPath, templatePreCommit)
-    console.log('✅ Added .pre-commit-config.yaml')
-  }
-
-  // Copy requirements-dev.txt
-  const requirementsDevPath = path.join(process.cwd(), 'requirements-dev.txt')
-  if (!fs.existsSync(requirementsDevPath)) {
-    const templateRequirements = fs.readFileSync(
-      path.join(__dirname, 'config/requirements-dev.txt'),
-      'utf8'
-    )
-    fs.writeFileSync(requirementsDevPath, templateRequirements)
-    console.log('✅ Added requirements-dev.txt')
-  }
-
-  // Copy Python workflow
-  const pythonWorkflowFile = path.join(workflowDir, 'quality-python.yml')
-  if (!fs.existsSync(pythonWorkflowFile)) {
-    const templatePythonWorkflow = fs.readFileSync(
-      path.join(__dirname, 'config/quality-python.yml'),
-      'utf8'
-    )
-    fs.writeFileSync(pythonWorkflowFile, templatePythonWorkflow)
-    console.log('✅ Added Python GitHub Actions workflow')
-  }
-
-  // Create tests directory if it doesn't exist
-  const testsDir = path.join(process.cwd(), 'tests')
-  if (!fs.existsSync(testsDir)) {
-    fs.mkdirSync(testsDir)
-    fs.writeFileSync(path.join(testsDir, '__init__.py'), '')
-    console.log('✅ Created tests directory')
-  }
-
-  // Add Python helper scripts to package.json if it exists and is a JS/TS project too
   if (fs.existsSync(packageJsonPath)) {
     try {
-      const pkg = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'))
-      const pythonScripts = {
-        'python:format': 'black .',
-        'python:format:check': 'black --check .',
-        'python:lint': 'ruff check .',
-        'python:lint:fix': 'ruff check --fix .',
-        'python:type-check': 'mypy .',
-        'python:quality':
-          'black --check . && ruff check . && isort --check-only . && mypy .',
-        'python:test': 'pytest',
+      const packageJsonContent = fs.readFileSync(packageJsonPath, 'utf8')
+      // Validate JSON content before parsing
+      if (packageJsonContent.trim().length === 0) {
+        console.error('❌ package.json is empty')
+        console.log(
+          'Please add valid JSON content to package.json and try again.'
+        )
+        process.exit(1)
       }
 
-      pkg.scripts = { ...pkg.scripts, ...pythonScripts }
-      fs.writeFileSync(packageJsonPath, JSON.stringify(pkg, null, 2))
-      console.log('✅ Added Python helper scripts to package.json')
-    } catch (e) {
-      console.warn(
-        '⚠️ Could not add Python scripts to package.json:',
-        e.message
+      packageJson = JSON.parse(packageJsonContent)
+
+      // Validate package.json structure
+      if (typeof packageJson !== 'object' || packageJson === null) {
+        console.error('❌ package.json must contain a valid JSON object')
+        console.log('Please fix the package.json structure and try again.')
+        process.exit(1)
+      }
+
+      // Sanitize package name if present
+      if (packageJson.name && typeof packageJson.name === 'string') {
+        packageJson.name =
+          validateAndSanitizeInput(packageJson.name) || 'my-project'
+      }
+
+      console.log('✅ Found existing package.json')
+    } catch (error) {
+      console.error(`❌ Error parsing package.json: ${error.message}`)
+      console.log('Please fix the JSON syntax in package.json and try again.')
+      console.log(
+        'Common issues: trailing commas, missing quotes, unclosed brackets'
       )
+      process.exit(1)
+    }
+  } else {
+    console.log('📦 Creating new package.json')
+    const projectName =
+      validateAndSanitizeInput(path.basename(process.cwd())) || 'my-project'
+    packageJson = {
+      name: projectName,
+      version: '1.0.0',
+      description: '',
+      main: 'index.js',
+      scripts: {},
     }
   }
-}
 
-console.log('\n🎉 Quality automation setup complete!')
+  const hasTypeScriptDependency = Boolean(
+    (packageJson.devDependencies && packageJson.devDependencies.typescript) ||
+      (packageJson.dependencies && packageJson.dependencies.typescript)
+  )
 
-// Dynamic next steps based on detected languages
-console.log('\n📋 Next steps:')
+  const tsconfigCandidates = ['tsconfig.json', 'tsconfig.base.json']
+  const hasTypeScriptConfig = tsconfigCandidates.some(file =>
+    fs.existsSync(path.join(process.cwd(), file))
+  )
 
-if (usesPython && fs.existsSync(packageJsonPath)) {
-  console.log('JavaScript/TypeScript setup:')
-  console.log('1. Run: npm install')
-  console.log('2. Run: npm run prepare')
-  console.log('\nPython setup:')
-  console.log('3. Run: python3 -m pip install -r requirements-dev.txt')
-  console.log('4. Run: pre-commit install')
-  console.log('\n5. Commit your changes to activate both workflows')
-} else if (usesPython) {
-  console.log('Python setup:')
-  console.log('1. Run: python3 -m pip install -r requirements-dev.txt')
-  console.log('2. Run: pre-commit install')
-  console.log('3. Commit your changes to activate the workflow')
-} else {
-  console.log('1. Run: npm install')
-  console.log('2. Run: npm run prepare')
-  console.log('3. Commit your changes to activate the workflow')
-}
-console.log('\n✨ Your project now has:')
-console.log('  • Prettier code formatting')
-console.log('  • Pre-commit hooks via Husky')
-console.log('  • GitHub Actions quality checks')
-console.log('  • Lint-staged for efficient processing')
+  const usesTypeScript = Boolean(hasTypeScriptDependency || hasTypeScriptConfig)
+  if (usesTypeScript) {
+    console.log(
+      '🔍 Detected TypeScript configuration; enabling TypeScript lint defaults'
+    )
+  }
+
+  // Python detection
+  const pythonCandidates = [
+    'pyproject.toml',
+    'setup.py',
+    'requirements.txt',
+    'poetry.lock',
+  ]
+  const hasPythonConfig = pythonCandidates.some(file =>
+    fs.existsSync(path.join(process.cwd(), file))
+  )
+
+  const hasPythonFiles = safeReadDir(process.cwd()).some(
+    dirent => dirent.isFile() && dirent.name.endsWith('.py')
+  )
+
+  const usesPython = Boolean(hasPythonConfig || hasPythonFiles)
+  if (usesPython) {
+    console.log(
+      '🐍 Detected Python project; enabling Python quality automation'
+    )
+  }
+
+  const stylelintTargets = findStylelintTargets(process.cwd())
+  const usingDefaultStylelintTarget =
+    stylelintTargets.length === 1 &&
+    stylelintTargets[0] === STYLELINT_DEFAULT_TARGET
+  if (!usingDefaultStylelintTarget) {
+    console.log(`🔍 Detected stylelint targets: ${stylelintTargets.join(', ')}`)
+  }
+
+  // Add quality automation scripts (conservative: do not overwrite existing)
+  console.log('📝 Adding quality automation scripts...')
+  packageJson.scripts = packageJson.scripts || {}
+  const defaultScripts = getDefaultScripts({
+    typescript: usesTypeScript,
+    stylelintTargets,
+  })
+  Object.entries(defaultScripts).forEach(([name, command]) => {
+    if (!packageJson.scripts[name]) {
+      packageJson.scripts[name] = command
+    }
+  })
+  // prepare: ensure husky command is present
+  const prepareScript = packageJson.scripts.prepare
+  if (!prepareScript) {
+    packageJson.scripts.prepare = 'husky'
+  } else if (prepareScript.includes('husky install')) {
+    packageJson.scripts.prepare = prepareScript.replace(
+      /husky install/g,
+      'husky'
+    )
+  } else if (!prepareScript.includes('husky')) {
+    packageJson.scripts.prepare = `${prepareScript} && husky`
+  }
+
+  // Add devDependencies
+  console.log('📦 Adding devDependencies...')
+  packageJson.devDependencies = packageJson.devDependencies || {}
+  const defaultDevDependencies = getDefaultDevDependencies({
+    typescript: usesTypeScript,
+  })
+  Object.entries(defaultDevDependencies).forEach(([dependency, version]) => {
+    if (!packageJson.devDependencies[dependency]) {
+      packageJson.devDependencies[dependency] = version
+    }
+  })
+
+  // Add lint-staged configuration
+  console.log('⚙️ Adding lint-staged configuration...')
+  const lintStagedConfig = packageJson['lint-staged'] || {}
+  const defaultLintStaged = getDefaultLintStaged({
+    typescript: usesTypeScript,
+    stylelintTargets,
+    python: usesPython,
+  })
+  const stylelintTargetSet = new Set(stylelintTargets)
+  const hasExistingCssPatterns = Object.keys(lintStagedConfig).some(
+    patternIncludesStylelintExtension
+  )
+
+  if (hasExistingCssPatterns) {
+    console.log(
+      'ℹ️ Detected existing lint-staged CSS globs; preserving current CSS targets'
+    )
+  }
+
+  Object.entries(defaultLintStaged).forEach(([pattern, commands]) => {
+    const isStylelintPattern = stylelintTargetSet.has(pattern)
+    if (isStylelintPattern && hasExistingCssPatterns) {
+      return
+    }
+    if (!lintStagedConfig[pattern]) {
+      lintStagedConfig[pattern] = commands
+      return
+    }
+    const existing = Array.isArray(lintStagedConfig[pattern])
+      ? [...lintStagedConfig[pattern]]
+      : [lintStagedConfig[pattern]]
+    const merged = [...existing]
+    commands.forEach(command => {
+      if (!merged.includes(command)) {
+        merged.push(command)
+      }
+    })
+    lintStagedConfig[pattern] = merged
+  })
+  packageJson['lint-staged'] = lintStagedConfig
+
+  // Write updated package.json with validation
+  try {
+    const jsonString = JSON.stringify(packageJson, null, 2)
+    // Validate the JSON string before writing
+    if (jsonString.length === 0) {
+      throw new Error('Generated package.json is empty')
+    }
+    fs.writeFileSync(packageJsonPath, jsonString)
+    console.log('✅ Updated package.json')
+  } catch (error) {
+    console.error(`❌ Error writing package.json: ${error.message}`)
+    process.exit(1)
+  }
+
+  // Ensure Node toolchain pinning in target project
+  const nvmrcPath = path.join(process.cwd(), '.nvmrc')
+  if (!fs.existsSync(nvmrcPath)) {
+    fs.writeFileSync(nvmrcPath, '20\n')
+    console.log('✅ Added .nvmrc (Node 20)')
+  }
+
+  const npmrcPath = path.join(process.cwd(), '.npmrc')
+  if (!fs.existsSync(npmrcPath)) {
+    fs.writeFileSync(npmrcPath, 'engine-strict = true\n')
+    console.log('✅ Added .npmrc (engine-strict)')
+  }
+
+  // Create .github/workflows directory if it doesn't exist
+  const workflowDir = path.join(process.cwd(), '.github', 'workflows')
+  if (!fs.existsSync(workflowDir)) {
+    fs.mkdirSync(workflowDir, { recursive: true })
+    console.log('📁 Created .github/workflows directory')
+  }
+
+  // Copy workflow file if it doesn't exist
+  const workflowFile = path.join(workflowDir, 'quality.yml')
+  if (!fs.existsSync(workflowFile)) {
+    const templateWorkflow = fs.readFileSync(
+      path.join(__dirname, '.github/workflows/quality.yml'),
+      'utf8'
+    )
+    fs.writeFileSync(workflowFile, templateWorkflow)
+    console.log('✅ Added GitHub Actions workflow')
+  }
+
+  // Copy Prettier config if it doesn't exist
+  const prettierrcPath = path.join(process.cwd(), '.prettierrc')
+  if (!fs.existsSync(prettierrcPath)) {
+    const templatePrettierrc = fs.readFileSync(
+      path.join(__dirname, '.prettierrc'),
+      'utf8'
+    )
+    fs.writeFileSync(prettierrcPath, templatePrettierrc)
+    console.log('✅ Added Prettier configuration')
+  }
+
+  // Copy ESLint config if it doesn't exist
+  const eslintConfigPath = path.join(process.cwd(), 'eslint.config.cjs')
+  const templateEslintPath = path.join(
+    __dirname,
+    usesTypeScript ? 'eslint.config.ts.cjs' : 'eslint.config.cjs'
+  )
+  const templateEslint = fs.readFileSync(templateEslintPath, 'utf8')
+
+  if (!fs.existsSync(eslintConfigPath)) {
+    fs.writeFileSync(eslintConfigPath, templateEslint)
+    console.log(
+      `✅ Added ESLint configuration${usesTypeScript ? ' (TypeScript-aware)' : ''}`
+    )
+  } else if (usesTypeScript) {
+    const existingConfig = fs.readFileSync(eslintConfigPath, 'utf8')
+    if (!existingConfig.includes('@typescript-eslint')) {
+      fs.writeFileSync(eslintConfigPath, templateEslint)
+      console.log('♻️ Updated ESLint configuration with TypeScript support')
+    }
+  }
+
+  const legacyEslintrcPath = path.join(process.cwd(), '.eslintrc.json')
+  if (fs.existsSync(legacyEslintrcPath)) {
+    console.log(
+      'ℹ️ Detected legacy .eslintrc.json; ESLint 9 prefers eslint.config.cjs. Consider removing the legacy file after verifying the new config.'
+    )
+  }
+
+  // Copy Stylelint config if it doesn't exist
+  const stylelintrcPath = path.join(process.cwd(), '.stylelintrc.json')
+  if (!fs.existsSync(stylelintrcPath)) {
+    const templateStylelint = fs.readFileSync(
+      path.join(__dirname, '.stylelintrc.json'),
+      'utf8'
+    )
+    fs.writeFileSync(stylelintrcPath, templateStylelint)
+    console.log('✅ Added Stylelint configuration')
+  }
+
+  // Copy .prettierignore if it doesn't exist
+  const prettierignorePath = path.join(process.cwd(), '.prettierignore')
+  if (!fs.existsSync(prettierignorePath)) {
+    const templatePrettierignore = fs.readFileSync(
+      path.join(__dirname, '.prettierignore'),
+      'utf8'
+    )
+    fs.writeFileSync(prettierignorePath, templatePrettierignore)
+    console.log('✅ Added Prettier ignore file')
+  }
+
+  // Copy Lighthouse CI config if it doesn't exist
+  const lighthousercPath = path.join(process.cwd(), '.lighthouserc.js')
+  if (!fs.existsSync(lighthousercPath)) {
+    const templateLighthouserc = fs.readFileSync(
+      path.join(__dirname, 'config', '.lighthouserc.js'),
+      'utf8'
+    )
+    fs.writeFileSync(lighthousercPath, templateLighthouserc)
+    console.log('✅ Added Lighthouse CI configuration')
+  }
+
+  // Copy ESLint ignore if it doesn't exist
+  const eslintignorePath = path.join(process.cwd(), '.eslintignore')
+  const templateEslintIgnorePath = path.join(__dirname, '.eslintignore')
+  if (
+    !fs.existsSync(eslintignorePath) &&
+    fs.existsSync(templateEslintIgnorePath)
+  ) {
+    const templateEslintIgnore = fs.readFileSync(
+      templateEslintIgnorePath,
+      'utf8'
+    )
+    fs.writeFileSync(eslintignorePath, templateEslintIgnore)
+    console.log('✅ Added ESLint ignore file')
+  }
+
+  // Copy .editorconfig if it doesn't exist
+  const editorconfigPath = path.join(process.cwd(), '.editorconfig')
+  if (!fs.existsSync(editorconfigPath)) {
+    const templateEditorconfig = fs.readFileSync(
+      path.join(__dirname, '.editorconfig'),
+      'utf8'
+    )
+    fs.writeFileSync(editorconfigPath, templateEditorconfig)
+    console.log('✅ Added .editorconfig')
+  }
+
+  // Ensure Husky pre-commit hook runs lint-staged
+  try {
+    const huskyDir = path.join(process.cwd(), '.husky')
+    if (!fs.existsSync(huskyDir)) {
+      fs.mkdirSync(huskyDir, { recursive: true })
+    }
+    const preCommitPath = path.join(huskyDir, 'pre-commit')
+    if (!fs.existsSync(preCommitPath)) {
+      const hook =
+        '#!/bin/sh\n. "$(dirname "$0")/_/husky.sh"\n\n# Run lint-staged on staged files\nnpx --no -- lint-staged\n'
+      fs.writeFileSync(preCommitPath, hook)
+      fs.chmodSync(preCommitPath, 0o755)
+      console.log('✅ Added Husky pre-commit hook (lint-staged)')
+    }
+  } catch (e) {
+    console.warn('⚠️ Could not create Husky pre-commit hook:', e.message)
+  }
+
+  // Ensure engines/volta pins in target package.json (non-destructive)
+  try {
+    const pkg = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'))
+    pkg.engines = { node: '>=20', ...(pkg.engines || {}) }
+    pkg.volta = { node: '20.11.1', npm: '10.2.4', ...(pkg.volta || {}) }
+    fs.writeFileSync(packageJsonPath, JSON.stringify(pkg, null, 2))
+    console.log('✅ Ensured engines and Volta pins in package.json')
+  } catch (e) {
+    console.warn(
+      '⚠️ Could not update engines/volta in package.json:',
+      e.message
+    )
+  }
+
+  // Python quality automation setup
+  if (usesPython) {
+    console.log('\n🐍 Setting up Python quality automation...')
+
+    // Copy pyproject.toml if it doesn't exist
+    const pyprojectPath = path.join(process.cwd(), 'pyproject.toml')
+    if (!fs.existsSync(pyprojectPath)) {
+      const templatePyproject = fs.readFileSync(
+        path.join(__dirname, 'config/pyproject.toml'),
+        'utf8'
+      )
+      fs.writeFileSync(pyprojectPath, templatePyproject)
+      console.log(
+        '✅ Added pyproject.toml with Black, Ruff, isort, mypy config'
+      )
+    }
+
+    // Copy pre-commit config
+    const preCommitPath = path.join(process.cwd(), '.pre-commit-config.yaml')
+    if (!fs.existsSync(preCommitPath)) {
+      const templatePreCommit = fs.readFileSync(
+        path.join(__dirname, 'config/.pre-commit-config.yaml'),
+        'utf8'
+      )
+      fs.writeFileSync(preCommitPath, templatePreCommit)
+      console.log('✅ Added .pre-commit-config.yaml')
+    }
+
+    // Copy requirements-dev.txt
+    const requirementsDevPath = path.join(process.cwd(), 'requirements-dev.txt')
+    if (!fs.existsSync(requirementsDevPath)) {
+      const templateRequirements = fs.readFileSync(
+        path.join(__dirname, 'config/requirements-dev.txt'),
+        'utf8'
+      )
+      fs.writeFileSync(requirementsDevPath, templateRequirements)
+      console.log('✅ Added requirements-dev.txt')
+    }
+
+    // Copy Python workflow
+    const pythonWorkflowFile = path.join(workflowDir, 'quality-python.yml')
+    if (!fs.existsSync(pythonWorkflowFile)) {
+      const templatePythonWorkflow = fs.readFileSync(
+        path.join(__dirname, 'config/quality-python.yml'),
+        'utf8'
+      )
+      fs.writeFileSync(pythonWorkflowFile, templatePythonWorkflow)
+      console.log('✅ Added Python GitHub Actions workflow')
+    }
+
+    // Create tests directory if it doesn't exist
+    const testsDir = path.join(process.cwd(), 'tests')
+    if (!fs.existsSync(testsDir)) {
+      fs.mkdirSync(testsDir)
+      fs.writeFileSync(path.join(testsDir, '__init__.py'), '')
+      console.log('✅ Created tests directory')
+    }
+
+    // Add Python helper scripts to package.json if it exists and is a JS/TS project too
+    if (fs.existsSync(packageJsonPath)) {
+      try {
+        const pkg = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'))
+        const pythonScripts = {
+          'python:format': 'black .',
+          'python:format:check': 'black --check .',
+          'python:lint': 'ruff check .',
+          'python:lint:fix': 'ruff check --fix .',
+          'python:type-check': 'mypy .',
+          'python:quality':
+            'black --check . && ruff check . && isort --check-only . && mypy .',
+          'python:test': 'pytest',
+        }
+
+        pkg.scripts = { ...pkg.scripts, ...pythonScripts }
+        fs.writeFileSync(packageJsonPath, JSON.stringify(pkg, null, 2))
+        console.log('✅ Added Python helper scripts to package.json')
+      } catch (e) {
+        console.warn(
+          '⚠️ Could not add Python scripts to package.json:',
+          e.message
+        )
+      }
+    }
+  }
+
+  console.log('\n🎉 Quality automation setup complete!')
+
+  // Dynamic next steps based on detected languages
+  console.log('\n📋 Next steps:')
+
+  if (usesPython && fs.existsSync(packageJsonPath)) {
+    console.log('JavaScript/TypeScript setup:')
+    console.log('1. Run: npm install')
+    console.log('2. Run: npm run prepare')
+    console.log('\nPython setup:')
+    console.log('3. Run: python3 -m pip install -r requirements-dev.txt')
+    console.log('4. Run: pre-commit install')
+    console.log('\n5. Commit your changes to activate both workflows')
+  } else if (usesPython) {
+    console.log('Python setup:')
+    console.log('1. Run: python3 -m pip install -r requirements-dev.txt')
+    console.log('2. Run: pre-commit install')
+    console.log('3. Commit your changes to activate the workflow')
+  } else {
+    console.log('1. Run: npm install')
+    console.log('2. Run: npm run prepare')
+    console.log('3. Commit your changes to activate the workflow')
+  }
+  console.log('\n✨ Your project now has:')
+  console.log('  • Prettier code formatting')
+  console.log('  • Pre-commit hooks via Husky')
+  console.log('  • GitHub Actions quality checks')
+  console.log('  • Lint-staged for efficient processing')
+} // End of normal setup flow
