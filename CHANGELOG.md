@@ -9,6 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.3.2] - 2025-11-01
+
+### Fixed
+
+- **🚨 CRITICAL**: Fixed gitleaks error swallowing that caused false positives
+  - Previous version silently ignored gitleaks failures (missing binary, permissions, etc.)
+  - Security validation would pass with "✅ Security checks passed" even when gitleaks never ran
+  - Now properly surfaces failures: info message for missing binary, blocking errors for other issues
+
+---
+
 ## [2.3.1] - 2025-11-01
 
 ### Fixed
