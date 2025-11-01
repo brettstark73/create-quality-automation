@@ -9,6 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.3.3] - 2025-11-01
+
+### Fixed
+
+- **🚨 CRITICAL**: Made missing gitleaks binary block security validation instead of silently passing
+  - v2.3.2 still allowed "✅ Security checks passed" when gitleaks was missing
+  - Missing gitleaks now properly fails validation with clear error message
+  - Users can use `--no-gitleaks` flag to explicitly skip if desired
+
+---
+
 ## [2.3.2] - 2025-11-01
 
 ### Fixed
