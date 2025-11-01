@@ -18,10 +18,13 @@
     "validate:docs": "node setup.js --validate-docs",
     "validate:comprehensive": "node setup.js --comprehensive",
     "validate:all": "npm run validate:comprehensive && npm run security:audit",
-    "test": "node tests/setup.test.js",
+    "test": "node tests/setup.test.js && node tests/integration.test.js",
     "docs:check": "bash scripts/check-docs.sh",
     "prerelease": "npm run docs:check && npm run validate:comprehensive && npm test",
-    "setup": "node setup.js"
+    "setup": "node setup.js",
+    "release:patch": "npm version patch && git push --follow-tags",
+    "release:minor": "npm version minor && git push --follow-tags",
+    "release:major": "npm version major && git push --follow-tags"
   },
   "keywords": [
     "quality",
@@ -69,8 +72,10 @@
     "node": ">=20"
   },
   "devDependencies": {
+    "actionlint": "^2.0.6",
     "eslint": "^9.12.0",
     "eslint-plugin-security": "^3.0.1",
+    "gitleaks": "^1.0.0",
     "globals": "^15.9.0",
     "husky": "^9.1.4",
     "lint-staged": "^15.2.10",
@@ -108,5 +113,9 @@
       "stylelint --fix",
       "prettier --write"
     ]
+  },
+  "dependencies": {
+    "@npmcli/package-json": "^7.0.1",
+    "markdownlint-cli2": "^0.18.1"
   }
 }

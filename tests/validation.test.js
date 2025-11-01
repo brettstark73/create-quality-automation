@@ -44,12 +44,26 @@ async function testConfigSecurityScanner(testDir, originalCwd) {
   const packageJson = {
     name: 'test-project',
     version: '1.0.0',
+    description: 'A test project for quality automation validation',
+    keywords: ['test', 'validation', 'quality'],
+    license: 'MIT',
     scripts: {
       test: 'echo "test"',
       format: 'prettier --write .',
     },
   }
   fs.writeFileSync('package.json', JSON.stringify(packageJson, null, 2))
+
+  // Create .gitignore (required for security validation)
+  const gitignoreContent = `
+node_modules/
+.env*
+*.log
+.DS_Store
+dist/
+build/
+`
+  fs.writeFileSync('.gitignore', gitignoreContent.trim())
 
   // Test 1: Valid Next.js config (should pass)
   const validNextConfig = `
@@ -139,10 +153,28 @@ async function testDocumentationValidator(testDir, originalCwd) {
   const validReadme = `
 # Test Project
 
+## Description
+
+This is a test project for validating our quality automation setup.
+
 ## Installation
 
 \`\`\`bash
 npm install
+\`\`\`
+
+## Usage
+
+Run tests:
+
+\`\`\`bash
+npm run test
+\`\`\`
+
+Format code:
+
+\`\`\`bash
+npm run format
 \`\`\`
 
 ## Scripts
@@ -221,17 +253,52 @@ npm install
 async function testComprehensiveValidation(testDir, originalCwd) {
   console.log('🔍 Testing comprehensive validation...')
 
-  // Create valid project setup
+  // Create valid project setup with all required sections
   const validReadme = `
 # Test Project
+
+## Description
+
+This is a test project for comprehensive validation.
+
+## Installation
+
+\`\`\`bash
+npm install
+\`\`\`
+
+## Usage
+
+Run tests:
 
 \`\`\`bash
 npm run test
 \`\`\`
 
-Files: \`package.json\`
+## Files
+
+- \`package.json\` - Package configuration
 `
   fs.writeFileSync('README.md', validReadme)
+
+  // Create .github/workflows directory (required by workflow validator)
+  fs.mkdirSync('.github/workflows', { recursive: true })
+
+  // Create a basic workflow file
+  const basicWorkflow = `
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test
+        run: npm test
+`
+  fs.writeFileSync('.github/workflows/test.yml', basicWorkflow.trim())
 
   try {
     execSync(`node "${path.join(originalCwd, 'setup.js')}" --comprehensive`, {
