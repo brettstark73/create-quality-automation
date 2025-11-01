@@ -9,6 +9,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.3.1] - 2025-11-01
+
+### Fixed
+
+- **🚨 CRITICAL**: Fixed gitleaks invocation to use `npx` instead of `which` + bare command
+  - Previous version silently skipped secret scanning on Windows and local npm installs
+- **🚨 CRITICAL**: Fixed actionlint invocation to use `npx` instead of `which` + bare command
+  - Previous version silently skipped workflow validation on Windows and local npm installs
+- **🔧 MAJOR**: Fixed Python script setup to preserve existing scripts instead of overwriting
+  - Previous version broke idempotency and clobbered custom python:\* commands
+
+---
+
 ## [2.3.0] - 2025-11-01
 
 ### Changed
