@@ -1,10 +1,35 @@
 #!/usr/bin/env node
-/* eslint-disable security/detect-object-injection */
+ 
 /* eslint-disable security/detect-non-literal-fs-filename */
 
 const fs = require('fs')
 const path = require('path')
 const { execSync } = require('child_process')
+const { mergeScripts, mergeDevDependencies, mergeLintStaged } = require('./lib/package-utils')
+
+/**
+ * Check Node version and lazily load @npmcli/package-json
+ * This prevents import errors on older Node versions for basic commands like --help
+ */
+function checkNodeVersionAndLoadPackageJson() {
+  const nodeVersion = process.version
+  const majorVersion = parseInt(nodeVersion.split('.')[0].slice(1))
+
+  if (majorVersion < 20) {
+    console.error(`❌ Node.js ${nodeVersion} is not supported. This tool requires Node.js 20 or higher.`)
+    console.log('Please upgrade Node.js and try again.')
+    console.log('Visit https://nodejs.org/ to download the latest version.')
+    process.exit(1)
+  }
+
+  try {
+    return require('@npmcli/package-json')
+  } catch (error) {
+    console.error(`❌ Failed to load package.json utilities: ${error.message}`)
+    console.log('This tool requires Node.js 20+ with modern module support.')
+    process.exit(1)
+  }
+}
 
 const {
   STYLELINT_EXTENSIONS,
@@ -174,13 +199,70 @@ const isConfigSecurityMode = sanitizedArgs.includes('--security-config')
 const isDocsValidationMode = sanitizedArgs.includes('--validate-docs')
 const isComprehensiveMode = sanitizedArgs.includes('--comprehensive')
 
+// Granular tool disable options
+const disableNpmAudit = sanitizedArgs.includes('--no-npm-audit')
+const disableGitleaks = sanitizedArgs.includes('--no-gitleaks')
+const disableActionlint = sanitizedArgs.includes('--no-actionlint')
+const disableMarkdownlint = sanitizedArgs.includes('--no-markdownlint')
+const disableEslintSecurity = sanitizedArgs.includes('--no-eslint-security')
+
+// Show help if requested
+if (sanitizedArgs.includes('--help') || sanitizedArgs.includes('-h')) {
+  console.log(`
+🚀 Create Quality Automation Setup
+
+Usage: npx create-quality-automation@latest [options]
+
+SETUP OPTIONS:
+  (no args)         Run complete quality automation setup
+  --update          Update existing configuration
+
+VALIDATION OPTIONS:
+  --validate        Run comprehensive validation (same as --comprehensive)
+  --comprehensive   Run all validation checks
+  --security-config Run configuration security checks only
+  --validate-docs   Run documentation validation only
+
+GRANULAR TOOL CONTROL:
+  --no-npm-audit       Disable npm audit dependency vulnerability checks
+  --no-gitleaks        Disable gitleaks secret scanning
+  --no-actionlint      Disable actionlint GitHub Actions workflow validation
+  --no-markdownlint    Disable markdownlint markdown formatting checks
+  --no-eslint-security Disable ESLint security rule checking
+
+EXAMPLES:
+  npx create-quality-automation@latest
+    → Set up quality automation with all tools
+
+  npx create-quality-automation@latest --comprehensive --no-gitleaks
+    → Run validation but skip gitleaks secret scanning
+
+  npx create-quality-automation@latest --security-config --no-npm-audit
+    → Run security checks but skip npm audit
+
+  npx create-quality-automation@latest --validate-docs --no-markdownlint
+    → Validate docs but skip markdown linting
+
+HELP:
+  --help, -h        Show this help message
+`)
+  process.exit(0)
+}
+
 console.log(
   `🚀 ${isUpdateMode ? 'Updating' : 'Setting up'} Quality Automation...\n`
 )
 
 // Handle validation-only commands
 async function handleValidationCommands() {
-  const validator = new ValidationRunner()
+  const validationOptions = {
+    disableNpmAudit,
+    disableGitleaks,
+    disableActionlint,
+    disableMarkdownlint,
+    disableEslintSecurity,
+  }
+  const validator = new ValidationRunner(validationOptions)
 
   if (isConfigSecurityMode) {
     try {
@@ -233,7 +315,7 @@ if (
   })()
 } else {
   // Normal setup flow
-
+async function runMainSetup() {
   // Check if we're in a git repository
   try {
     execSync('git status', { stdio: 'ignore' })
@@ -345,51 +427,28 @@ if (
 
   // Add quality automation scripts (conservative: do not overwrite existing)
   console.log('📝 Adding quality automation scripts...')
-  packageJson.scripts = packageJson.scripts || {}
   const defaultScripts = getDefaultScripts({
     typescript: usesTypeScript,
     stylelintTargets,
   })
-  Object.entries(defaultScripts).forEach(([name, command]) => {
-    if (!packageJson.scripts[name]) {
-      packageJson.scripts[name] = command
-    }
-  })
-  // prepare: ensure husky command is present
-  const prepareScript = packageJson.scripts.prepare
-  if (!prepareScript) {
-    packageJson.scripts.prepare = 'husky'
-  } else if (prepareScript.includes('husky install')) {
-    packageJson.scripts.prepare = prepareScript.replace(
-      /husky install/g,
-      'husky'
-    )
-  } else if (!prepareScript.includes('husky')) {
-    packageJson.scripts.prepare = `${prepareScript} && husky`
-  }
+  packageJson.scripts = mergeScripts(packageJson.scripts || {}, defaultScripts)
 
   // Add devDependencies
   console.log('📦 Adding devDependencies...')
-  packageJson.devDependencies = packageJson.devDependencies || {}
   const defaultDevDependencies = getDefaultDevDependencies({
     typescript: usesTypeScript,
   })
-  Object.entries(defaultDevDependencies).forEach(([dependency, version]) => {
-    if (!packageJson.devDependencies[dependency]) {
-      packageJson.devDependencies[dependency] = version
-    }
-  })
+  packageJson.devDependencies = mergeDevDependencies(packageJson.devDependencies || {}, defaultDevDependencies)
 
   // Add lint-staged configuration
   console.log('⚙️ Adding lint-staged configuration...')
-  const lintStagedConfig = packageJson['lint-staged'] || {}
   const defaultLintStaged = getDefaultLintStaged({
     typescript: usesTypeScript,
     stylelintTargets,
     python: usesPython,
   })
-  const stylelintTargetSet = new Set(stylelintTargets)
-  const hasExistingCssPatterns = Object.keys(lintStagedConfig).some(
+
+  const hasExistingCssPatterns = Object.keys(packageJson['lint-staged'] || {}).some(
     patternIncludesStylelintExtension
   )
 
@@ -399,36 +458,29 @@ if (
     )
   }
 
-  Object.entries(defaultLintStaged).forEach(([pattern, commands]) => {
-    const isStylelintPattern = stylelintTargetSet.has(pattern)
-    if (isStylelintPattern && hasExistingCssPatterns) {
-      return
-    }
-    if (!lintStagedConfig[pattern]) {
-      lintStagedConfig[pattern] = commands
-      return
-    }
-    const existing = Array.isArray(lintStagedConfig[pattern])
-      ? [...lintStagedConfig[pattern]]
-      : [lintStagedConfig[pattern]]
-    const merged = [...existing]
-    commands.forEach(command => {
-      if (!merged.includes(command)) {
-        merged.push(command)
-      }
-    })
-    lintStagedConfig[pattern] = merged
-  })
-  packageJson['lint-staged'] = lintStagedConfig
+  packageJson['lint-staged'] = mergeLintStaged(
+    packageJson['lint-staged'] || {},
+    defaultLintStaged,
+    { stylelintTargets },
+    patternIncludesStylelintExtension
+  )
 
-  // Write updated package.json with validation
+  // Write updated package.json using @npmcli/package-json
   try {
-    const jsonString = JSON.stringify(packageJson, null, 2)
-    // Validate the JSON string before writing
-    if (jsonString.length === 0) {
-      throw new Error('Generated package.json is empty')
+    const PackageJson = checkNodeVersionAndLoadPackageJson()
+    let pkgJson
+    if (fs.existsSync(packageJsonPath)) {
+      // Load existing package.json
+      pkgJson = await PackageJson.load(process.cwd())
+      // Update with our changes
+      Object.assign(pkgJson.content, packageJson)
+    } else {
+      // Create new package.json
+      pkgJson = await PackageJson.create(process.cwd())
+      Object.assign(pkgJson.content, packageJson)
     }
-    fs.writeFileSync(packageJsonPath, jsonString)
+
+    await pkgJson.save()
     console.log('✅ Updated package.json')
   } catch (error) {
     console.error(`❌ Error writing package.json: ${error.message}`)
@@ -564,6 +616,54 @@ if (
     console.log('✅ Added .editorconfig')
   }
 
+  // Ensure .gitignore exists with essential entries
+  const gitignorePath = path.join(process.cwd(), '.gitignore')
+  if (!fs.existsSync(gitignorePath)) {
+    const essentialGitignore = `# Dependencies
+node_modules/
+.pnpm-store/
+
+# Environment variables
+.env*
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Build outputs
+dist/
+build/
+.next/
+.nuxt/
+.output/
+.vercel/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Coverage
+coverage/
+.nyc_output/
+
+# Cache
+.cache/
+.parcel-cache/
+.turbo/
+`
+    fs.writeFileSync(gitignorePath, essentialGitignore)
+    console.log('✅ Added .gitignore with essential entries')
+  }
+
   // Ensure Husky pre-commit hook runs lint-staged
   try {
     const huskyDir = path.join(process.cwd(), '.husky')
@@ -582,13 +682,30 @@ if (
     console.warn('⚠️ Could not create Husky pre-commit hook:', e.message)
   }
 
-  // Ensure engines/volta pins in target package.json (non-destructive)
+  // Ensure engines/volta pins in target package.json (enforce minimums)
   try {
-    const pkg = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'))
-    pkg.engines = { node: '>=20', ...(pkg.engines || {}) }
-    pkg.volta = { node: '20.11.1', npm: '10.2.4', ...(pkg.volta || {}) }
-    fs.writeFileSync(packageJsonPath, JSON.stringify(pkg, null, 2))
-    console.log('✅ Ensured engines and Volta pins in package.json')
+    if (fs.existsSync(packageJsonPath)) {
+      const PackageJson = checkNodeVersionAndLoadPackageJson()
+      const pkgJson = await PackageJson.load(process.cwd())
+
+      // Preserve existing engines but enforce Node >=20 minimum
+      const existingEngines = pkgJson.content.engines || {}
+      pkgJson.content.engines = {
+        ...existingEngines,
+        node: '>=20'  // Always enforce our minimum
+      }
+
+      // Preserve existing volta but set our pinned versions
+      const existingVolta = pkgJson.content.volta || {}
+      pkgJson.content.volta = {
+        ...existingVolta,
+        node: '20.11.1',
+        npm: '10.2.4'
+      }
+
+      await pkgJson.save()
+      console.log('✅ Ensured engines and Volta pins in package.json (Node >=20 enforced)')
+    }
   } catch (e) {
     console.warn(
       '⚠️ Could not update engines/volta in package.json:',
@@ -657,7 +774,9 @@ if (
     // Add Python helper scripts to package.json if it exists and is a JS/TS project too
     if (fs.existsSync(packageJsonPath)) {
       try {
-        const pkg = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'))
+        const PackageJson = checkNodeVersionAndLoadPackageJson()
+        const pkgJson = await PackageJson.load(process.cwd())
+
         const pythonScripts = {
           'python:format': 'black .',
           'python:format:check': 'black --check .',
@@ -669,8 +788,11 @@ if (
           'python:test': 'pytest',
         }
 
-        pkg.scripts = { ...pkg.scripts, ...pythonScripts }
-        fs.writeFileSync(packageJsonPath, JSON.stringify(pkg, null, 2))
+        if (!pkgJson.content.scripts) {
+          pkgJson.content.scripts = {}
+        }
+        Object.assign(pkgJson.content.scripts, pythonScripts)
+        await pkgJson.save()
         console.log('✅ Added Python helper scripts to package.json')
       } catch (e) {
         console.warn(
@@ -709,4 +831,10 @@ if (
   console.log('  • Pre-commit hooks via Husky')
   console.log('  • GitHub Actions quality checks')
   console.log('  • Lint-staged for efficient processing')
+} // End of runMainSetup function
+
+runMainSetup().catch(error => {
+  console.error('❌ Setup failed:', error.message)
+  process.exit(1)
+})
 } // End of normal setup flow

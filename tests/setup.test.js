@@ -125,35 +125,8 @@ const patternIncludesStylelintExtension = pattern => {
   return STYLELINT_EXTENSIONS.some(ext => lower.includes(`.${ext}`))
 }
 
-const mergeScripts = (initialScripts = {}, defaultScripts) => {
-  const scripts = { ...initialScripts }
-  Object.entries(defaultScripts).forEach(([name, command]) => {
-    if (!scripts[name]) {
-      scripts[name] = command
-    }
-  })
-
-  const prepareScript = scripts.prepare
-  if (!prepareScript) {
-    scripts.prepare = 'husky'
-  } else if (prepareScript.includes('husky install')) {
-    scripts.prepare = prepareScript.replace(/husky install/g, 'husky')
-  } else if (!prepareScript.includes('husky')) {
-    scripts.prepare = `${prepareScript} && husky`
-  }
-
-  return scripts
-}
-
-const mergeDevDependencies = (initialDevDeps = {}, defaultDevDeps) => {
-  const devDeps = { ...initialDevDeps }
-  Object.entries(defaultDevDeps).forEach(([dependency, version]) => {
-    if (!devDeps[dependency]) {
-      devDeps[dependency] = version
-    }
-  })
-  return devDeps
-}
+// Import shared merge utilities
+const { mergeScripts, mergeDevDependencies } = require('../lib/package-utils')
 
 const mergeLintStaged = (
   initialLintStaged = {},

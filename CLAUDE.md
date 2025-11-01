@@ -55,6 +55,67 @@ This catches documentation gaps that manual review misses. Also reference:
 
 **Why this matters**: Documentation gaps weren't caught in v2.1.0 release because we relied on manual memory instead of systematic verification.
 
+## 🚨 CRITICAL: Code Change Verification Protocol
+
+### **When Making ANY Code Change:**
+
+1. **Systematic Search**: Use multiple search methods to find ALL instances
+   ```bash
+   # Example: Removing 'grep' usage
+   grep -r "grep" . --exclude-dir=node_modules --exclude-dir=.git
+   rg "grep" --type js --type ts
+   find . -name "*.js" -o -name "*.ts" | xargs grep "grep"
+   ```
+
+2. **Verify Complete Removal**: After edits, re-search to confirm ZERO instances
+   ```bash
+   # Must return NO results
+   grep -r "target_pattern" . --exclude-dir=node_modules --exclude-dir=.git
+   ```
+
+3. **Test the Specific Issue**: Create minimal reproduction of the reported problem
+   ```bash
+   # Example: Test Windows grep issue
+   node setup.js --security-config 2>&1 | grep "not recognized"
+   ```
+
+4. **Integration Test**: Run full test suite to ensure no regressions
+   ```bash
+   npm test
+   ```
+
+5. **Edge Case Testing**: Test the specific environment mentioned (Windows, Node versions, etc.)
+
+### **Before Declaring "Fixed":**
+
+- [ ] **Search Verification**: Multiple search methods confirm target is eliminated
+- [ ] **Functional Test**: The reported error condition no longer occurs
+- [ ] **Integration Test**: Full test suite passes
+- [ ] **Documentation**: Update/add tests to prevent regression
+
+### **Example Verification Checklist for Windows Compatibility:**
+
+```bash
+# 1. Verify no grep usage anywhere
+grep -r "| grep" . --exclude-dir=node_modules --exclude-dir=.git
+grep -r "\| grep" . --exclude-dir=node_modules --exclude-dir=.git
+rg "\| grep" --type js
+
+# 2. Test the exact command that was failing
+node setup.js --security-config
+
+# 3. Simulate Windows environment (if possible)
+# Or ensure cross-platform compatibility via Node.js only
+
+# 4. Check that ESLint security actually runs and detects issues
+# (not just silently skipped)
+```
+
+## Never Accept "It Should Work" - Always Verify
+
+**Bad**: "I removed the grep, so it should work on Windows now"
+**Good**: "I verified zero grep usage remains, tested the command, and confirmed ESLint security detection still functions"
+
 ---
 
 _Inherits all global preferences from Brett Stark's universal Claude Code configuration_
