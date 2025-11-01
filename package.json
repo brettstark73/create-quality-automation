@@ -1,6 +1,6 @@
 {
   "name": "create-quality-automation",
-  "version": "2.3.2",
+  "version": "2.3.3",
   "description": "Bootstrap quality automation for JavaScript/TypeScript and Python projects with GitHub Actions, pre-commit hooks, linting, and formatting",
   "main": "setup.js",
   "bin": {
