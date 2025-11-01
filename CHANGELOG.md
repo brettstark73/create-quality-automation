@@ -9,6 +9,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.3.0] - 2025-11-01
+
+### Changed
+
+- **🔧 Mature Tool Integration**: Replaced custom implementations with industry-standard tools
+  - `@npmcli/package-json` for robust package.json handling (replaces custom JSON manipulation)
+  - `gitleaks` for comprehensive secret scanning (replaces regex patterns)
+  - `actionlint` for GitHub Actions workflow validation
+  - `markdownlint-cli2` for documentation validation (replaces custom parsing)
+
+### Added
+
+- **📱 Enhanced Windows Compatibility**: Replaced shell pipe dependencies with Node.js parsing
+- **🧪 Comprehensive Integration Tests**: Prevents regressions across multiple environments
+- **📦 Shared Package Utilities**: Extracted common functionality to eliminate code duplication
+- **⚡ Lazy Loading**: Node.js 20+ requirement enforcement with proper dependency loading
+- **🎛️ Granular Configuration**: Tool-specific disable options for advanced users
+- **🚀 Automated Release Workflow**: Streamlined npm publishing and GitHub releases
+
+### Fixed
+
+- **Node Version Compatibility**: Proper enforcement of Node.js 20+ requirement
+- **ESLint Config Detection**: Support for both `.js` and `.cjs` config file variants
+- **Cross-Platform Reliability**: Eliminated grep and shell-specific commands
+- **Package.json API Usage**: Correct usage of `PackageJson.create()` vs `PackageJson.load()`
+
+---
+
 ## [2.2.0] - 2025-10-29
 
 ### Added
