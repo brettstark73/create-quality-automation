@@ -1,6 +1,6 @@
 # Create Quality Automation 🚀
 
-Bootstrap quality automation in JavaScript/TypeScript and Python projects with comprehensive tooling. Features GitHub Actions, pre-commit hooks, lint-staged processing, security scanning, SEO validation, and multi-language support with smart project detection.
+Bootstrap quality automation in JavaScript/TypeScript and Python projects with comprehensive tooling. Features GitHub Actions, pre-commit hooks, lint-staged processing, security scanning, SEO validation, and freemium dependency monitoring with smart project detection.
 
 ## ✨ Features
 
@@ -14,6 +14,7 @@ Bootstrap quality automation in JavaScript/TypeScript and Python projects with c
 - **🚢 Lighthouse CI** - SEO and performance checking with configurable thresholds
 - **🆕 Modern Tooling** - ESLint 9 flat config, Husky 9, latest dependencies
 - **🔒 Security Automation** - Blocking npm audit and hardcoded secrets scanning
+- **📊 Dependency Monitoring** - Basic Dependabot config (Free) + Advanced features (Pro/Enterprise)
 
 ## 🚀 Quick Start
 
@@ -47,6 +48,42 @@ npm install
 # Verify everything works
 npm run lint
 ```
+
+### Dependency Monitoring (v2.4.0+)
+
+```bash
+# Add basic dependency monitoring (FREE TIER)
+npx create-quality-automation@latest --deps
+
+# What you get for free:
+# ✅ Basic Dependabot configuration for npm packages
+# ✅ Weekly dependency updates on Monday 9am
+# ✅ Auto-merge for security patches only
+# ✅ GitHub Actions dependency monitoring
+
+# Check your current license tier and features
+npx create-quality-automation@latest --license-status
+```
+
+#### 🔒 Premium Tiers
+
+**💰 Pro Tier ($39/month)**
+
+- Framework-aware package grouping (React, Next.js, Vue, Angular)
+- Multi-language support (Python, Rust, Go)
+- Advanced security audit workflows
+- Custom update schedules
+- Breaking change detection
+
+**🏢 Enterprise Tier ($197/month)**
+
+- Everything in Pro
+- Custom notification channels (Slack, Teams)
+- Multi-repository management
+- Advanced reporting and analytics
+- Priority support
+
+[**🚀 Upgrade to Pro**](https://create-quality-automation.dev/pro) | [**🏢 Get Enterprise**](https://create-quality-automation.dev/enterprise)
 
 ### Validation Commands (v2.2.0+)
 
