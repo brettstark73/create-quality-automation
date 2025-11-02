@@ -47,6 +47,20 @@ const {
 // Enhanced validation capabilities
 const { ValidationRunner } = require('./lib/validation')
 
+// Basic dependency monitoring (Free Tier)
+const {
+  hasNpmProject,
+  generateBasicDependabotConfig,
+  writeBasicDependabotConfig,
+} = require('./lib/dependency-monitoring-basic')
+
+// Licensing system
+const {
+  getLicenseInfo,
+  showUpgradeMessage,
+  showLicenseStatus,
+} = require('./lib/licensing')
+
 const STYLELINT_EXTENSION_SET = new Set(STYLELINT_EXTENSIONS)
 const STYLELINT_DEFAULT_TARGET = `**/*.{${STYLELINT_EXTENSIONS.join(',')}}`
 const STYLELINT_EXTENSION_GLOB = `*.{${STYLELINT_EXTENSIONS.join(',')}}`
@@ -204,6 +218,10 @@ const isValidationMode = sanitizedArgs.includes('--validate')
 const isConfigSecurityMode = sanitizedArgs.includes('--security-config')
 const isDocsValidationMode = sanitizedArgs.includes('--validate-docs')
 const isComprehensiveMode = sanitizedArgs.includes('--comprehensive')
+const isDependencyMonitoringMode =
+  sanitizedArgs.includes('--deps') ||
+  sanitizedArgs.includes('--dependency-monitoring')
+const isLicenseStatusMode = sanitizedArgs.includes('--license-status')
 
 // Granular tool disable options
 const disableNpmAudit = sanitizedArgs.includes('--no-npm-audit')
@@ -222,12 +240,17 @@ Usage: npx create-quality-automation@latest [options]
 SETUP OPTIONS:
   (no args)         Run complete quality automation setup
   --update          Update existing configuration
+  --deps            Add basic dependency monitoring (Free Tier)
+  --dependency-monitoring  Same as --deps
 
 VALIDATION OPTIONS:
   --validate        Run comprehensive validation (same as --comprehensive)
   --comprehensive   Run all validation checks
   --security-config Run configuration security checks only
   --validate-docs   Run documentation validation only
+
+LICENSE OPTIONS:
+  --license-status  Show current license tier and available features
 
 GRANULAR TOOL CONTROL:
   --no-npm-audit       Disable npm audit dependency vulnerability checks
@@ -240,14 +263,17 @@ EXAMPLES:
   npx create-quality-automation@latest
     → Set up quality automation with all tools
 
+  npx create-quality-automation@latest --deps
+    → Add basic dependency monitoring (Dependabot config + security auto-merge)
+
+  npx create-quality-automation@latest --license-status
+    → Show current license tier and upgrade options
+
   npx create-quality-automation@latest --comprehensive --no-gitleaks
     → Run validation but skip gitleaks secret scanning
 
   npx create-quality-automation@latest --security-config --no-npm-audit
     → Run security checks but skip npm audit
-
-  npx create-quality-automation@latest --validate-docs --no-markdownlint
-    → Validate docs but skip markdown linting
 
 HELP:
   --help, -h        Show this help message
@@ -256,7 +282,7 @@ HELP:
 }
 
 console.log(
-  `🚀 ${isUpdateMode ? 'Updating' : 'Setting up'} Quality Automation...\n`
+  `🚀 ${isUpdateMode ? 'Updating' : isDependencyMonitoringMode ? 'Adding dependency monitoring to' : 'Setting up'} Quality Automation...\n`
 )
 
 // Handle validation-only commands
@@ -301,6 +327,80 @@ async function handleValidationCommands() {
       process.exit(1)
     }
   }
+}
+
+// Handle basic dependency monitoring (Free Tier)
+async function handleBasicDependencyMonitoring() {
+  console.log('🔍 Setting up basic dependency monitoring (Free Tier)...\n')
+
+  const projectPath = process.cwd()
+  const license = getLicenseInfo()
+
+  if (!hasNpmProject(projectPath)) {
+    console.error(
+      '❌ No package.json found. Dependency monitoring requires an npm project.'
+    )
+    console.log("💡 Make sure you're in a directory with a package.json file.")
+    process.exit(1)
+  }
+
+  console.log('📦 Detected: npm project')
+  console.log(`📋 License tier: ${license.tier.toUpperCase()}`)
+
+  // Generate basic Dependabot configuration
+  console.log('⚙️ Generating basic Dependabot configuration...')
+  const dependabotConfig = generateBasicDependabotConfig({
+    projectPath,
+    schedule: 'weekly',
+  })
+
+  if (dependabotConfig) {
+    const dependabotPath = path.join(projectPath, '.github', 'dependabot.yml')
+    writeBasicDependabotConfig(dependabotConfig, dependabotPath)
+    console.log('✅ Created .github/dependabot.yml')
+  }
+
+  console.log('\n🎉 Basic dependency monitoring setup complete!')
+  console.log('\n📋 What was added (Free Tier):')
+  console.log('   • Basic Dependabot configuration for npm packages')
+  console.log('   • Weekly dependency updates on Monday 9am')
+  console.log('   • Auto-merge for security patches only')
+  console.log('   • GitHub Actions dependency monitoring')
+
+  // Show upgrade message for premium features
+  console.log('\n🔒 Premium features available:')
+  console.log('   • Framework-aware package grouping (React, Next.js, Vue)')
+  console.log('   • Multi-language support (Python, Rust, Go)')
+  console.log('   • Advanced security audit workflows')
+  console.log('   • Custom update schedules and notifications')
+
+  showUpgradeMessage('Advanced Dependency Monitoring')
+
+  console.log('\n💡 Next steps:')
+  console.log('   • Review and commit .github/dependabot.yml')
+  console.log('   • Enable Dependabot alerts in GitHub repository settings')
+  console.log(
+    '   • Dependabot will start monitoring weekly for security patches'
+  )
+}
+
+// Handle license status command
+if (isLicenseStatusMode) {
+  showLicenseStatus()
+  process.exit(0)
+}
+
+// Handle dependency monitoring command
+if (isDependencyMonitoringMode) {
+  ;(async () => {
+    try {
+      await handleBasicDependencyMonitoring()
+      process.exit(0)
+    } catch (error) {
+      console.error('Dependency monitoring setup error:', error.message)
+      process.exit(1)
+    }
+  })()
 }
 
 // Run validation commands if requested
