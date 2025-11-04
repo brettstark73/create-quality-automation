@@ -18,6 +18,17 @@ Bootstrap quality automation in JavaScript/TypeScript and Python projects with c
 
 ## 🚀 Quick Start
 
+### Requirements
+
+- Node.js **20 or higher**
+- npm **10+** (installed automatically with Node 20)
+
+> **Troubleshooting**
+>
+> - Using Volta: `volta install node@20.11.1`
+> - Using nvm: `nvm install 20 && nvm use 20`
+> - npm cache permission errors (`EPERM` on `~/.npm`): either fix ownership (`sudo chown -R $(id -u):$(id -g) ~/.npm`) or point npm to a writable cache (`npm_config_cache=$PWD/.npm-cache npm install`).
+
 ### For Any Project (Recommended)
 
 ```bash
@@ -436,6 +447,11 @@ Want to improve this template?
 2. Make your changes
 3. Test with a sample project
 4. Submit a pull request
+
+## 🗺️ Roadmap & Status
+
+- [Current roadmap snapshot](ROADMAP.md)
+- Premium tiers are in private beta; join the waitlists in the Premium section above to participate.
 
 ## 📄 License
 
