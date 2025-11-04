@@ -9,6 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.4.0] - 2025-11-04
+
+### Added
+
+- **🆓 Freemium Dependency Monitoring:** `--deps` command now scaffolds a Dependabot + GitHub Actions baseline for npm projects, auto-merging security patches by default.
+- **📋 License Awareness:** CLI surfaces current tier details through `--license-status`, including upgrade prompts for Pro/Enterprise.
+
+### Changed
+
+- **📣 Documentation:** README now highlights the free tier entry point, premium upgrade paths, and dependency monitoring workflow.
+- **🛠️ Validation Scripts:** `validate:comprehensive` bundles freemium configuration checks so repos stay aligned after upgrades.
+
+---
+
 ## [2.3.3] - 2025-11-01
 
 ### Fixed

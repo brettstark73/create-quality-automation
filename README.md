@@ -65,25 +65,25 @@ npx create-quality-automation@latest --deps
 npx create-quality-automation@latest --license-status
 ```
 
-#### 🔒 Premium Tiers
+#### 🔒 Premium Tiers (Private Beta)
 
-**💰 Pro Tier ($39/month)**
+> We’re validating premium automation now. Join the waitlist to influence the roadmap.
 
-- Framework-aware package grouping (React, Next.js, Vue, Angular)
-- Multi-language support (Python, Rust, Go)
-- Advanced security audit workflows
-- Custom update schedules
-- Breaking change detection
+**💰 Pro Tier (planned $39/month)**
 
-**🏢 Enterprise Tier ($197/month)**
+- Coming soon: framework-aware dependency grouping (React, Next.js, Vue, Angular)
+- Coming soon: multi-language support beyond npm (Python, Rust, Go, more)
+- Planned: advanced security audit workflows and custom schedules
+- Planned: breaking change detection before merging updates
 
-- Everything in Pro
-- Custom notification channels (Slack, Teams)
-- Multi-repository management
-- Advanced reporting and analytics
-- Priority support
+**🏢 Enterprise Tier (planned $197/month)**
 
-[**🚀 Upgrade to Pro**](https://create-quality-automation.dev/pro) | [**🏢 Get Enterprise**](https://create-quality-automation.dev/enterprise)
+- Everything in the Pro roadmap
+- Planned: custom notification channels (Slack, Teams)
+- Planned: multi-repository governance and analytics
+- Planned: priority support with shared runbooks
+
+[**🚀 Join the Pro waitlist**](https://create-quality-automation.dev/pro) | [**🏢 Request Enterprise beta**](https://create-quality-automation.dev/enterprise)
 
 ### Validation Commands (v2.2.0+)
 
