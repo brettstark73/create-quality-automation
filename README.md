@@ -448,11 +448,6 @@ Want to improve this template?
 3. Test with a sample project
 4. Submit a pull request
 
-## 🗺️ Roadmap & Status
-
-- [Current roadmap snapshot](ROADMAP.md)
-- Premium tiers are in private beta; join the waitlists in the Premium section above to participate.
-
 ## 📄 License
 
 MIT License - feel free to use in any project!
