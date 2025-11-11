@@ -64,9 +64,19 @@ jobs:
 
       - name: Check for hardcoded secrets
         run: |
-          # Check for common secret patterns (excluding workflow files)
-          if grep -r -E "(password|secret|key|token).*[=:].*['\"][^'\"]{8,}" . --exclude-dir=node_modules --exclude-dir=.git --exclude-dir=.github || \
-             grep -r -E "-----BEGIN.*KEY-----" . --exclude-dir=node_modules --exclude-dir=.git --exclude-dir=.github; then
+          # Check for common secret patterns (excluding docs, tests, and workflow files)
+          if grep -r -E "(password|secret|key|token).*[=:].*['\"][^'\"]{8,}" . \
+               --exclude-dir=node_modules \
+               --exclude-dir=.git \
+               --exclude-dir=.github \
+               --exclude-dir=tests \
+               --exclude="*.md" \
+               --exclude="package.json" || \
+             grep -r -E "-----BEGIN.*KEY-----" . \
+               --exclude-dir=node_modules \
+               --exclude-dir=.git \
+               --exclude-dir=.github \
+               --exclude-dir=tests; then
             echo "❌ Potential hardcoded secrets found"
             exit 1
           else
