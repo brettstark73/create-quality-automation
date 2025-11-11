@@ -204,6 +204,7 @@ async function testPermissionErrors() {
   } finally {
     // Restore write permission before cleanup
     try {
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
       fs.chmodSync(path.join(testDir, 'package.json'), 0o644)
     } catch {
       // Ignore cleanup errors
