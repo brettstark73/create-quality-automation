@@ -60,6 +60,7 @@ This catches documentation gaps that manual review misses. Also reference:
 ### **When Making ANY Code Change:**
 
 1. **Systematic Search**: Use multiple search methods to find ALL instances
+
    ```bash
    # Example: Removing 'grep' usage
    grep -r "grep" . --exclude-dir=node_modules --exclude-dir=.git
@@ -68,18 +69,21 @@ This catches documentation gaps that manual review misses. Also reference:
    ```
 
 2. **Verify Complete Removal**: After edits, re-search to confirm ZERO instances
+
    ```bash
    # Must return NO results
    grep -r "target_pattern" . --exclude-dir=node_modules --exclude-dir=.git
    ```
 
 3. **Test the Specific Issue**: Create minimal reproduction of the reported problem
+
    ```bash
    # Example: Test Windows grep issue
    node setup.js --security-config 2>&1 | grep "not recognized"
    ```
 
 4. **Integration Test**: Run full test suite to ensure no regressions
+
    ```bash
    npm test
    ```
