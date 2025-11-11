@@ -9,6 +9,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.5.0] - 2025-11-11
+
+### Added
+
+- **🧪 Comprehensive Error Path Testing:** Added `tests/error-paths.test.js` with 6 error scenarios (ESLint missing, malformed JSON, permissions, missing deps, invalid config, missing package.json)
+- **📚 CI README Verification:** GitHub Actions now tests Quick Start instructions from clean environment to catch broken documentation
+- **🏗️ Base Validator Class:** Created `lib/validation/base-validator.js` with common error handling, state management, and validation patterns
+- **🏭 Validation Factory:** Implemented dependency injection pattern in `lib/validation/validation-factory.js` for better testability and loose coupling
+
+### Changed
+
+- **⚡ ESLint Programmatic API:** Refactored security validation to use ESLint API instead of fragile shell parsing, providing precise file:line:column error locations
+- **🔧 TypeScript Config Detection:** Now detects all ESLint config variants including `eslint.config.ts.cjs` for TypeScript-first projects
+- **🛡️ Better Error Messages:** Centralized error formatting for ENOENT, EACCES, MODULE_NOT_FOUND with context-aware messages
+
+### Fixed
+
+- **🚨 CRITICAL**: ESLint security validation now properly fails when ESLint binary is missing instead of silently passing (resolves false positive security gates)
+- **🚨 CRITICAL**: TypeScript projects using `eslint.config.ts.cjs` are now properly scanned (previously invisible to security scanner)
+- **📖 Documentation Validation:** Implemented promised README file/script reference validation that was advertised but not implemented
+- **🪟 Cross-platform Testing:** Replaced Unix-only `rm -rf` with `fs.rmSync()` for Windows compatibility
+
+---
+
 ## [2.4.0] - 2025-11-04
 
 ### Added
