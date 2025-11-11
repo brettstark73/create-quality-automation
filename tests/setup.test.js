@@ -429,9 +429,9 @@ try {
   console.error('❌ Python setup test failed:', error.message)
   process.exit(1)
 } finally {
-  // Clean up
+  // Clean up (cross-platform compatible)
   if (fs.existsSync(pythonProjectDir)) {
-    execSync(`rm -rf "${pythonProjectDir}"`, { stdio: 'ignore' })
+    fs.rmSync(pythonProjectDir, { recursive: true, force: true })
   }
 }
 
