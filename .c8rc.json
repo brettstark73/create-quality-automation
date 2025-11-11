@@ -1,0 +1,17 @@
+{
+  "all": true,
+  "include": ["lib/**/*.js", "setup.js"],
+  "exclude": [
+    "tests/**",
+    "node_modules/**",
+    "coverage/**",
+    "**/*.test.js",
+    "**/*.spec.js"
+  ],
+  "reporter": ["html", "text", "lcov"],
+  "lines": 75,
+  "statements": 75,
+  "functions": 70,
+  "branches": 65,
+  "check-coverage": true
+}

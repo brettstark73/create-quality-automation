@@ -194,20 +194,6 @@ const validateAndSanitizeInput = input => {
   return sanitized
 }
 
-// Keeping validateDirectory for future use and security best practices
-// eslint-disable-next-line no-unused-vars
-const validateDirectory = dirPath => {
-  if (!dirPath || typeof dirPath !== 'string') {
-    throw new Error('Directory path must be a valid string')
-  }
-  // Prevent path traversal attacks
-  const normalized = path.normalize(dirPath)
-  if (normalized.includes('..') || normalized.startsWith('/')) {
-    throw new Error('Invalid directory path: path traversal detected')
-  }
-  return normalized
-}
-
 // CLI argument parsing with validation
 const args = process.argv.slice(2)
 const sanitizedArgs = args

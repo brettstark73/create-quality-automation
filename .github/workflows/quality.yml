@@ -29,6 +29,27 @@ jobs:
             npm install
           fi
 
+      - name: Verify dependency integrity
+        run: |
+          echo "🔐 Verifying dependency integrity..."
+          # Verify package-lock.json integrity hashes
+          if [ -f package-lock.json ]; then
+            npm ci --dry-run --prefer-offline
+            echo "✅ Dependency integrity verified"
+          else
+            echo "⚠️ No package-lock.json found - skipping integrity verification"
+          fi
+
+          # Check for known vulnerabilities in dependencies
+          echo "🔍 Checking for vulnerable dependencies..."
+          npm audit --audit-level=moderate || true
+
+          # Verify npm package signatures (Node.js 16+)
+          if command -v npm &> /dev/null; then
+            echo "✍️ Verifying npm package signatures..."
+            npm audit signatures || echo "⚠️ Signature verification not available or failed"
+          fi
+
       - name: Prettier check
         run: npm run format:check
 
