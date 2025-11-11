@@ -72,7 +72,9 @@ async function testESLintNotInstalled() {
       })
       // If it succeeds, ESLint might be globally installed - that's OK
       // The key is that it doesn't crash
-      console.log('  ✅ Handled ESLint scenario gracefully (globally installed)')
+      console.log(
+        '  ✅ Handled ESLint scenario gracefully (globally installed)'
+      )
     } catch (error) {
       // Check that error message is helpful (not a crash)
       const output = (error.stdout || '') + (error.stderr || '')
@@ -104,9 +106,7 @@ async function testESLintNotInstalled() {
 async function testMalformedPackageJson() {
   console.log('🔍 Testing malformed package.json error handling...')
 
-  const testDir = fs.mkdtempSync(
-    path.join(os.tmpdir(), 'malformed-json-test-')
-  )
+  const testDir = fs.mkdtempSync(path.join(os.tmpdir(), 'malformed-json-test-'))
   const originalCwd = process.cwd()
 
   try {
@@ -219,9 +219,7 @@ async function testPermissionErrors() {
 async function testMissingDependencies() {
   console.log('🔍 Testing missing dependencies error handling...')
 
-  const testDir = fs.mkdtempSync(
-    path.join(os.tmpdir(), 'missing-deps-test-')
-  )
+  const testDir = fs.mkdtempSync(path.join(os.tmpdir(), 'missing-deps-test-'))
   const originalCwd = process.cwd()
 
   try {
@@ -267,9 +265,7 @@ async function testMissingDependencies() {
 async function testInvalidESLintConfig() {
   console.log('🔍 Testing invalid ESLint config error handling...')
 
-  const testDir = fs.mkdtempSync(
-    path.join(os.tmpdir(), 'invalid-eslint-test-')
-  )
+  const testDir = fs.mkdtempSync(path.join(os.tmpdir(), 'invalid-eslint-test-'))
   const originalCwd = process.cwd()
 
   try {
