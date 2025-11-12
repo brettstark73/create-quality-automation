@@ -136,37 +136,15 @@ jobs:
 
       - name: Configuration security check
         run: |
-          # Check for configuration security issues
-          if [ -f "setup.js" ]; then
-            echo "🔍 Running configuration security validation..."
-            node setup.js --security-config
-          else
-            echo "⏭️ No setup.js found, running basic security checks..."
-
-            # Basic Next.js env block check
-            if find . -name "next.config.*" -type f | head -1 | xargs grep -l "env:" 2>/dev/null; then
-              echo "⚠️ Next.js env block found - manually verify no secrets are exposed to client"
-            fi
-
-            # Basic Vite env check
-            if find . -name "vite.config.*" -type f | head -1 | xargs grep -l "VITE_.*SECRET\|VITE_.*PASSWORD\|VITE_.*KEY" 2>/dev/null; then
-              echo "❌ VITE_ prefixed secrets detected - these are exposed to client!"
-              exit 1
-            fi
-          fi
+          # Run comprehensive configuration security validation
+          echo "🔍 Running configuration security validation..."
+          npx create-quality-automation@latest --security-config
 
       - name: Documentation validation
         run: |
-          # Validate documentation accuracy
-          # TEMPORARILY DISABLED: README.md has references to future features
-          # TODO: Clean up README.md to remove Python/Lighthouse references
-          echo "⏭️ Documentation validation temporarily disabled"
-          # if [ -f "setup.js" ]; then
-          #   echo "📖 Running documentation validation..."
-          #   node setup.js --validate-docs
-          # else
-          #   echo "⏭️ No setup.js found, skipping documentation validation"
-          # fi
+          # Run comprehensive documentation validation
+          echo "📖 Running documentation validation..."
+          npx create-quality-automation@latest --validate-docs
 
       - name: Lighthouse CI
         run: |
