@@ -57,9 +57,12 @@ npx create-quality-automation@latest --deps
 
 # What you get for free:
 # ✅ Basic Dependabot configuration for npm packages
-# ✅ Weekly dependency updates on Monday 9am
-# ✅ Auto-merge for security patches only
+# ✅ Weekly dependency updates on Monday 9am (configurable)
 # ✅ GitHub Actions dependency monitoring
+# ✅ Automatic PR creation for dependency updates
+#
+# Note: Auto-merge requires manual GitHub Actions workflow setup
+# See: https://docs.github.com/en/code-security/dependabot/working-with-dependabot/automating-dependabot-with-github-actions
 
 # Check your current license tier and features
 npx create-quality-automation@latest --license-status
