@@ -445,7 +445,7 @@ MIT License - feel free to use in any project!
 
 If you run into issues:
 
-1. Check the troubleshooting section above
+1. Check the **[Troubleshooting Guide](./TROUBLESHOOTING.md)** for common problems and solutions
 2. Review the GitHub Actions logs
 3. Open an issue in this repository
 
