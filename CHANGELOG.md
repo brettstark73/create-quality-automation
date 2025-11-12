@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.6.1] - 2025-11-12
+
+### Fixed
+
+- **🚨 CRITICAL**: Workflow validation steps using conditional setup.js checks that always fall back to weaker validation
+  - Configuration security check now uses `npx create-quality-automation@latest --security-config`
+  - Documentation validation now uses `npx create-quality-automation@latest --validate-docs`
+  - Previously: `if [ -f "setup.js" ]` was always false in consumer repos, silently falling back to basic grep checks
+  - Impact: Consumer repos now get comprehensive validation instead of weak fallback checks
+- **📖 README accuracy**: Removed "Auto-merge for security patches only" claim from Dependabot feature list
+  - Auto-merge is NOT included in basic Dependabot configuration
+  - Added note that auto-merge requires manual GitHub Actions workflow setup
+  - Provided link to GitHub documentation for auto-merge setup
+
+---
+
 ## [2.6.0] - 2025-11-12
 
 ### Added
