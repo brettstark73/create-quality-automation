@@ -208,6 +208,7 @@ const isDependencyMonitoringMode =
   sanitizedArgs.includes('--deps') ||
   sanitizedArgs.includes('--dependency-monitoring')
 const isLicenseStatusMode = sanitizedArgs.includes('--license-status')
+const isDryRun = sanitizedArgs.includes('--dry-run')
 
 // Granular tool disable options
 const disableNpmAudit = sanitizedArgs.includes('--no-npm-audit')
@@ -228,6 +229,7 @@ SETUP OPTIONS:
   --update          Update existing configuration
   --deps            Add basic dependency monitoring (Free Tier)
   --dependency-monitoring  Same as --deps
+  --dry-run         Preview changes without modifying files
 
 VALIDATION OPTIONS:
   --validate        Run comprehensive validation (same as --comprehensive)
@@ -261,6 +263,9 @@ EXAMPLES:
   npx create-quality-automation@latest --security-config --no-npm-audit
     → Run security checks but skip npm audit
 
+  npx create-quality-automation@latest --dry-run
+    → Preview what files and configurations would be created/modified
+
 HELP:
   --help, -h        Show this help message
 `)
@@ -268,8 +273,44 @@ HELP:
 }
 
 console.log(
-  `🚀 ${isUpdateMode ? 'Updating' : isDependencyMonitoringMode ? 'Adding dependency monitoring to' : 'Setting up'} Quality Automation...\n`
+  `🚀 ${isDryRun ? '[DRY RUN] Previewing' : isUpdateMode ? 'Updating' : isDependencyMonitoringMode ? 'Adding dependency monitoring to' : 'Setting up'} Quality Automation...\n`
 )
+
+// Handle dry-run mode - preview what would be changed
+if (isDryRun) {
+  console.log('📋 DRY RUN MODE - No files will be modified\n')
+  console.log('The following files would be created/modified:\n')
+  console.log('Configuration Files:')
+  console.log('  • .prettierrc - Prettier formatting configuration')
+  console.log('  • .prettierignore - Files to exclude from formatting')
+  console.log('  • eslint.config.cjs - ESLint linting configuration')
+  console.log('  • .stylelintrc.json - Stylelint CSS linting configuration')
+  console.log(
+    '  • .editorconfig - Editor configuration for consistent formatting'
+  )
+  console.log('  • .nvmrc - Node version specification')
+  console.log('  • .npmrc - npm configuration with engine-strict')
+  console.log('')
+  console.log('Git Hooks (Husky):')
+  console.log('  • .husky/pre-commit - Pre-commit hook for lint-staged')
+  console.log('')
+  console.log('GitHub Actions:')
+  console.log('  • .github/workflows/quality.yml - Quality checks workflow')
+  console.log('')
+  console.log('Package.json Modifications:')
+  console.log(
+    '  • Add devDependencies: eslint, prettier, stylelint, husky, lint-staged'
+  )
+  console.log('  • Add scripts: format, lint, prepare')
+  console.log('  • Add lint-staged configuration')
+  console.log('  • Add engines requirement (Node >=20)')
+  console.log('')
+  console.log('✅ Dry run complete - no files were modified')
+  console.log('')
+  console.log('To apply these changes, run without --dry-run flag:')
+  console.log('  npx create-quality-automation@latest')
+  process.exit(0)
+}
 
 // Handle validation-only commands
 async function handleValidationCommands() {
