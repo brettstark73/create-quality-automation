@@ -179,71 +179,9 @@ jobs:
           fi
         continue-on-error: true
 
-      - name: Test README Quick Start Instructions
-        run: |
-          # Test that the README Quick Start actually works from a clean environment
-          echo "📚 Testing README Quick Start instructions..."
-
-          # Create temporary test directory
-          TEST_DIR=$(mktemp -d)
-          cd "$TEST_DIR"
-
-          echo "📦 Creating minimal test project..."
-          # Initialize git repo (required by setup.js)
-          git init
-          git config user.email "ci@example.com"
-          git config user.name "CI Test"
-
-          # Create minimal package.json as shown in Quick Start
-          cat > package.json <<'EOF'
-          {
-            "name": "readme-test",
-            "version": "1.0.0",
-            "description": "Testing README Quick Start",
-            "keywords": ["test"],
-            "license": "MIT"
-          }
-          EOF
-
-          # Run the exact command from README: npx create-quality-automation@latest
-          # Since we're in CI testing the current version, use the local setup.js
-          echo "🚀 Running: npx create-quality-automation@latest"
-          node "$GITHUB_WORKSPACE/setup.js"
-
-          # Verify files were created (as promised in README)
-          echo "✅ Verifying setup results..."
-
-          if [ ! -f "package.json" ]; then
-            echo "❌ package.json not found"
-            exit 1
-          fi
-
-          if [ ! -f ".prettierrc" ]; then
-            echo "❌ .prettierrc not created"
-            exit 1
-          fi
-
-          if [ ! -f ".prettierignore" ]; then
-            echo "❌ .prettierignore not created"
-            exit 1
-          fi
-
-          # Test npm install (as instructed in README)
-          echo "📦 Running: npm install"
-          npm install --ignore-scripts
-
-          # Test npm run prepare (as instructed in README)
-          echo "🪝 Running: npm run prepare"
-          npm run prepare
-
-          # Verify Husky hooks were installed
-          if [ ! -d ".husky" ]; then
-            echo "❌ Husky hooks not installed"
-            exit 1
-          fi
-
-          echo "✅ README Quick Start instructions verified successfully!"
-
-          # Clean up
-          cd "$GITHUB_WORKSPACE"
-          rm -rf "$TEST_DIR"
+      # NOTE: The "Test README Quick Start Instructions" step has been removed
+      # because it relies on setup.js which only exists in the create-quality-automation
+      # package itself, not in consumer repositories that copy this workflow.
+      #
+      # Consumer projects get the quality checks above (prettier, eslint, stylelint, etc.)
+      # but don't need to test the installation process.
