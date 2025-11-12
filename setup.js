@@ -539,7 +539,7 @@ if (
       )
     }
 
-    // Python detection
+    // Python detection (including in workspace packages for monorepos)
     const pythonCandidates = [
       'pyproject.toml',
       'setup.py',
@@ -550,9 +550,40 @@ if (
       fs.existsSync(path.join(process.cwd(), file))
     )
 
-    const hasPythonFiles = safeReadDir(process.cwd()).some(
-      dirent => dirent.isFile() && dirent.name.endsWith('.py')
-    )
+    /**
+     * Recursively check for Python files in directory and subdirectories
+     * Limited to 2 levels deep to avoid performance issues in large monorepos
+     */
+    function hasPythonFilesRecursive(dir, depth = 0, maxDepth = 2) {
+      if (depth > maxDepth) return false
+
+      try {
+        const entries = safeReadDir(dir)
+
+        // Check files in current directory
+        const hasPyInCurrentDir = entries.some(
+          dirent => dirent.isFile() && dirent.name.endsWith('.py')
+        )
+        if (hasPyInCurrentDir) return true
+
+        // Check subdirectories (skip node_modules, .git, etc.)
+        const skipDirs = ['node_modules', '.git', 'dist', 'build', 'coverage']
+        for (const dirent of entries) {
+          if (dirent.isDirectory() && !skipDirs.includes(dirent.name)) {
+            const subDir = path.join(dir, dirent.name)
+            if (hasPythonFilesRecursive(subDir, depth + 1, maxDepth)) {
+              return true
+            }
+          }
+        }
+
+        return false
+      } catch {
+        return false
+      }
+    }
+
+    const hasPythonFiles = hasPythonFilesRecursive(process.cwd())
 
     const usesPython = Boolean(hasPythonConfig || hasPythonFiles)
     if (usesPython) {
