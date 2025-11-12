@@ -1,0 +1,807 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Create Quality Automation - AI Builder Lab</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      :root {
+        --color-primary: #030712;
+        --color-secondary: #f9fafb;
+        --color-accent: #3843d0;
+        --color-text: #1f2937;
+        --color-text-light: #6b7280;
+        --color-border: #e5e7eb;
+        --color-success: #10b981;
+      }
+
+      body {
+        font-family:
+          'Inter',
+          -apple-system,
+          BlinkMacSystemFont,
+          'Segoe UI',
+          Roboto,
+          sans-serif;
+        line-height: 1.6;
+        color: var(--color-text);
+        background: white;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      /* Header */
+      .header {
+        background: var(--color-primary);
+        color: white;
+        padding: 20px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .header-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .logo {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: white;
+        text-decoration: none;
+      }
+
+      .nav-link {
+        color: rgba(255, 255, 255, 0.8);
+        text-decoration: none;
+        font-size: 0.875rem;
+        transition: color 0.2s;
+      }
+
+      .nav-link:hover {
+        color: white;
+      }
+
+      /* Hero Section */
+      .hero {
+        background: linear-gradient(
+          180deg,
+          var(--color-primary) 0%,
+          #1a1f3a 100%
+        );
+        color: white;
+        padding: 100px 24px 80px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .hero::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background:
+          radial-gradient(
+            circle at 20% 50%,
+            rgba(56, 67, 208, 0.1) 0%,
+            transparent 50%
+          ),
+          radial-gradient(
+            circle at 80% 80%,
+            rgba(56, 67, 208, 0.1) 0%,
+            transparent 50%
+          );
+        pointer-events: none;
+      }
+
+      .hero-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        position: relative;
+        z-index: 1;
+      }
+
+      .badge {
+        display: inline-block;
+        background: rgba(56, 67, 208, 0.2);
+        color: #93c5fd;
+        padding: 6px 16px;
+        border-radius: 20px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        margin-bottom: 24px;
+        border: 1px solid rgba(56, 67, 208, 0.3);
+      }
+
+      .hero h1 {
+        font-size: 3.5rem;
+        font-weight: 800;
+        margin-bottom: 24px;
+        line-height: 1.1;
+        letter-spacing: -0.02em;
+      }
+
+      .hero-subtitle {
+        font-size: 1.5rem;
+        color: rgba(255, 255, 255, 0.8);
+        margin-bottom: 16px;
+        font-weight: 400;
+      }
+
+      .hero-description {
+        font-size: 1.125rem;
+        color: rgba(255, 255, 255, 0.6);
+        margin-bottom: 40px;
+        max-width: 700px;
+      }
+
+      .cta-group {
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+        margin-bottom: 48px;
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 14px 28px;
+        font-size: 1rem;
+        font-weight: 600;
+        text-decoration: none;
+        border-radius: 8px;
+        transition: all 0.2s;
+        cursor: pointer;
+        border: none;
+      }
+
+      .btn-primary {
+        background: var(--color-accent);
+        color: white;
+      }
+
+      .btn-primary:hover {
+        background: #2d36b0;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(56, 67, 208, 0.3);
+      }
+
+      .btn-secondary {
+        background: white;
+        color: var(--color-primary);
+      }
+
+      .btn-secondary:hover {
+        background: var(--color-secondary);
+      }
+
+      .btn-ghost {
+        background: transparent;
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .btn-ghost:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.3);
+      }
+
+      /* Code Block */
+      .terminal {
+        background: #0d1117;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        padding: 24px;
+        max-width: 600px;
+        font-family: 'Monaco', 'Menlo', monospace;
+        position: relative;
+      }
+
+      .terminal-header {
+        display: flex;
+        gap: 6px;
+        margin-bottom: 16px;
+      }
+
+      .terminal-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+      }
+
+      .terminal-dot:nth-child(1) {
+        background: #ff5f56;
+      }
+      .terminal-dot:nth-child(2) {
+        background: #ffbd2e;
+      }
+      .terminal-dot:nth-child(3) {
+        background: #27c93f;
+      }
+
+      .terminal-content {
+        color: #58a6ff;
+        font-size: 1rem;
+        line-height: 1.8;
+      }
+
+      .terminal-prompt {
+        color: #8b949e;
+      }
+
+      .terminal-command {
+        color: #79c0ff;
+      }
+
+      /* Container */
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 24px;
+      }
+
+      /* Section */
+      .section {
+        padding: 80px 24px;
+      }
+
+      .section-header {
+        text-align: center;
+        margin-bottom: 64px;
+      }
+
+      .section-title {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: var(--color-primary);
+        margin-bottom: 16px;
+        letter-spacing: -0.02em;
+      }
+
+      .section-subtitle {
+        font-size: 1.125rem;
+        color: var(--color-text-light);
+        max-width: 600px;
+        margin: 0 auto;
+      }
+
+      /* Features Grid */
+      .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 32px;
+      }
+
+      .feature-card {
+        background: white;
+        border: 1px solid var(--color-border);
+        border-radius: 12px;
+        padding: 32px;
+        transition: all 0.3s;
+      }
+
+      .feature-card:hover {
+        border-color: var(--color-accent);
+        box-shadow: 0 8px 24px rgba(56, 67, 208, 0.1);
+        transform: translateY(-4px);
+      }
+
+      .feature-icon {
+        width: 48px;
+        height: 48px;
+        background: linear-gradient(135deg, var(--color-accent), #5b66e8);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin-bottom: 20px;
+      }
+
+      .feature-card h3 {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--color-primary);
+        margin-bottom: 12px;
+      }
+
+      .feature-card p {
+        color: var(--color-text-light);
+        line-height: 1.6;
+        font-size: 0.9375rem;
+      }
+
+      .feature-tag {
+        display: inline-block;
+        background: #d1fae5;
+        color: #065f46;
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        margin-left: 8px;
+        text-transform: uppercase;
+      }
+
+      /* Stats Section */
+      .stats-section {
+        background: var(--color-secondary);
+        padding: 64px 24px;
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 48px;
+        max-width: 900px;
+        margin: 0 auto;
+        text-align: center;
+      }
+
+      .stat-item h4 {
+        font-size: 3rem;
+        font-weight: 800;
+        color: var(--color-accent);
+        margin-bottom: 8px;
+      }
+
+      .stat-item p {
+        color: var(--color-text-light);
+        font-size: 0.9375rem;
+      }
+
+      /* Pricing */
+      .pricing-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 32px;
+        max-width: 900px;
+        margin: 0 auto;
+      }
+
+      .pricing-card {
+        background: white;
+        border: 2px solid var(--color-border);
+        border-radius: 16px;
+        padding: 40px;
+        position: relative;
+      }
+
+      .pricing-card.featured {
+        border-color: var(--color-accent);
+        box-shadow: 0 12px 40px rgba(56, 67, 208, 0.15);
+      }
+
+      .pricing-card.featured::before {
+        content: 'RECOMMENDED';
+        position: absolute;
+        top: -12px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: var(--color-accent);
+        color: white;
+        padding: 4px 16px;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 700;
+      }
+
+      .pricing-card h3 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--color-primary);
+        margin-bottom: 8px;
+      }
+
+      .pricing-card .price {
+        font-size: 3.5rem;
+        font-weight: 800;
+        color: var(--color-primary);
+        margin: 20px 0;
+      }
+
+      .pricing-card .price span {
+        font-size: 1.25rem;
+        font-weight: 400;
+        color: var(--color-text-light);
+      }
+
+      .pricing-card .price-description {
+        color: var(--color-text-light);
+        margin-bottom: 32px;
+        font-size: 0.9375rem;
+      }
+
+      .feature-list {
+        list-style: none;
+        margin-bottom: 32px;
+      }
+
+      .feature-list li {
+        padding: 12px 0;
+        color: var(--color-text);
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        border-bottom: 1px solid var(--color-border);
+        font-size: 0.9375rem;
+      }
+
+      .feature-list li:last-child {
+        border-bottom: none;
+      }
+
+      .feature-list li::before {
+        content: '✓';
+        color: var(--color-success);
+        font-weight: 700;
+        font-size: 1.125rem;
+        flex-shrink: 0;
+      }
+
+      .feature-list li.unavailable {
+        color: var(--color-text-light);
+        opacity: 0.5;
+      }
+
+      .feature-list li.unavailable::before {
+        content: '−';
+        color: var(--color-text-light);
+      }
+
+      /* CTA Section */
+      .cta-section {
+        background: linear-gradient(135deg, var(--color-primary), #1a1f3a);
+        color: white;
+        padding: 80px 24px;
+        text-align: center;
+      }
+
+      .cta-section h2 {
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin-bottom: 16px;
+      }
+
+      .cta-section p {
+        font-size: 1.125rem;
+        color: rgba(255, 255, 255, 0.8);
+        margin-bottom: 32px;
+      }
+
+      /* Footer */
+      .footer {
+        background: var(--color-primary);
+        color: rgba(255, 255, 255, 0.6);
+        padding: 32px 24px;
+        text-align: center;
+        font-size: 0.875rem;
+      }
+
+      .footer a {
+        color: rgba(255, 255, 255, 0.8);
+        text-decoration: none;
+      }
+
+      .footer a:hover {
+        color: white;
+      }
+
+      /* Responsive */
+      @media (max-width: 768px) {
+        .hero h1 {
+          font-size: 2.5rem;
+        }
+
+        .hero-subtitle {
+          font-size: 1.25rem;
+        }
+
+        .cta-group {
+          flex-direction: column;
+        }
+
+        .btn {
+          width: 100%;
+          justify-content: center;
+        }
+
+        .section-title {
+          font-size: 2rem;
+        }
+
+        .pricing-card.featured::before {
+          font-size: 0.625rem;
+          padding: 4px 12px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header -->
+    <header class="header">
+      <div class="header-content">
+        <a href="https://www.aibuilderlab.com" class="logo">AI Builder Lab</a>
+        <a href="https://www.aibuilderlab.com/projects" class="nav-link"
+          >← Back to Projects</a
+        >
+      </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="hero-content">
+        <div class="badge">🚀 OPEN SOURCE PROJECT</div>
+        <h1>Create Quality Automation</h1>
+        <p class="hero-subtitle">
+          Professional code quality tools in minutes, not hours
+        </p>
+        <p class="hero-description">
+          Bootstrap ESLint 9, Prettier, Stylelint, Husky hooks, and GitHub
+          Actions in any JavaScript/TypeScript project with a single command.
+          Merge-safe for existing projects.
+        </p>
+
+        <div class="cta-group">
+          <a href="#install" class="btn btn-primary">
+            <span>Get Started Free</span>
+            <span>→</span>
+          </a>
+          <a
+            href="https://github.com/brettstark73/quality-automation-template"
+            class="btn btn-secondary"
+            target="_blank"
+          >
+            <span>⭐</span>
+            <span>Star on GitHub</span>
+          </a>
+        </div>
+
+        <div class="terminal" id="install">
+          <div class="terminal-header">
+            <span class="terminal-dot"></span>
+            <span class="terminal-dot"></span>
+            <span class="terminal-dot"></span>
+          </div>
+          <div class="terminal-content">
+            <div>
+              <span class="terminal-prompt">$</span>
+              <span class="terminal-command"
+                >npx create-quality-automation@latest</span
+              >
+            </div>
+            <div>
+              <span class="terminal-prompt">#</span> Requires Node.js ≥20
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats-section">
+      <div class="stats-grid">
+        <div class="stat-item">
+          <h4>100%</h4>
+          <p>Free & Open Source</p>
+        </div>
+        <div class="stat-item">
+          <h4>&lt;60s</h4>
+          <p>Setup Time</p>
+        </div>
+        <div class="stat-item">
+          <h4>6</h4>
+          <p>Integrated Tools</p>
+        </div>
+        <div class="stat-item">
+          <h4>0</h4>
+          <p>Configuration Needed</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="section">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title">Everything You Need for Code Quality</h2>
+          <p class="section-subtitle">
+            Industry-standard tools configured with best practices, ready to use
+            immediately
+          </p>
+        </div>
+
+        <div class="features-grid">
+          <div class="feature-card">
+            <div class="feature-icon">🔍</div>
+            <h3>ESLint 9 Flat Config<span class="feature-tag">Free</span></h3>
+            <p>
+              Modern ESLint configuration with automatic TypeScript detection.
+              Supports both JavaScript and TypeScript projects with zero manual
+              setup.
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">🎨</div>
+            <h3>
+              Comprehensive Stylelint<span class="feature-tag">Free</span>
+            </h3>
+            <p>
+              CSS linting for CSS, SCSS, Sass, Less, and PostCSS. Maintain
+              consistent styling standards across your entire codebase.
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">✨</div>
+            <h3>Prettier Formatting<span class="feature-tag">Free</span></h3>
+            <p>
+              Opinionated code formatting that works automatically. Stop
+              debating code style and focus on building features.
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">🐕</div>
+            <h3>Husky 9 Pre-commit<span class="feature-tag">Free</span></h3>
+            <p>
+              Automated quality checks before every commit. Catch issues before
+              they reach your repository and waste CI/CD time.
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">📦</div>
+            <h3>
+              lint-staged Integration<span class="feature-tag">Free</span>
+            </h3>
+            <p>
+              Run linters only on staged files for lightning-fast commits. No
+              more waiting for full project linting on every commit.
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">⚡</div>
+            <h3>GitHub Actions CI/CD<span class="feature-tag">Free</span></h3>
+            <p>
+              Pre-configured workflows with automated quality checks. Ensure
+              code quality on every pull request automatically.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section class="section" style="background: var(--color-secondary)">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title">Simple, Transparent Pricing</h2>
+          <p class="section-subtitle">
+            Start free and upgrade when you need advanced enterprise features
+          </p>
+        </div>
+
+        <div class="pricing-grid">
+          <!-- Free Tier -->
+          <div class="pricing-card featured">
+            <h3>Open Source</h3>
+            <div class="price">
+              $0
+              <span>/forever</span>
+            </div>
+            <p class="price-description">
+              Perfect for individual developers and open source projects
+            </p>
+
+            <ul class="feature-list">
+              <li>ESLint 9 Flat Config</li>
+              <li>Stylelint for all CSS variants</li>
+              <li>Prettier code formatting</li>
+              <li>Husky 9 pre-commit hooks</li>
+              <li>lint-staged integration</li>
+              <li>GitHub Actions workflows</li>
+              <li>TypeScript auto-detection</li>
+              <li>Merge-safe for existing projects</li>
+              <li>Community support via GitHub</li>
+            </ul>
+
+            <a
+              href="#install"
+              class="btn btn-primary"
+              style="width: 100%; justify-content: center"
+              >Get Started Free</a
+            >
+          </div>
+
+          <!-- Premium Tier -->
+          <div class="pricing-card">
+            <h3>Premium</h3>
+            <div class="price">
+              TBD
+              <span>/month</span>
+            </div>
+            <p class="price-description">
+              Advanced features for teams and enterprises (Coming Soon)
+            </p>
+
+            <ul class="feature-list">
+              <li>All Open Source features</li>
+              <li class="unavailable">Advanced security scanning</li>
+              <li class="unavailable">Custom rule sets library</li>
+              <li class="unavailable">Team collaboration tools</li>
+              <li class="unavailable">Priority support & SLA</li>
+              <li class="unavailable">Advanced analytics dashboard</li>
+              <li class="unavailable">Multi-project management</li>
+              <li class="unavailable">Custom integrations</li>
+              <li class="unavailable">Dedicated account manager</li>
+            </ul>
+
+            <a
+              href="https://github.com/brettstark73/quality-automation-template/issues"
+              class="btn btn-ghost"
+              style="width: 100%; justify-content: center"
+              target="_blank"
+              >Request Features</a
+            >
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+      <div class="container">
+        <h2>Open Source & Community Driven</h2>
+        <p>
+          Built by developers, for developers. Star us on GitHub, contribute, or
+          share feedback.
+        </p>
+        <div class="cta-group" style="justify-content: center">
+          <a
+            href="https://github.com/brettstark73/quality-automation-template"
+            class="btn btn-primary"
+            target="_blank"
+          >
+            ⭐ Star on GitHub
+          </a>
+          <a
+            href="https://github.com/brettstark73/quality-automation-template/issues"
+            class="btn btn-secondary"
+            target="_blank"
+          >
+            💬 Report an Issue
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <p>
+        &copy; 2024 AI Builder Lab. All rights reserved. |
+        <a href="https://www.aibuilderlab.com">Home</a> |
+        <a href="https://www.aibuilderlab.com/projects">Projects</a>
+      </p>
+    </footer>
+  </body>
+</html>

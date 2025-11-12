@@ -47,6 +47,10 @@ const {
 // Enhanced validation capabilities
 const { ValidationRunner } = require('./lib/validation')
 
+// Interactive mode capabilities
+const { InteractivePrompt } = require('./lib/interactive/prompt')
+const { runInteractiveFlow } = require('./lib/interactive/questions')
+
 // Basic dependency monitoring (Free Tier)
 const {
   hasNpmProject,
@@ -196,9 +200,13 @@ const validateAndSanitizeInput = input => {
 
 // CLI argument parsing with validation
 const args = process.argv.slice(2)
-const sanitizedArgs = args
+let sanitizedArgs = args
   .map(arg => validateAndSanitizeInput(arg))
   .filter(Boolean)
+
+// Interactive mode detection - to be handled at execution time
+const isInteractiveRequested = sanitizedArgs.includes('--interactive')
+
 const isUpdateMode = sanitizedArgs.includes('--update')
 const isValidationMode = sanitizedArgs.includes('--validate')
 const isConfigSecurityMode = sanitizedArgs.includes('--security-config')
@@ -226,6 +234,7 @@ Usage: npx create-quality-automation@latest [options]
 
 SETUP OPTIONS:
   (no args)         Run complete quality automation setup
+  --interactive     Interactive mode with guided configuration prompts
   --update          Update existing configuration
   --deps            Add basic dependency monitoring (Free Tier)
   --dependency-monitoring  Same as --deps
@@ -985,7 +994,52 @@ coverage/
     console.log('  • Lint-staged for efficient processing')
   } // End of runMainSetup function
 
-  runMainSetup().catch(error => {
+  // Handle interactive mode if requested, then run main setup
+  ;(async function startSetup() {
+    // Check if interactive mode is explicitly requested
+    if (isInteractiveRequested) {
+      const prompt = new InteractivePrompt()
+
+      // Check TTY availability
+      if (!prompt.isTTY()) {
+        console.error(
+          '❌ Interactive mode requires a TTY environment (interactive terminal).'
+        )
+        console.error(
+          '   For non-interactive use, please specify flags directly.'
+        )
+        console.error('   Run with --help to see available options.\n')
+        process.exit(1)
+      }
+
+      // Run interactive flow
+      try {
+        const interactiveFlags = await runInteractiveFlow(prompt)
+        console.log(
+          `\n🚀 Running setup with options: ${interactiveFlags.join(' ')}\n`
+        )
+
+        // Note: In this initial implementation, we're just showing what flags
+        // would be used. A future enhancement could re-parse flags and re-run.
+        // For now, interactive mode is informational and guides the user.
+        console.log('💡 To run with these options non-interactively, use:')
+        console.log(
+          `   npx create-quality-automation@latest ${interactiveFlags.join(' ')}\n`
+        )
+        console.log('Continuing with default setup for now...\n')
+      } catch (error) {
+        if (error.message.includes('cancelled')) {
+          // User cancelled
+          process.exit(0)
+        }
+        console.error(`❌ Interactive mode error: ${error.message}\n`)
+        process.exit(1)
+      }
+    }
+
+    // Run main setup
+    await runMainSetup()
+  })().catch(error => {
     console.error('❌ Setup failed:', error.message)
     process.exit(1)
   })
