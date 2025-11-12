@@ -18,7 +18,7 @@
     "validate:docs": "node setup.js --validate-docs",
     "validate:comprehensive": "node setup.js --comprehensive --no-markdownlint",
     "validate:all": "npm run validate:comprehensive && npm run security:audit",
-    "test": "node tests/setup.test.js && node tests/integration.test.js && node tests/error-paths.test.js && node tests/error-messages.test.js && node tests/cache-manager.test.js && node tests/parallel-validation.test.js && node tests/python-integration.test.js",
+    "test": "node tests/setup.test.js && node tests/integration.test.js && node tests/error-paths.test.js && node tests/error-messages.test.js && node tests/cache-manager.test.js && node tests/parallel-validation.test.js && node tests/python-integration.test.js && node tests/interactive.test.js",
     "test:coverage": "c8 --reporter=html --reporter=text --reporter=lcov npm test",
     "test:e2e": "bash scripts/test-e2e-package.sh",
     "coverage": "npm run test:coverage && echo '\nCoverage report generated in coverage/index.html'",
