@@ -58,6 +58,9 @@ const {
   writeBasicDependabotConfig,
 } = require('./lib/dependency-monitoring-basic')
 
+// Custom template loading
+const { TemplateLoader } = require('./lib/template-loader')
+
 // Licensing system
 const {
   getLicenseInfo,
@@ -218,6 +221,13 @@ const isDependencyMonitoringMode =
 const isLicenseStatusMode = sanitizedArgs.includes('--license-status')
 const isDryRun = sanitizedArgs.includes('--dry-run')
 
+// Custom template directory
+const templateFlagIndex = sanitizedArgs.findIndex(arg => arg === '--template')
+const customTemplatePath =
+  templateFlagIndex !== -1 && sanitizedArgs[templateFlagIndex + 1]
+    ? sanitizedArgs[templateFlagIndex + 1]
+    : null
+
 // Granular tool disable options
 const disableNpmAudit = sanitizedArgs.includes('--no-npm-audit')
 const disableGitleaks = sanitizedArgs.includes('--no-gitleaks')
@@ -238,6 +248,7 @@ SETUP OPTIONS:
   --update          Update existing configuration
   --deps            Add basic dependency monitoring (Free Tier)
   --dependency-monitoring  Same as --deps
+  --template <path> Use custom templates from specified directory
   --dry-run         Preview changes without modifying files
 
 VALIDATION OPTIONS:
@@ -683,6 +694,13 @@ if (
       console.log('✅ Added .npmrc (engine-strict)')
     }
 
+    // Load and merge templates (custom + defaults)
+    const templateLoader = new TemplateLoader({ verbose: true })
+    const templates = await templateLoader.mergeTemplates(
+      customTemplatePath,
+      __dirname
+    )
+
     // Create .github/workflows directory if it doesn't exist
     const workflowDir = path.join(process.cwd(), '.github', 'workflows')
     if (!fs.existsSync(workflowDir)) {
@@ -693,10 +711,15 @@ if (
     // Copy workflow file if it doesn't exist
     const workflowFile = path.join(workflowDir, 'quality.yml')
     if (!fs.existsSync(workflowFile)) {
-      const templateWorkflow = fs.readFileSync(
-        path.join(__dirname, '.github/workflows/quality.yml'),
-        'utf8'
-      )
+      const templateWorkflow =
+        templateLoader.getTemplate(
+          templates,
+          path.join('.github', 'workflows', 'quality.yml')
+        ) ||
+        fs.readFileSync(
+          path.join(__dirname, '.github/workflows/quality.yml'),
+          'utf8'
+        )
       fs.writeFileSync(workflowFile, templateWorkflow)
       console.log('✅ Added GitHub Actions workflow')
     }
@@ -704,21 +727,21 @@ if (
     // Copy Prettier config if it doesn't exist
     const prettierrcPath = path.join(process.cwd(), '.prettierrc')
     if (!fs.existsSync(prettierrcPath)) {
-      const templatePrettierrc = fs.readFileSync(
-        path.join(__dirname, '.prettierrc'),
-        'utf8'
-      )
+      const templatePrettierrc =
+        templateLoader.getTemplate(templates, '.prettierrc') ||
+        fs.readFileSync(path.join(__dirname, '.prettierrc'), 'utf8')
       fs.writeFileSync(prettierrcPath, templatePrettierrc)
       console.log('✅ Added Prettier configuration')
     }
 
     // Copy ESLint config if it doesn't exist
     const eslintConfigPath = path.join(process.cwd(), 'eslint.config.cjs')
-    const templateEslintPath = path.join(
-      __dirname,
-      usesTypeScript ? 'eslint.config.ts.cjs' : 'eslint.config.cjs'
-    )
-    const templateEslint = fs.readFileSync(templateEslintPath, 'utf8')
+    const eslintTemplateFile = usesTypeScript
+      ? 'eslint.config.ts.cjs'
+      : 'eslint.config.cjs'
+    const templateEslint =
+      templateLoader.getTemplate(templates, eslintTemplateFile) ||
+      fs.readFileSync(path.join(__dirname, eslintTemplateFile), 'utf8')
 
     if (!fs.existsSync(eslintConfigPath)) {
       fs.writeFileSync(eslintConfigPath, templateEslint)
@@ -743,10 +766,9 @@ if (
     // Copy Stylelint config if it doesn't exist
     const stylelintrcPath = path.join(process.cwd(), '.stylelintrc.json')
     if (!fs.existsSync(stylelintrcPath)) {
-      const templateStylelint = fs.readFileSync(
-        path.join(__dirname, '.stylelintrc.json'),
-        'utf8'
-      )
+      const templateStylelint =
+        templateLoader.getTemplate(templates, '.stylelintrc.json') ||
+        fs.readFileSync(path.join(__dirname, '.stylelintrc.json'), 'utf8')
       fs.writeFileSync(stylelintrcPath, templateStylelint)
       console.log('✅ Added Stylelint configuration')
     }
@@ -754,10 +776,9 @@ if (
     // Copy .prettierignore if it doesn't exist
     const prettierignorePath = path.join(process.cwd(), '.prettierignore')
     if (!fs.existsSync(prettierignorePath)) {
-      const templatePrettierignore = fs.readFileSync(
-        path.join(__dirname, '.prettierignore'),
-        'utf8'
-      )
+      const templatePrettierignore =
+        templateLoader.getTemplate(templates, '.prettierignore') ||
+        fs.readFileSync(path.join(__dirname, '.prettierignore'), 'utf8')
       fs.writeFileSync(prettierignorePath, templatePrettierignore)
       console.log('✅ Added Prettier ignore file')
     }
@@ -765,25 +786,30 @@ if (
     // Copy Lighthouse CI config if it doesn't exist
     const lighthousercPath = path.join(process.cwd(), '.lighthouserc.js')
     if (!fs.existsSync(lighthousercPath)) {
-      const templateLighthouserc = fs.readFileSync(
-        path.join(__dirname, 'config', '.lighthouserc.js'),
-        'utf8'
-      )
+      const templateLighthouserc =
+        templateLoader.getTemplate(
+          templates,
+          path.join('config', '.lighthouserc.js')
+        ) ||
+        fs.readFileSync(
+          path.join(__dirname, 'config', '.lighthouserc.js'),
+          'utf8'
+        )
       fs.writeFileSync(lighthousercPath, templateLighthouserc)
       console.log('✅ Added Lighthouse CI configuration')
     }
 
     // Copy ESLint ignore if it doesn't exist
     const eslintignorePath = path.join(process.cwd(), '.eslintignore')
-    const templateEslintIgnorePath = path.join(__dirname, '.eslintignore')
+    const eslintignoreTemplatePath = path.join(__dirname, '.eslintignore')
     if (
       !fs.existsSync(eslintignorePath) &&
-      fs.existsSync(templateEslintIgnorePath)
+      (templateLoader.hasTemplate(templates, '.eslintignore') ||
+        fs.existsSync(eslintignoreTemplatePath))
     ) {
-      const templateEslintIgnore = fs.readFileSync(
-        templateEslintIgnorePath,
-        'utf8'
-      )
+      const templateEslintIgnore =
+        templateLoader.getTemplate(templates, '.eslintignore') ||
+        fs.readFileSync(eslintignoreTemplatePath, 'utf8')
       fs.writeFileSync(eslintignorePath, templateEslintIgnore)
       console.log('✅ Added ESLint ignore file')
     }
@@ -791,10 +817,9 @@ if (
     // Copy .editorconfig if it doesn't exist
     const editorconfigPath = path.join(process.cwd(), '.editorconfig')
     if (!fs.existsSync(editorconfigPath)) {
-      const templateEditorconfig = fs.readFileSync(
-        path.join(__dirname, '.editorconfig'),
-        'utf8'
-      )
+      const templateEditorconfig =
+        templateLoader.getTemplate(templates, '.editorconfig') ||
+        fs.readFileSync(path.join(__dirname, '.editorconfig'), 'utf8')
       fs.writeFileSync(editorconfigPath, templateEditorconfig)
       console.log('✅ Added .editorconfig')
     }
@@ -905,10 +930,12 @@ coverage/
       // Copy pyproject.toml if it doesn't exist
       const pyprojectPath = path.join(process.cwd(), 'pyproject.toml')
       if (!fs.existsSync(pyprojectPath)) {
-        const templatePyproject = fs.readFileSync(
-          path.join(__dirname, 'config/pyproject.toml'),
-          'utf8'
-        )
+        const templatePyproject =
+          templateLoader.getTemplate(
+            templates,
+            path.join('config', 'pyproject.toml')
+          ) ||
+          fs.readFileSync(path.join(__dirname, 'config/pyproject.toml'), 'utf8')
         fs.writeFileSync(pyprojectPath, templatePyproject)
         console.log(
           '✅ Added pyproject.toml with Black, Ruff, isort, mypy config'
@@ -918,10 +945,15 @@ coverage/
       // Copy pre-commit config
       const preCommitPath = path.join(process.cwd(), '.pre-commit-config.yaml')
       if (!fs.existsSync(preCommitPath)) {
-        const templatePreCommit = fs.readFileSync(
-          path.join(__dirname, 'config/.pre-commit-config.yaml'),
-          'utf8'
-        )
+        const templatePreCommit =
+          templateLoader.getTemplate(
+            templates,
+            path.join('config', '.pre-commit-config.yaml')
+          ) ||
+          fs.readFileSync(
+            path.join(__dirname, 'config/.pre-commit-config.yaml'),
+            'utf8'
+          )
         fs.writeFileSync(preCommitPath, templatePreCommit)
         console.log('✅ Added .pre-commit-config.yaml')
       }
@@ -932,10 +964,15 @@ coverage/
         'requirements-dev.txt'
       )
       if (!fs.existsSync(requirementsDevPath)) {
-        const templateRequirements = fs.readFileSync(
-          path.join(__dirname, 'config/requirements-dev.txt'),
-          'utf8'
-        )
+        const templateRequirements =
+          templateLoader.getTemplate(
+            templates,
+            path.join('config', 'requirements-dev.txt')
+          ) ||
+          fs.readFileSync(
+            path.join(__dirname, 'config/requirements-dev.txt'),
+            'utf8'
+          )
         fs.writeFileSync(requirementsDevPath, templateRequirements)
         console.log('✅ Added requirements-dev.txt')
       }
@@ -943,10 +980,15 @@ coverage/
       // Copy Python workflow
       const pythonWorkflowFile = path.join(workflowDir, 'quality-python.yml')
       if (!fs.existsSync(pythonWorkflowFile)) {
-        const templatePythonWorkflow = fs.readFileSync(
-          path.join(__dirname, 'config/quality-python.yml'),
-          'utf8'
-        )
+        const templatePythonWorkflow =
+          templateLoader.getTemplate(
+            templates,
+            path.join('config', 'quality-python.yml')
+          ) ||
+          fs.readFileSync(
+            path.join(__dirname, 'config/quality-python.yml'),
+            'utf8'
+          )
         fs.writeFileSync(pythonWorkflowFile, templatePythonWorkflow)
         console.log('✅ Added Python GitHub Actions workflow')
       }
