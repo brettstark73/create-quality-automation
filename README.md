@@ -15,6 +15,7 @@ Bootstrap quality automation in JavaScript/TypeScript and Python projects with c
 - **🆕 Modern Tooling** - ESLint 9 flat config, Husky 9, latest dependencies
 - **🔒 Security Automation** - Blocking npm audit and hardcoded secrets scanning
 - **📊 Dependency Monitoring** - Basic Dependabot config (Free) + Advanced features (Pro/Enterprise)
+- **🎨 Custom Templates** - Use organization-specific coding standards with `--template` flag
 
 ## 🚀 Quick Start
 
@@ -48,6 +49,38 @@ npm install
 # Verify everything works
 npm run lint
 ```
+
+### Custom Templates (v2.6.2+)
+
+Use organization-specific coding standards by providing a custom template directory:
+
+```bash
+# Use custom templates from a local directory
+npx create-quality-automation@latest --template ./my-org-templates
+
+# Custom template directory structure example:
+# my-org-templates/
+# ├── .prettierrc              # Custom Prettier config
+# ├── eslint.config.cjs        # Custom ESLint rules
+# ├── .github/
+# │   └── workflows/
+# │       └── quality.yml      # Custom CI workflow
+# └── config/
+#     └── pyproject.toml       # Custom Python tooling config
+
+# How it works:
+# - Custom templates override package defaults
+# - Missing files fall back to package defaults
+# - Partial templates supported (override only specific files)
+# - Enables consistent standards across organization projects
+```
+
+**Use Cases:**
+
+- Enforce organization-specific linting rules across all projects
+- Customize CI/CD workflows for your infrastructure
+- Maintain company coding style guidelines
+- Share best practices across development teams
 
 ### Dependency Monitoring (v2.4.0+)
 
