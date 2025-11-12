@@ -59,6 +59,7 @@
     ".github/",
     ".prettierrc",
     ".prettierignore",
+    ".eslintignore",
     "eslint.config.cjs",
     "eslint.config.ts.cjs",
     ".stylelintrc.json",
