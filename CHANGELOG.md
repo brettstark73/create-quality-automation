@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Custom template support** - New `--template <path>` flag enables organizations to use custom coding standards
+  - Load template files from local directory to override package defaults
+  - Partial template support - custom templates can override specific files while falling back to defaults for others
+  - Nested directory support - templates can include subdirectories (e.g., `.github/workflows/`, `config/`)
+  - Path characters preserved - Special characters like `&` in directory names handled correctly
+  - Use case: Enforce organization-specific linting rules, CI/CD workflows, and coding standards across projects
+
+### Fixed
+
+- **Path sanitization for --template flag** - Template directory paths now preserve special characters (`&`, `<`, `>`, etc.) that are valid in file paths
+  - Previously: `validateAndSanitizeInput` stripped these characters, breaking legitimate paths like "ACME & Co"
+  - Now: Template path read from raw CLI args before sanitization
+
 ## [2.6.1] - 2025-11-12
 
 ### Fixed

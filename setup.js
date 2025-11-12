@@ -221,11 +221,11 @@ const isDependencyMonitoringMode =
 const isLicenseStatusMode = sanitizedArgs.includes('--license-status')
 const isDryRun = sanitizedArgs.includes('--dry-run')
 
-// Custom template directory
+// Custom template directory - use raw args to preserve valid path characters (&, <, >, etc.)
 const templateFlagIndex = sanitizedArgs.findIndex(arg => arg === '--template')
 const customTemplatePath =
-  templateFlagIndex !== -1 && sanitizedArgs[templateFlagIndex + 1]
-    ? sanitizedArgs[templateFlagIndex + 1]
+  templateFlagIndex !== -1 && args[templateFlagIndex + 1]
+    ? args[templateFlagIndex + 1]
     : null
 
 // Granular tool disable options

@@ -18,6 +18,7 @@ async function runIntegrationTests() {
   await testValidationInIsolatedEnvironment()
   await testPackageJsonBootstrap()
   await testToolAvailabilityHandling()
+  await testCustomTemplateIntegration()
 
   console.log('✅ All integration tests passed!\n')
 }
@@ -316,6 +317,97 @@ Run the project.
       // Documentation validation should pass even if markdownlint is missing
       throw new Error(`Tool availability handling failed: ${error.message}`)
     }
+  } finally {
+    process.chdir(originalCwd)
+    fs.rmSync(testDir, { recursive: true, force: true })
+  }
+}
+
+/**
+ * Test custom template integration with CLI
+ */
+async function testCustomTemplateIntegration() {
+  console.log('🔍 Testing custom template integration...')
+
+  const testDir = fs.mkdtempSync(
+    path.join(os.tmpdir(), 'custom-template-test-')
+  )
+  const originalCwd = process.cwd()
+
+  try {
+    process.chdir(testDir)
+
+    // Initialize git repository
+    execSync('git init', { stdio: 'ignore' })
+    execSync('git config user.email "test@example.com"', { stdio: 'ignore' })
+    execSync('git config user.name "Test User"', { stdio: 'ignore' })
+
+    // Create custom template directory with special characters in name
+    const customTemplateDir = path.join(testDir, 'templates-acme-&-co')
+    fs.mkdirSync(customTemplateDir)
+
+    // Create custom .prettierrc in template
+    const customPrettierConfig = {
+      semi: false,
+      singleQuote: true,
+      tabWidth: 4,
+      trailingComma: 'all',
+    }
+    fs.writeFileSync(
+      path.join(customTemplateDir, '.prettierrc'),
+      JSON.stringify(customPrettierConfig, null, 2)
+    )
+
+    // Create package.json
+    fs.writeFileSync(
+      'package.json',
+      JSON.stringify({ name: 'test', version: '1.0.0' }, null, 2)
+    )
+
+    // Run setup with custom template
+    try {
+      execSync(
+        `node "${path.join(originalCwd, 'setup.js')}" --template "${customTemplateDir}"`,
+        {
+          stdio: 'pipe',
+        }
+      )
+    } catch (error) {
+      throw new Error(`Setup with custom template failed: ${error.message}`)
+    }
+
+    // Verify custom .prettierrc was used
+    if (!fs.existsSync('.prettierrc')) {
+      throw new Error('Custom .prettierrc was not created')
+    }
+
+    const installedPrettierrc = JSON.parse(
+      fs.readFileSync('.prettierrc', 'utf8')
+    )
+
+    // Verify custom config values were applied
+    if (
+      installedPrettierrc.semi !== false ||
+      installedPrettierrc.singleQuote !== true ||
+      installedPrettierrc.tabWidth !== 4 ||
+      installedPrettierrc.trailingComma !== 'all'
+    ) {
+      throw new Error(
+        'Custom .prettierrc values were not applied correctly. Expected custom template to override defaults.'
+      )
+    }
+
+    // Verify other default files were still created (partial template support)
+    if (!fs.existsSync('eslint.config.cjs')) {
+      throw new Error(
+        'Default eslint.config.cjs was not created (partial template should still get defaults)'
+      )
+    }
+
+    console.log('  ✅ Custom template integration works correctly')
+    console.log(
+      '  ✅ Special characters (&) in template path handled correctly'
+    )
   } finally {
     process.chdir(originalCwd)
     fs.rmSync(testDir, { recursive: true, force: true })

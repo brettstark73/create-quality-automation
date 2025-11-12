@@ -65,6 +65,20 @@ async function testTemplatePathValidation() {
     fs.rmSync(testDir, { recursive: true, force: true })
   }
 
+  // Test 5: Directory with special characters should be valid
+  const specialCharDir = path.join(os.tmpdir(), 'template-test-special-&-chars')
+  // eslint-disable-next-line security/detect-non-literal-fs-filename
+  fs.mkdirSync(specialCharDir)
+  try {
+    if (!loader.isValidTemplatePath(specialCharDir)) {
+      throw new Error(
+        'Directory with special characters (&) should be valid for file paths'
+      )
+    }
+  } finally {
+    fs.rmSync(specialCharDir, { recursive: true, force: true })
+  }
+
   console.log('  ✅ Template path validation works correctly')
 }
 
