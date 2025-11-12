@@ -10,7 +10,7 @@ try {
 
 const configs = [
   {
-    ignores: ['**/node_modules/**', '**/dist/**', '**/build/**'],
+    ignores: ['**/node_modules/**', '**/dist/**', '**/build/**', '**/*.html'],
   },
   js.configs.recommended,
 ]
