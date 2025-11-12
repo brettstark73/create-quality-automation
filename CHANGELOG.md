@@ -7,6 +7,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.6.0] - 2025-11-12
+
+### Added
+
+- **Progress indicators** for validation operations - Shows [X/3] step progression during comprehensive validation
+- **--dry-run mode** - Preview what files would be created/modified without making changes
+- **Comprehensive troubleshooting guide** (TROUBLESHOOTING.md) - Covers common issues, platform-specific problems, and solutions
+- **Automatic E2E package testing** - Validates published package works for consumers before release
+- **Root cause analysis document** (claudedocs/CODEX_FINDINGS_ANALYSIS.md) - Prevention strategies for future issues
+
+### Fixed
+
+- **🚨 CRITICAL**: Workflow references to non-existent setup.js in consumer repos - Removed problematic step
+- **🚨 CRITICAL**: npm scripts using `node setup.js` instead of `npx create-quality-automation@latest`
+- **.eslintignore missing from npm package** - Added to files array
+- **Invalid Dependabot config schema** - Removed unsupported `update-type` keys
+- Removed .npmrc from files array (npm excludes it automatically)
+
+### Changed
+
+- Enhanced prerelease checks to include E2E package validation
+- npm scripts now use `npx create-quality-automation@latest` for CLI operations
+- Improved workflow to avoid consumer-facing failures
+
+### Developer Experience
+
+- Added `npm run test:e2e` for comprehensive package validation
+- Better error messages with context
+- Enhanced documentation for troubleshooting
+
 ---
 
 ## [2.5.0] - 2025-11-11
