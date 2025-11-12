@@ -1,0 +1,481 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      Create Quality Automation - Professional Code Quality Tools in Minutes
+    </title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+          'Helvetica Neue', Arial, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        background: #fff;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+      }
+
+      /* Hero Section */
+      .hero {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 80px 20px;
+        text-align: center;
+      }
+
+      .hero h1 {
+        font-size: 3rem;
+        font-weight: 700;
+        margin-bottom: 20px;
+        line-height: 1.2;
+      }
+
+      .hero p {
+        font-size: 1.5rem;
+        margin-bottom: 30px;
+        opacity: 0.95;
+      }
+
+      .hero .tagline {
+        font-size: 1.1rem;
+        margin-bottom: 40px;
+        opacity: 0.9;
+      }
+
+      .cta-buttons {
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-top: 30px;
+      }
+
+      .btn {
+        display: inline-block;
+        padding: 15px 40px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        text-decoration: none;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        cursor: pointer;
+      }
+
+      .btn-primary {
+        background: white;
+        color: #667eea;
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+      }
+
+      .btn-secondary {
+        background: transparent;
+        color: white;
+        border: 2px solid white;
+      }
+
+      .btn-secondary:hover {
+        background: white;
+        color: #667eea;
+      }
+
+      /* Installation Section */
+      .installation {
+        background: #f8f9fa;
+        padding: 40px 20px;
+        text-align: center;
+      }
+
+      .code-block {
+        background: #2d3748;
+        color: #48bb78;
+        padding: 20px 30px;
+        border-radius: 8px;
+        font-family: 'Monaco', 'Menlo', monospace;
+        font-size: 1.2rem;
+        margin: 20px auto;
+        max-width: 600px;
+        overflow-x: auto;
+      }
+
+      /* Features Section */
+      .features {
+        padding: 80px 20px;
+      }
+
+      .section-title {
+        text-align: center;
+        font-size: 2.5rem;
+        margin-bottom: 50px;
+        color: #2d3748;
+      }
+
+      .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 30px;
+        margin-top: 40px;
+      }
+
+      .feature-card {
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+      }
+
+      .feature-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+      }
+
+      .feature-icon {
+        font-size: 2.5rem;
+        margin-bottom: 15px;
+      }
+
+      .feature-card h3 {
+        font-size: 1.5rem;
+        margin-bottom: 15px;
+        color: #2d3748;
+      }
+
+      .feature-card p {
+        color: #666;
+        line-height: 1.6;
+      }
+
+      .feature-badge {
+        display: inline-block;
+        background: #48bb78;
+        color: white;
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        margin-left: 10px;
+      }
+
+      /* Pricing Section */
+      .pricing {
+        background: #f8f9fa;
+        padding: 80px 20px;
+      }
+
+      .pricing-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 30px;
+        max-width: 900px;
+        margin: 0 auto;
+      }
+
+      .pricing-card {
+        background: white;
+        padding: 40px;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        text-align: center;
+      }
+
+      .pricing-card.featured {
+        border: 3px solid #667eea;
+        transform: scale(1.05);
+      }
+
+      .pricing-card h3 {
+        font-size: 2rem;
+        margin-bottom: 10px;
+        color: #2d3748;
+      }
+
+      .price {
+        font-size: 3rem;
+        font-weight: 700;
+        color: #667eea;
+        margin: 20px 0;
+      }
+
+      .price-period {
+        font-size: 1rem;
+        color: #666;
+        font-weight: normal;
+      }
+
+      .features-list {
+        list-style: none;
+        margin: 30px 0;
+        text-align: left;
+      }
+
+      .features-list li {
+        padding: 12px 0;
+        border-bottom: 1px solid #e2e8f0;
+        color: #4a5568;
+      }
+
+      .features-list li:before {
+        content: '✓ ';
+        color: #48bb78;
+        font-weight: bold;
+        margin-right: 10px;
+      }
+
+      .features-list li.unavailable {
+        color: #cbd5e0;
+      }
+
+      .features-list li.unavailable:before {
+        content: '✗ ';
+        color: #cbd5e0;
+      }
+
+      /* GitHub Section */
+      .github-cta {
+        background: #2d3748;
+        color: white;
+        padding: 60px 20px;
+        text-align: center;
+      }
+
+      .github-cta h2 {
+        font-size: 2.5rem;
+        margin-bottom: 20px;
+      }
+
+      .github-cta p {
+        font-size: 1.2rem;
+        margin-bottom: 30px;
+        opacity: 0.9;
+      }
+
+      /* Responsive */
+      @media (max-width: 768px) {
+        .hero h1 {
+          font-size: 2rem;
+        }
+
+        .hero p {
+          font-size: 1.2rem;
+        }
+
+        .cta-buttons {
+          flex-direction: column;
+          align-items: center;
+        }
+
+        .btn {
+          width: 100%;
+          max-width: 300px;
+        }
+
+        .pricing-card.featured {
+          transform: scale(1);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="container">
+        <h1>Create Quality Automation</h1>
+        <p>Professional code quality tools in minutes, not hours</p>
+        <p class="tagline">
+          Bootstrap ESLint, Prettier, Stylelint, Husky, and GitHub Actions in
+          any project with a single command
+        </p>
+        <div class="cta-buttons">
+          <a
+            href="https://github.com/brettstark73/quality-automation-template"
+            class="btn btn-primary"
+            target="_blank"
+            >View on GitHub</a
+          >
+          <a href="#install" class="btn btn-secondary">Get Started</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Installation Section -->
+    <section class="installation" id="install">
+      <div class="container">
+        <h2>Get Started in Seconds</h2>
+        <div class="code-block">npx create-quality-automation@latest</div>
+        <p style="color: #666; margin-top: 20px">
+          Requires Node.js ≥20 • Works with any JavaScript/TypeScript project
+        </p>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features">
+      <div class="container">
+        <h2 class="section-title">Everything You Need for Code Quality</h2>
+
+        <div class="features-grid">
+          <div class="feature-card">
+            <div class="feature-icon">🔍</div>
+            <h3>
+              ESLint 9 Flat Config <span class="feature-badge">FREE</span>
+            </h3>
+            <p>
+              Modern ESLint configuration with automatic TypeScript detection.
+              Supports both JavaScript and TypeScript projects out of the box.
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">🎨</div>
+            <h3>Stylelint <span class="feature-badge">FREE</span></h3>
+            <p>
+              Comprehensive CSS linting for CSS, SCSS, Sass, Less, and PostCSS.
+              Maintains consistent styling across your project.
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">✨</div>
+            <h3>Prettier <span class="feature-badge">FREE</span></h3>
+            <p>
+              Opinionated code formatting that works automatically. Never debate
+              code style again.
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">🐕</div>
+            <h3>
+              Husky 9 Pre-commit Hooks <span class="feature-badge">FREE</span>
+            </h3>
+            <p>
+              Automated quality checks before every commit. Catch issues before
+              they reach your repository.
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">📦</div>
+            <h3>lint-staged <span class="feature-badge">FREE</span></h3>
+            <p>
+              Run linters only on staged files for lightning-fast commits. No
+              more waiting for full project linting.
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">🚀</div>
+            <h3>
+              GitHub Actions Workflows <span class="feature-badge">FREE</span>
+            </h3>
+            <p>
+              CI/CD workflows with automated quality checks. Ensure code quality
+              on every pull request.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section class="pricing">
+      <div class="container">
+        <h2 class="section-title">Simple, Transparent Pricing</h2>
+
+        <div class="pricing-grid">
+          <!-- Free Tier -->
+          <div class="pricing-card featured">
+            <h3>Open Source</h3>
+            <div class="price">
+              $0
+              <span class="price-period">forever</span>
+            </div>
+            <p style="color: #666; margin-bottom: 20px">
+              Perfect for individual developers and open source projects
+            </p>
+            <ul class="features-list">
+              <li>ESLint 9 Flat Config</li>
+              <li>Stylelint for CSS/SCSS/Sass/Less</li>
+              <li>Prettier formatting</li>
+              <li>Husky 9 pre-commit hooks</li>
+              <li>lint-staged integration</li>
+              <li>GitHub Actions workflows</li>
+              <li>TypeScript auto-detection</li>
+              <li>Merge-safe for existing projects</li>
+              <li>Community support via GitHub</li>
+            </ul>
+            <a href="#install" class="btn btn-primary">Get Started Free</a>
+          </div>
+
+          <!-- Premium Tier (Placeholder for future features) -->
+          <div class="pricing-card">
+            <h3>Premium</h3>
+            <div class="price">Coming Soon</div>
+            <p style="color: #666; margin-bottom: 20px">
+              Advanced features for teams and enterprises
+            </p>
+            <ul class="features-list">
+              <li>All Open Source features</li>
+              <li class="unavailable">Advanced security scanning</li>
+              <li class="unavailable">Custom rule sets</li>
+              <li class="unavailable">Team collaboration tools</li>
+              <li class="unavailable">Priority support</li>
+              <li class="unavailable">Advanced analytics</li>
+              <li class="unavailable">Multi-project management</li>
+            </ul>
+            <a
+              href="https://github.com/brettstark73/quality-automation-template/issues"
+              class="btn btn-secondary"
+              target="_blank"
+              >Request Features</a
+            >
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- GitHub CTA Section -->
+    <section class="github-cta">
+      <div class="container">
+        <h2>Open Source & Community Driven</h2>
+        <p>
+          Star us on GitHub, contribute, or report issues. We'd love your
+          feedback!
+        </p>
+        <div class="cta-buttons">
+          <a
+            href="https://github.com/brettstark73/quality-automation-template"
+            class="btn btn-primary"
+            target="_blank"
+          >
+            ⭐ Star on GitHub
+          </a>
+          <a
+            href="https://github.com/brettstark73/quality-automation-template/issues"
+            class="btn btn-secondary"
+            target="_blank"
+          >
+            💬 Report an Issue
+          </a>
+        </div>
+      </div>
+    </section>
+  </body>
+</html>
