@@ -20,9 +20,10 @@
     "validate:all": "npm run validate:comprehensive && npm run security:audit",
     "test": "node tests/setup.test.js && node tests/integration.test.js && node tests/error-paths.test.js",
     "test:coverage": "c8 --reporter=html --reporter=text --reporter=lcov npm test",
+    "test:e2e": "bash scripts/test-e2e-package.sh",
     "coverage": "npm run test:coverage && echo '\nCoverage report generated in coverage/index.html'",
     "docs:check": "bash scripts/check-docs.sh",
-    "prerelease": "npm run docs:check && npm run validate:comprehensive && npm test",
+    "prerelease": "npm run docs:check && npm run validate:comprehensive && npm test && npm run test:e2e",
     "setup": "node setup.js",
     "release:patch": "npm version patch && git push --follow-tags",
     "release:minor": "npm version minor && git push --follow-tags",
@@ -64,8 +65,7 @@
     "eslint.config.ts.cjs",
     ".stylelintrc.json",
     ".editorconfig",
-    ".nvmrc",
-    ".npmrc"
+    ".nvmrc"
   ],
   "repository": {
     "type": "git",
