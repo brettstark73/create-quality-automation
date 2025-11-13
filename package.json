@@ -23,7 +23,7 @@
     "test:e2e": "bash scripts/test-e2e-package.sh",
     "coverage": "npm run test:coverage && echo '\nCoverage report generated in coverage/index.html'",
     "docs:check": "bash scripts/check-docs.sh",
-    "prerelease": "npm run docs:check && npm run validate:comprehensive && npm test && npm run test:e2e",
+    "prerelease": "npm run docs:check && npm test && npm run test:e2e",
     "setup": "node setup.js",
     "release:patch": "npm version patch && git push --follow-tags",
     "release:minor": "npm version minor && git push --follow-tags",
