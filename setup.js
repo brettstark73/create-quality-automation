@@ -71,6 +71,12 @@ const {
 // Telemetry (opt-in usage tracking)
 const { TelemetrySession, showTelemetryStatus } = require('./lib/telemetry')
 
+// Error reporting (opt-in crash analytics)
+const {
+  ErrorReporter,
+  showErrorReportingStatus,
+} = require('./lib/error-reporter')
+
 const STYLELINT_EXTENSION_SET = new Set(STYLELINT_EXTENSIONS)
 const STYLELINT_DEFAULT_TARGET = `**/*.{${STYLELINT_EXTENSIONS.join(',')}}`
 const STYLELINT_EXTENSION_GLOB = `*.{${STYLELINT_EXTENSIONS.join(',')}}`
@@ -227,6 +233,9 @@ function parseArguments(rawArgs) {
     sanitizedArgs.includes('--dependency-monitoring')
   const isLicenseStatusMode = sanitizedArgs.includes('--license-status')
   const isTelemetryStatusMode = sanitizedArgs.includes('--telemetry-status')
+  const isErrorReportingStatusMode = sanitizedArgs.includes(
+    '--error-reporting-status'
+  )
   const isDryRun = sanitizedArgs.includes('--dry-run')
 
   // Custom template directory - use raw args to preserve valid path characters (&, <, >, etc.)
@@ -254,6 +263,7 @@ function parseArguments(rawArgs) {
     isDependencyMonitoringMode,
     isLicenseStatusMode,
     isTelemetryStatusMode,
+    isErrorReportingStatusMode,
     isDryRun,
     customTemplatePath,
     disableNpmAudit,
@@ -284,6 +294,7 @@ function parseArguments(rawArgs) {
     isDependencyMonitoringMode,
     isLicenseStatusMode,
     isTelemetryStatusMode,
+    isErrorReportingStatusMode,
     isDryRun,
     customTemplatePath,
     disableNpmAudit,
@@ -349,6 +360,7 @@ function parseArguments(rawArgs) {
       isDependencyMonitoringMode,
       isLicenseStatusMode,
       isTelemetryStatusMode,
+      isErrorReportingStatusMode,
       isDryRun,
       customTemplatePath,
       disableNpmAudit,
@@ -364,6 +376,12 @@ function parseArguments(rawArgs) {
   // Show telemetry status if requested
   if (isTelemetryStatusMode) {
     showTelemetryStatus()
+    process.exit(0)
+  }
+
+  // Show error reporting status if requested
+  if (isErrorReportingStatusMode) {
+    showErrorReportingStatus()
     process.exit(0)
   }
 
@@ -389,9 +407,10 @@ VALIDATION OPTIONS:
   --security-config Run configuration security checks only
   --validate-docs   Run documentation validation only
 
-LICENSE & TELEMETRY:
-  --license-status     Show current license tier and available features
-  --telemetry-status   Show telemetry status and opt-in instructions
+LICENSE, TELEMETRY & ERROR REPORTING:
+  --license-status          Show current license tier and available features
+  --telemetry-status        Show telemetry status and opt-in instructions
+  --error-reporting-status  Show error reporting status and privacy information
 
 GRANULAR TOOL CONTROL:
   --no-npm-audit       Disable npm audit dependency vulnerability checks
@@ -413,6 +432,9 @@ EXAMPLES:
   npx create-quality-automation@latest --telemetry-status
     → Show telemetry status and privacy information
 
+  npx create-quality-automation@latest --error-reporting-status
+    → Show error reporting status and crash analytics information
+
   npx create-quality-automation@latest --comprehensive --no-gitleaks
     → Run validation but skip gitleaks secret scanning
 
@@ -423,10 +445,12 @@ EXAMPLES:
     → Preview what files and configurations would be created/modified
 
 PRIVACY & TELEMETRY:
-  Telemetry is OPT-IN only (disabled by default). To enable:
-    export CQA_TELEMETRY=true
-  All data stays local (~/.create-quality-automation/telemetry.json)
-  No personal information collected. Run --telemetry-status for details.
+  Telemetry and error reporting are OPT-IN only (disabled by default). To enable:
+    export CQA_TELEMETRY=true           # Usage tracking (local only)
+    export CQA_ERROR_REPORTING=true     # Crash analytics (local only)
+  All data stays local (~/.create-quality-automation/)
+  No personal information collected. Run --telemetry-status or
+  --error-reporting-status for details.
 
 HELP:
   --help, -h        Show this help message
@@ -1261,6 +1285,21 @@ coverage/
     errorLocation: error.stack ? error.stack.split('\n')[1] : 'unknown',
   })
 
-  console.error('❌ Setup failed:', error.message)
+  // Capture and report error (opt-in only, fails silently)
+  const errorReporter = new ErrorReporter('setup')
+  const reportId = errorReporter.captureError(error, {
+    operation: 'setup',
+    errorLocation: error.stack ? error.stack.split('\n')[1] : 'unknown',
+  })
+
+  // Show friendly error message with category
+  errorReporter.promptErrorReport(error)
+
+  // If report was captured, show location
+  if (reportId) {
+    console.log(`\n📊 Error report saved: ${reportId}`)
+    console.log(`View at: ~/.create-quality-automation/error-reports.json`)
+  }
+
   process.exit(1)
 })
