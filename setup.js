@@ -68,6 +68,9 @@ const {
   showLicenseStatus,
 } = require('./lib/licensing')
 
+// Telemetry (opt-in usage tracking)
+const { TelemetrySession, showTelemetryStatus } = require('./lib/telemetry')
+
 const STYLELINT_EXTENSION_SET = new Set(STYLELINT_EXTENSIONS)
 const STYLELINT_DEFAULT_TARGET = `**/*.{${STYLELINT_EXTENSIONS.join(',')}}`
 const STYLELINT_EXTENSION_GLOB = `*.{${STYLELINT_EXTENSIONS.join(',')}}`
@@ -223,6 +226,7 @@ function parseArguments(rawArgs) {
     sanitizedArgs.includes('--deps') ||
     sanitizedArgs.includes('--dependency-monitoring')
   const isLicenseStatusMode = sanitizedArgs.includes('--license-status')
+  const isTelemetryStatusMode = sanitizedArgs.includes('--telemetry-status')
   const isDryRun = sanitizedArgs.includes('--dry-run')
 
   // Custom template directory - use raw args to preserve valid path characters (&, <, >, etc.)
@@ -249,6 +253,7 @@ function parseArguments(rawArgs) {
     isComprehensiveMode,
     isDependencyMonitoringMode,
     isLicenseStatusMode,
+    isTelemetryStatusMode,
     isDryRun,
     customTemplatePath,
     disableNpmAudit,
@@ -278,6 +283,7 @@ function parseArguments(rawArgs) {
     isComprehensiveMode,
     isDependencyMonitoringMode,
     isLicenseStatusMode,
+    isTelemetryStatusMode,
     isDryRun,
     customTemplatePath,
     disableNpmAudit,
@@ -286,6 +292,9 @@ function parseArguments(rawArgs) {
     disableMarkdownlint,
     disableEslintSecurity,
   } = parsedConfig
+
+  // Initialize telemetry session (opt-in only, fails silently)
+  const telemetry = new TelemetrySession()
 
   // Handle interactive mode FIRST (before any routing)
   // This must happen before help/dry-run/routing to ensure interactive selections drive behavior
@@ -339,6 +348,7 @@ function parseArguments(rawArgs) {
       isComprehensiveMode,
       isDependencyMonitoringMode,
       isLicenseStatusMode,
+      isTelemetryStatusMode,
       isDryRun,
       customTemplatePath,
       disableNpmAudit,
@@ -349,6 +359,12 @@ function parseArguments(rawArgs) {
     } = parsedConfig)
 
     console.log('📋 Configuration after interactive selections applied\n')
+  }
+
+  // Show telemetry status if requested
+  if (isTelemetryStatusMode) {
+    showTelemetryStatus()
+    process.exit(0)
   }
 
   // Show help if requested
@@ -373,8 +389,9 @@ VALIDATION OPTIONS:
   --security-config Run configuration security checks only
   --validate-docs   Run documentation validation only
 
-LICENSE OPTIONS:
-  --license-status  Show current license tier and available features
+LICENSE & TELEMETRY:
+  --license-status     Show current license tier and available features
+  --telemetry-status   Show telemetry status and opt-in instructions
 
 GRANULAR TOOL CONTROL:
   --no-npm-audit       Disable npm audit dependency vulnerability checks
@@ -393,6 +410,9 @@ EXAMPLES:
   npx create-quality-automation@latest --license-status
     → Show current license tier and upgrade options
 
+  npx create-quality-automation@latest --telemetry-status
+    → Show telemetry status and privacy information
+
   npx create-quality-automation@latest --comprehensive --no-gitleaks
     → Run validation but skip gitleaks secret scanning
 
@@ -401,6 +421,12 @@ EXAMPLES:
 
   npx create-quality-automation@latest --dry-run
     → Preview what files and configurations would be created/modified
+
+PRIVACY & TELEMETRY:
+  Telemetry is OPT-IN only (disabled by default). To enable:
+    export CQA_TELEMETRY=true
+  All data stays local (~/.create-quality-automation/telemetry.json)
+  No personal information collected. Run --telemetry-status for details.
 
 HELP:
   --help, -h        Show this help message
@@ -586,6 +612,13 @@ HELP:
   } else {
     // Normal setup flow
     async function runMainSetup() {
+      // Record telemetry start event (opt-in only, fails silently)
+      telemetry.recordStart({
+        mode: isDryRun ? 'dry-run' : isUpdateMode ? 'update' : 'setup',
+        hasCustomTemplate: !!customTemplatePath,
+        isInteractive: false, // Already handled at this point
+      })
+
       // Check if we're in a git repository
       try {
         execSync('git status', { stdio: 'ignore' })
@@ -1180,6 +1213,14 @@ coverage/
 
       console.log('\n🎉 Quality automation setup complete!')
 
+      // Record telemetry completion event (opt-in only, fails silently)
+      telemetry.recordComplete({
+        usesPython,
+        usesTypeScript,
+        hasStylelintFiles: stylelintTargets.length > 0,
+        mode: isDryRun ? 'dry-run' : isUpdateMode ? 'update' : 'setup',
+      })
+
       // Dynamic next steps based on detected languages
       console.log('\n📋 Next steps:')
 
@@ -1214,6 +1255,12 @@ coverage/
 
   // Close the main async function and handle errors
 })().catch(error => {
+  // Record telemetry failure event (opt-in only, fails silently)
+  const telemetry = new TelemetrySession()
+  telemetry.recordFailure(error, {
+    errorLocation: error.stack ? error.stack.split('\n')[1] : 'unknown',
+  })
+
   console.error('❌ Setup failed:', error.message)
   process.exit(1)
 })
