@@ -101,29 +101,36 @@ npx create-quality-automation@latest --deps
 npx create-quality-automation@latest --license-status
 ```
 
-#### 🔒 Premium Tiers (Now Available!)
+#### 🔒 Premium Tiers - BETA NOW LIVE! 🎉
 
-> Framework-aware dependency grouping is now live! Reduce dependency PRs by 60%+ with intelligent batching.
+> **PREMIUM-001 SHIPPED!** Framework-aware dependency grouping reduces dependency PRs by 60%+ with intelligent batching.
 
-**💰 Pro Tier ($39/month)**
+**💰 Pro Tier - BETA PRICING: $19.50/month** (50% off for 3 months, then $39/month)
 
-- ✅ **Framework-aware dependency grouping** (React, Vue, Angular, Testing, Build tools)
+- ✅ **Framework-aware dependency grouping** - **LIVE NOW** (React, Vue, Angular, Svelte, Testing, Build tools)
   - Automatically groups related dependencies into batched PRs
   - Reduces PR volume by 60%+ for React projects
-  - Supports React, Vue, Angular, testing frameworks, build tools, and Storybook
+  - Supports React, Vue, Angular, Svelte ecosystems
+  - Testing frameworks (Jest, Vitest, Playwright, Testing Library)
+  - Build tools (Vite, Webpack, Turbo, Nx, Rollup, esbuild)
+  - Storybook ecosystem grouping
+  - Wildcard pattern matching for scoped packages (`@tanstack/*`, `@radix-ui/*`)
   - Intelligent update-type filtering (major vs minor vs patch)
-- Coming soon: Multi-language support beyond npm (Python, Rust, Go)
-- Planned: Advanced security audit workflows and custom schedules
-- Planned: Breaking change detection before merging updates
+  - Production-ready with comprehensive test coverage
+- 📅 Multi-language support beyond npm (Python, Rust, Go) - Q1 2026
+- 📅 Advanced security audit workflows and custom schedules - Q2 2026
+- 📅 Breaking change detection before merging updates - Q2 2026
 
-**🏢 Enterprise Tier ($197/month)**
+**🏢 Enterprise Tier - BETA PRICING: $98.50/month** (50% off for 3 months, then $197/month)
 
 - Everything in Pro tier
-- Planned: Custom notification channels (Slack, Teams)
-- Planned: Multi-repository governance and analytics
-- Planned: Priority support with shared runbooks
+- 📅 Custom notification channels (Slack, Teams) - Q1 2026
+- 📅 Multi-repository governance and analytics - Q2 2026
+- 📅 Priority support with shared runbooks - Available now
 
-[**🚀 Upgrade to Pro**](https://create-quality-automation.dev/pro) | [**🏢 Request Enterprise beta**](https://create-quality-automation.dev/enterprise)
+**Beta Duration**: December 2025 - February 2026 (3 months at 50% off)
+
+[**🚀 Join Pro Beta**](https://create-quality-automation.dev/pro) | [**🏢 Request Enterprise Beta**](https://create-quality-automation.dev/enterprise)
 
 **Example: React Project Dependency Grouping**
 

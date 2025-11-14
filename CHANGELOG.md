@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- **🚀 PREMIUM-001: Framework-Aware Dependency Grouping (Pro Tier)** - Flagship premium feature now available!
+- **🚀 PREMIUM-001: Framework-Aware Dependency Grouping (Pro Tier)** - **SHIPPED AND LIVE!** Flagship premium feature reducing dependency PRs by 60%+
   - Intelligent dependency batching by framework (React, Vue, Angular)
   - Reduces dependency PRs by 60%+ for React projects (15+ individual PRs → 3-5 grouped PRs)
   - Automatic framework detection from package.json
@@ -44,9 +44,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - License tier displayed during setup
   - Detected frameworks logged for Pro/Enterprise users
   - Upgrade messaging updated to show "Available now" for framework grouping
+- **Premium tier pricing** - Beta launch pricing announced
+  - Pro tier: $19.50/mo for 3 months (50% off, then $39/mo)
+  - Enterprise tier: $98.50/mo for 3 months (50% off, then $197/mo)
+  - Beta duration: December 2025 - February 2026
 
 ### Fixed
 
+- **🚨 CRITICAL: TypeError in framework detection** - Fixed crash when `dependencies` or `devDependencies` are undefined
+  - Issue: Fresh apps or projects with only devDependencies would crash with "Cannot convert undefined or null to object"
+  - Fix: Added `|| {}` default values in `detectFrameworks()` function (lib/dependency-monitoring-premium.js:91-94)
+  - Impact: Framework-aware grouping now works for all project configurations
+  - Test: Added comprehensive Test 11b covering all edge cases (missing dependencies, missing devDependencies, both missing)
+  - Discovered by: User testing before beta launch - prevented production bug
 - **Path sanitization for --template flag** - Template directory paths now preserve special characters (`&`, `<`, `>`, etc.) that are valid in file paths
   - Previously: `validateAndSanitizeInput` stripped these characters, breaking legitimate paths like "ACME & Co"
   - Now: Template path read from raw CLI args before sanitization
