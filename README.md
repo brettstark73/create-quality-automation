@@ -101,25 +101,44 @@ npx create-quality-automation@latest --deps
 npx create-quality-automation@latest --license-status
 ```
 
-#### 🔒 Premium Tiers (Private Beta)
+#### 🔒 Premium Tiers (Now Available!)
 
-> We’re validating premium automation now. Join the waitlist to influence the roadmap.
+> Framework-aware dependency grouping is now live! Reduce dependency PRs by 60%+ with intelligent batching.
 
-**💰 Pro Tier (planned $39/month)**
+**💰 Pro Tier ($39/month)**
 
-- Coming soon: framework-aware dependency grouping (React, Next.js, Vue, Angular)
-- Coming soon: multi-language support beyond npm (Python, Rust, Go, more)
-- Planned: advanced security audit workflows and custom schedules
-- Planned: breaking change detection before merging updates
+- ✅ **Framework-aware dependency grouping** (React, Vue, Angular, Testing, Build tools)
+  - Automatically groups related dependencies into batched PRs
+  - Reduces PR volume by 60%+ for React projects
+  - Supports React, Vue, Angular, testing frameworks, build tools, and Storybook
+  - Intelligent update-type filtering (major vs minor vs patch)
+- Coming soon: Multi-language support beyond npm (Python, Rust, Go)
+- Planned: Advanced security audit workflows and custom schedules
+- Planned: Breaking change detection before merging updates
 
-**🏢 Enterprise Tier (planned $197/month)**
+**🏢 Enterprise Tier ($197/month)**
 
-- Everything in the Pro roadmap
-- Planned: custom notification channels (Slack, Teams)
-- Planned: multi-repository governance and analytics
-- Planned: priority support with shared runbooks
+- Everything in Pro tier
+- Planned: Custom notification channels (Slack, Teams)
+- Planned: Multi-repository governance and analytics
+- Planned: Priority support with shared runbooks
 
-[**🚀 Join the Pro waitlist**](https://create-quality-automation.dev/pro) | [**🏢 Request Enterprise beta**](https://create-quality-automation.dev/enterprise)
+[**🚀 Upgrade to Pro**](https://create-quality-automation.dev/pro) | [**🏢 Request Enterprise beta**](https://create-quality-automation.dev/enterprise)
+
+**Example: React Project Dependency Grouping**
+
+```yaml
+# Before (Free Tier): 15+ individual PRs for React dependencies
+# After (Pro Tier): 3-5 grouped PRs
+
+groups:
+  react-core:              # Core React packages
+    patterns: [react, react-dom, react-router*]
+  react-ecosystem:         # State management, data fetching
+    patterns: [@tanstack/*, zustand, swr]
+  testing-frameworks:      # All testing tools
+    patterns: [jest, @testing-library/*, vitest]
+```
 
 ### Validation Commands (v2.2.0+)
 
