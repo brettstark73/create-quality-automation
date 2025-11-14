@@ -9,12 +9,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **🚀 PREMIUM-001: Framework-Aware Dependency Grouping (Pro Tier)** - Flagship premium feature now available!
+  - Intelligent dependency batching by framework (React, Vue, Angular)
+  - Reduces dependency PRs by 60%+ for React projects (15+ individual PRs → 3-5 grouped PRs)
+  - Automatic framework detection from package.json
+  - Supports React ecosystem (core, state management, routing, UI libraries)
+  - Supports Vue ecosystem (core, router, pinia, ecosystem packages)
+  - Supports Angular ecosystem (core, common, router, state management)
+  - Testing framework grouping (Jest, Vitest, Testing Library, Playwright)
+  - Build tool grouping (Vite, Webpack, Turbo, Nx, Rollup)
+  - Storybook ecosystem grouping
+  - Wildcard pattern matching for scoped packages (@tanstack/_, @radix-ui/_, etc.)
+  - Update-type filtering (major vs minor vs patch)
+  - Dependency-type awareness (production vs development)
+  - License tier validation (Pro/Enterprise only)
+  - Generated Dependabot configs include framework detection comments
+  - Comprehensive test suite (14 tests covering all frameworks and edge cases)
+  - Implementation: `lib/dependency-monitoring-premium.js` (500+ lines)
+  - Integration: `setup.js` updated to use premium config for licensed users
+  - Free tier users see upgrade prompt with concrete example of PR reduction
+
 - **Custom template support** - New `--template <path>` flag enables organizations to use custom coding standards
   - Load template files from local directory to override package defaults
   - Partial template support - custom templates can override specific files while falling back to defaults for others
   - Nested directory support - templates can include subdirectories (e.g., `.github/workflows/`, `config/`)
   - Path characters preserved - Special characters like `&` in directory names handled correctly
   - Use case: Enforce organization-specific linting rules, CI/CD workflows, and coding standards across projects
+
+### Changed
+
+- **Dependency monitoring setup enhanced** - `--deps` flag now routes to tier-appropriate config
+  - Free tier: Basic Dependabot config (npm + github-actions, no grouping)
+  - Pro/Enterprise tier: Framework-aware grouping with intelligent batching
+  - License tier displayed during setup
+  - Detected frameworks logged for Pro/Enterprise users
+  - Upgrade messaging updated to show "Available now" for framework grouping
 
 ### Fixed
 
