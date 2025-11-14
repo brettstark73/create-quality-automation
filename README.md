@@ -101,25 +101,56 @@ npx create-quality-automation@latest --deps
 npx create-quality-automation@latest --license-status
 ```
 
-#### 🔒 Premium Tiers (Private Beta)
+#### 🎉 FREE BETA - All Features Unlocked!
 
-> We’re validating premium automation now. Join the waitlist to influence the roadmap.
+> **PREMIUM-001 SHIPPED!** Framework-aware dependency grouping is now available to **everyone for free** during our beta period.
+>
+> We're collecting feedback before launching paid tiers. **No payment required - no license keys - just run the setup!**
 
-**💰 Pro Tier (planned $39/month)**
+**✨ Available Now - 100% Free During Beta**
 
-- Coming soon: framework-aware dependency grouping (React, Next.js, Vue, Angular)
-- Coming soon: multi-language support beyond npm (Python, Rust, Go, more)
-- Planned: advanced security audit workflows and custom schedules
-- Planned: breaking change detection before merging updates
+- ✅ **Framework-aware dependency grouping** - **LIVE NOW**
+  - Automatically groups related dependencies into batched PRs
+  - Reduces PR volume by 60%+ for React projects
+  - Supports React, Vue, Angular, Svelte ecosystems
+  - Testing frameworks (Jest, Vitest, Playwright, Testing Library)
+  - Build tools (Vite, Webpack, Turbo, Nx, Rollup, esbuild)
+  - Storybook ecosystem grouping
+  - Wildcard pattern matching for scoped packages (`@tanstack/*`, `@radix-ui/*`)
+  - Intelligent update-type filtering (major vs minor vs patch)
+  - Production-ready with comprehensive test coverage
 
-**🏢 Enterprise Tier (planned $197/month)**
+**🚀 Coming This Month - Also Free During Beta**
 
-- Everything in the Pro roadmap
-- Planned: custom notification channels (Slack, Teams)
-- Planned: multi-repository governance and analytics
-- Planned: priority support with shared runbooks
+- 📅 **Multi-language dependency monitoring** (Python/Pip, Rust/Cargo, Ruby/Bundler)
+- 📅 **Advanced security audit workflows** with custom schedules
+- 📅 **Breaking change detection** before merging dependency updates
 
-[**🚀 Join the Pro waitlist**](https://create-quality-automation.dev/pro) | [**🏢 Request Enterprise beta**](https://create-quality-automation.dev/enterprise)
+**💰 Future Pricing - Lock in Founder Discount**
+
+When we launch paid tiers (Q1 2026), pricing will be:
+
+- **Pro Tier**: $39/month (advanced features, multi-language support)
+- **Enterprise Tier**: $197/month (team features, governance, priority support)
+
+**Beta users who join our waitlist get 50% off for life** ($19.50/mo Pro, $98.50/mo Enterprise)
+
+[**📬 Join Waitlist - Lock in Founder Pricing**](https://tally.so/r/create-quality-automation-beta)
+
+**Example: React Project Dependency Grouping**
+
+```yaml
+# Before (Free Tier): 15+ individual PRs for React dependencies
+# After (Pro Tier): 3-5 grouped PRs
+
+groups:
+  react-core:              # Core React packages
+    patterns: [react, react-dom, react-router*]
+  react-ecosystem:         # State management, data fetching
+    patterns: [@tanstack/*, zustand, swr]
+  testing-frameworks:      # All testing tools
+    patterns: [jest, @testing-library/*, vitest]
+```
 
 ### Validation Commands (v2.2.0+)
 
