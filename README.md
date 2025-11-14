@@ -109,7 +109,7 @@ npx create-quality-automation@latest --license-status
 
 **✨ Available Now - 100% Free During Beta**
 
-- ✅ **Framework-aware dependency grouping** - **LIVE NOW**
+- ✅ **Framework-aware dependency grouping for JavaScript/TypeScript** - **LIVE NOW**
   - Automatically groups related dependencies into batched PRs
   - Reduces PR volume by 60%+ for React projects
   - Supports React, Vue, Angular, Svelte ecosystems
@@ -120,9 +120,16 @@ npx create-quality-automation@latest --license-status
   - Intelligent update-type filtering (major vs minor vs patch)
   - Production-ready with comprehensive test coverage
 
+- ✅ **Multi-language dependency monitoring** - **JUST SHIPPED**
+  - **Python/Pip**: Django, Flask, FastAPI, Data Science (numpy, pandas, scikit-learn)
+  - **Rust/Cargo**: Actix, Rocket, async runtimes (Tokio, async-std), Serde ecosystem
+  - **Ruby/Bundler**: Rails, Sinatra, RSpec testing frameworks
+  - **Polyglot support**: Single Dependabot config for npm + pip + cargo + bundler
+  - Framework-aware grouping across all languages
+  - Automatic ecosystem detection from project files
+
 **🚀 Coming This Month - Also Free During Beta**
 
-- 📅 **Multi-language dependency monitoring** (Python/Pip, Rust/Cargo, Ruby/Bundler)
 - 📅 **Advanced security audit workflows** with custom schedules
 - 📅 **Breaking change detection** before merging dependency updates
 
