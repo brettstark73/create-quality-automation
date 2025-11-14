@@ -11,7 +11,7 @@ const {
   generateAngularGroups,
   generateTestingGroups,
   generateBuildToolGroups,
-  FRAMEWORK_SIGNATURES,
+  NPM_FRAMEWORK_SIGNATURES,
 } = require('../lib/dependency-monitoring-premium')
 
 console.log('\n🧪 Testing Premium Dependency Monitoring...\n')
@@ -448,27 +448,33 @@ function testUpdateTypes() {
 function testFrameworkSignatures() {
   console.log('Test 13: Framework Signature Completeness')
 
-  assert(FRAMEWORK_SIGNATURES.react, 'Should have React signature definitions')
-  assert(FRAMEWORK_SIGNATURES.vue, 'Should have Vue signature definitions')
   assert(
-    FRAMEWORK_SIGNATURES.angular,
+    NPM_FRAMEWORK_SIGNATURES.react,
+    'Should have React signature definitions'
+  )
+  assert(NPM_FRAMEWORK_SIGNATURES.vue, 'Should have Vue signature definitions')
+  assert(
+    NPM_FRAMEWORK_SIGNATURES.angular,
     'Should have Angular signature definitions'
   )
   assert(
-    FRAMEWORK_SIGNATURES.testing,
+    NPM_FRAMEWORK_SIGNATURES.testing,
     'Should have testing framework signatures'
   )
-  assert(FRAMEWORK_SIGNATURES.build, 'Should have build tool signatures')
+  assert(NPM_FRAMEWORK_SIGNATURES.build, 'Should have build tool signatures')
 
   // Check React completeness
-  assert(FRAMEWORK_SIGNATURES.react.core, 'React should have core packages')
+  assert(NPM_FRAMEWORK_SIGNATURES.react.core, 'React should have core packages')
   assert(
-    FRAMEWORK_SIGNATURES.react.routing,
+    NPM_FRAMEWORK_SIGNATURES.react.routing,
     'React should have routing packages'
   )
-  assert(FRAMEWORK_SIGNATURES.react.state, 'React should have state packages')
   assert(
-    FRAMEWORK_SIGNATURES.react.metaFrameworks,
+    NPM_FRAMEWORK_SIGNATURES.react.state,
+    'React should have state packages'
+  )
+  assert(
+    NPM_FRAMEWORK_SIGNATURES.react.metaFrameworks,
     'React should have meta-frameworks'
   )
 

@@ -9,6 +9,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **🚀 PREMIUM-002: Multi-Language Dependency Monitoring (Pro Tier)** - **JUST SHIPPED!** Python, Rust, and Ruby ecosystem support
+  - **Python/Pip ecosystem support**
+    - Framework detection for Django (core, REST framework, async, CMS)
+    - Framework detection for Flask (core, extensions, SQLAlchemy, CORS)
+    - Framework detection for FastAPI (core, async runtime, validation)
+    - Data Science stack detection (numpy, pandas, scipy, scikit-learn, TensorFlow, PyTorch, matplotlib)
+    - Testing framework grouping (pytest ecosystem)
+    - Web server grouping (gunicorn, uvicorn, waitress)
+    - Dependency file parsing: requirements.txt and pyproject.toml
+  - **Rust/Cargo ecosystem support**
+    - Framework detection for Actix Web (core, middleware)
+    - Framework detection for Rocket (core, features)
+    - Async runtime grouping (Tokio, async-std, futures)
+    - Serde ecosystem grouping (serde, serde_json, serde_yaml)
+    - Testing framework grouping (criterion, proptest)
+    - Cargo.toml parsing with inline table support
+  - **Ruby/Bundler ecosystem support**
+    - Framework detection for Rails (core, database, testing, frontend)
+    - Framework detection for Sinatra (core, extensions)
+    - Testing framework grouping (RSpec, Minitest, Capybara, FactoryBot)
+    - Utility grouping (Sidekiq, Faraday, HTTParty)
+    - Gemfile parsing with version constraints
+  - **Polyglot repository support**
+    - Single Dependabot config supporting npm + pip + cargo + bundler simultaneously
+    - Automatic ecosystem detection from project files
+    - Independent update schedules per ecosystem
+    - Framework-aware grouping across all languages
+    - Ecosystem-specific labels and commit message prefixes
+  - **Comprehensive test coverage**: 15 tests covering all languages, frameworks, and edge cases
+  - **Implementation**: Extended `lib/dependency-monitoring-premium.js` to 1200+ lines
+  - **Zero external dependencies**: Simple regex-based parsing for all file formats
+
 - **🚀 PREMIUM-001: Framework-Aware Dependency Grouping (Pro Tier)** - **SHIPPED AND LIVE!** Flagship premium feature reducing dependency PRs by 60%+
   - Intelligent dependency batching by framework (React, Vue, Angular)
   - Reduces dependency PRs by 60%+ for React projects (15+ individual PRs → 3-5 grouped PRs)
