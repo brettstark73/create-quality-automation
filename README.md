@@ -101,13 +101,15 @@ npx create-quality-automation@latest --deps
 npx create-quality-automation@latest --license-status
 ```
 
-#### 🔒 Premium Tiers - BETA NOW LIVE! 🎉
+#### 🎉 FREE BETA - All Features Unlocked!
 
-> **PREMIUM-001 SHIPPED!** Framework-aware dependency grouping reduces dependency PRs by 60%+ with intelligent batching.
+> **PREMIUM-001 SHIPPED!** Framework-aware dependency grouping is now available to **everyone for free** during our beta period.
+>
+> We're collecting feedback before launching paid tiers. **No payment required - no license keys - just run the setup!**
 
-**💰 Pro Tier - BETA PRICING: $19.50/month** (50% off for 3 months, then $39/month)
+**✨ Available Now - 100% Free During Beta**
 
-- ✅ **Framework-aware dependency grouping** - **LIVE NOW** (React, Vue, Angular, Svelte, Testing, Build tools)
+- ✅ **Framework-aware dependency grouping** - **LIVE NOW**
   - Automatically groups related dependencies into batched PRs
   - Reduces PR volume by 60%+ for React projects
   - Supports React, Vue, Angular, Svelte ecosystems
@@ -117,20 +119,23 @@ npx create-quality-automation@latest --license-status
   - Wildcard pattern matching for scoped packages (`@tanstack/*`, `@radix-ui/*`)
   - Intelligent update-type filtering (major vs minor vs patch)
   - Production-ready with comprehensive test coverage
-- 📅 Multi-language support beyond npm (Python, Rust, Go) - Q1 2026
-- 📅 Advanced security audit workflows and custom schedules - Q2 2026
-- 📅 Breaking change detection before merging updates - Q2 2026
 
-**🏢 Enterprise Tier - BETA PRICING: $98.50/month** (50% off for 3 months, then $197/month)
+**🚀 Coming This Month - Also Free During Beta**
 
-- Everything in Pro tier
-- 📅 Custom notification channels (Slack, Teams) - Q1 2026
-- 📅 Multi-repository governance and analytics - Q2 2026
-- 📅 Priority support with shared runbooks - Available now
+- 📅 **Multi-language dependency monitoring** (Python/Pip, Rust/Cargo, Ruby/Bundler)
+- 📅 **Advanced security audit workflows** with custom schedules
+- 📅 **Breaking change detection** before merging dependency updates
 
-**Beta Duration**: December 2025 - February 2026 (3 months at 50% off)
+**💰 Future Pricing - Lock in Founder Discount**
 
-[**🚀 Join Pro Beta**](https://create-quality-automation.dev/pro) | [**🏢 Request Enterprise Beta**](https://create-quality-automation.dev/enterprise)
+When we launch paid tiers (Q1 2026), pricing will be:
+
+- **Pro Tier**: $39/month (advanced features, multi-language support)
+- **Enterprise Tier**: $197/month (team features, governance, priority support)
+
+**Beta users who join our waitlist get 50% off for life** ($19.50/mo Pro, $98.50/mo Enterprise)
+
+[**📬 Join Waitlist - Lock in Founder Pricing**](https://tally.so/r/create-quality-automation-beta)
 
 **Example: React Project Dependency Grouping**
 
