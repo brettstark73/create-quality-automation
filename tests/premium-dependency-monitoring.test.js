@@ -360,6 +360,59 @@ function testEmptyPackageJson() {
   console.log('✅ Empty package.json handled correctly\n')
 }
 
+// Test 11b: Missing Dependencies Fields (undefined)
+function testMissingDependencies() {
+  console.log('Test 11b: Missing Dependencies Fields (undefined)')
+
+  // Fresh app might only have dependencies
+  const onlyDependencies = {
+    name: 'fresh-app',
+    dependencies: {
+      react: '^18.0.0',
+    },
+    // devDependencies is undefined
+  }
+
+  const result1 = detectFrameworks(onlyDependencies)
+  assert.strictEqual(
+    result1.primary,
+    'react',
+    'Should handle missing devDependencies'
+  )
+
+  // Or only devDependencies
+  const onlyDevDependencies = {
+    name: 'tool-project',
+    devDependencies: {
+      vite: '^5.0.0',
+    },
+    // dependencies is undefined
+  }
+
+  const result2 = detectFrameworks(onlyDevDependencies)
+  assert.ok(result2.detected.build, 'Should handle missing dependencies')
+
+  // Or both missing (edge case)
+  const noDependencies = {
+    name: 'minimal-project',
+    // No dependencies or devDependencies fields at all
+  }
+
+  const result3 = detectFrameworks(noDependencies)
+  assert.strictEqual(
+    result3.primary,
+    null,
+    'Should handle missing both dependency fields'
+  )
+  assert.strictEqual(
+    Object.keys(result3.detected).length,
+    0,
+    'Should detect no frameworks when both fields missing'
+  )
+
+  console.log('✅ Missing dependencies fields (undefined) handled correctly\n')
+}
+
 // Test 12: Update Types Configuration
 function testUpdateTypes() {
   console.log('Test 12: Update Types Configuration')
@@ -484,6 +537,7 @@ function runAllTests() {
     testBuildToolGroups()
     testPatternMatching()
     testEmptyPackageJson()
+    testMissingDependencies()
     testUpdateTypes()
     testFrameworkSignatures()
     testGroupCount()
