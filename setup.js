@@ -548,22 +548,36 @@ HELP:
     }
   }
 
+  // Detect Python project
+  function detectPythonProject(projectPath) {
+    const pythonFiles = [
+      'pyproject.toml',
+      'requirements.txt',
+      'setup.py',
+      'Pipfile',
+    ]
+    return pythonFiles.some(file => fs.existsSync(path.join(projectPath, file)))
+  }
+
   // Handle dependency monitoring (Free/Pro/Enterprise)
   async function handleDependencyMonitoring() {
     const projectPath = process.cwd()
     const license = getLicenseInfo()
 
-    if (!hasNpmProject(projectPath)) {
+    // Detect all supported ecosystems (npm, Python, Ruby, Rust, etc.)
+    const hasNpm = hasNpmProject(projectPath)
+    const hasPython = detectPythonProject(projectPath)
+
+    if (!hasNpm && !hasPython) {
       console.error(
-        '❌ No package.json found. Dependency monitoring requires an npm project.'
+        '❌ No supported dependency file found (package.json, pyproject.toml, requirements.txt, Gemfile, Cargo.toml).'
       )
-      console.log(
-        "💡 Make sure you're in a directory with a package.json file."
-      )
+      console.log("💡 Make sure you're in a directory with dependency files.")
       process.exit(1)
     }
 
-    console.log('📦 Detected: npm project')
+    if (hasNpm) console.log('📦 Detected: npm project')
+    if (hasPython) console.log('🐍 Detected: Python project')
     console.log(`📋 License tier: ${license.tier.toUpperCase()}`)
 
     const dependabotPath = path.join(projectPath, '.github', 'dependabot.yml')
@@ -580,16 +594,16 @@ HELP:
       })
 
       if (configData) {
-        const { frameworks } = configData
-        const detectedFrameworks = Object.keys(frameworks.detected)
+        const { ecosystems } = configData
+        const detectedEcosystems = Object.keys(ecosystems.detected)
 
-        if (detectedFrameworks.length > 0) {
-          console.log('🔍 Detected frameworks:')
-          detectedFrameworks.forEach(fw => {
-            const info = frameworks.detected[fw]
-            console.log(`   • ${fw}: ${info.count} packages`)
+        if (detectedEcosystems.length > 0) {
+          console.log('🔍 Detected ecosystems:')
+          detectedEcosystems.forEach(eco => {
+            const info = ecosystems.detected[eco]
+            console.log(`   • ${eco}: ${info.count} packages`)
           })
-          console.log(`\n🎯 Primary framework: ${frameworks.primary || 'none'}`)
+          console.log(`\n🎯 Primary ecosystem: ${ecosystems.primary || 'none'}`)
         }
 
         writePremiumDependabotConfig(configData, dependabotPath)

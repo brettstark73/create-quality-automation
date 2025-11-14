@@ -55,6 +55,14 @@ This catches documentation gaps that manual review misses. Also reference:
 
 **Why this matters**: Documentation gaps weren't caught in v2.1.0 release because we relied on manual memory instead of systematic verification.
 
+## Bash Command Permissions
+
+This project has approval for the following Bash commands (no permission prompts):
+
+- `npm publish` - Publishing releases to npm registry
+- `npm version` - Bumping package versions
+- `npm run prerelease` - Pre-release validation
+
 ## 🚨 CRITICAL: Code Change Verification Protocol
 
 ### **When Making ANY Code Change:**
