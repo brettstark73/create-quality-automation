@@ -177,6 +177,7 @@ function testAppPatternDetection() {
 
     // Run setup
     const setupPath = path.resolve(__dirname, '..', 'setup.js')
+    execSync(`node "${setupPath}"`, {
       cwd: testDir,
       encoding: 'utf8',
       stdio: 'pipe',
@@ -212,6 +213,7 @@ function testConfigFileDetection() {
 
     // Run setup
     const setupPath = path.resolve(__dirname, '..', 'setup.js')
+    execSync(`node "${setupPath}"`, {
       cwd: testDir,
       encoding: 'utf8',
       stdio: 'pipe',
@@ -254,6 +256,7 @@ function testSubdirectorySinglePy() {
 
     // Run setup
     const setupPath = path.resolve(__dirname, '..', 'setup.js')
+    execSync(`node "${setupPath}"`, {
       cwd: testDir,
       encoding: 'utf8',
       stdio: 'pipe',
