@@ -559,6 +559,16 @@ HELP:
     return pythonFiles.some(file => fs.existsSync(path.join(projectPath, file)))
   }
 
+  // Detect Rust project
+  function detectRustProject(projectPath) {
+    return fs.existsSync(path.join(projectPath, 'Cargo.toml'))
+  }
+
+  // Detect Ruby project
+  function detectRubyProject(projectPath) {
+    return fs.existsSync(path.join(projectPath, 'Gemfile'))
+  }
+
   // Handle dependency monitoring (Free/Pro/Enterprise)
   async function handleDependencyMonitoring() {
     const projectPath = process.cwd()
@@ -567,8 +577,10 @@ HELP:
     // Detect all supported ecosystems (npm, Python, Ruby, Rust, etc.)
     const hasNpm = hasNpmProject(projectPath)
     const hasPython = detectPythonProject(projectPath)
+    const hasRust = detectRustProject(projectPath)
+    const hasRuby = detectRubyProject(projectPath)
 
-    if (!hasNpm && !hasPython) {
+    if (!hasNpm && !hasPython && !hasRust && !hasRuby) {
       console.error(
         '❌ No supported dependency file found (package.json, pyproject.toml, requirements.txt, Gemfile, Cargo.toml).'
       )
@@ -578,12 +590,21 @@ HELP:
 
     if (hasNpm) console.log('📦 Detected: npm project')
     if (hasPython) console.log('🐍 Detected: Python project')
+    if (hasRust) console.log('🦀 Detected: Rust project')
+    if (hasRuby) console.log('💎 Detected: Ruby project')
     console.log(`📋 License tier: ${license.tier.toUpperCase()}`)
 
     const dependabotPath = path.join(projectPath, '.github', 'dependabot.yml')
 
     // Use premium or basic config based on license tier
-    if (license.tier === 'pro' || license.tier === 'enterprise') {
+    // During free beta (v3.0.0), ALL projects use premium generator
+    // After beta: Pro/Enterprise use premium, Free tier uses basic (npm-only)
+    const shouldUsePremium =
+      license.tier === 'pro' ||
+      license.tier === 'enterprise' ||
+      license.tier === 'free' // Free beta: all projects get premium features
+
+    if (shouldUsePremium) {
       console.log(
         '\n🚀 Setting up framework-aware dependency monitoring (Premium)...\n'
       )
@@ -595,15 +616,30 @@ HELP:
 
       if (configData) {
         const { ecosystems } = configData
-        const detectedEcosystems = Object.keys(ecosystems.detected)
+        const ecosystemNames = Object.keys(ecosystems)
 
-        if (detectedEcosystems.length > 0) {
+        if (ecosystemNames.length > 0) {
           console.log('🔍 Detected ecosystems:')
-          detectedEcosystems.forEach(eco => {
-            const info = ecosystems.detected[eco]
-            console.log(`   • ${eco}: ${info.count} packages`)
+
+          // Find primary ecosystem and total package count
+          let primaryEcosystem = null
+          ecosystemNames.forEach(ecoName => {
+            const eco = ecosystems[ecoName]
+            const frameworks = Object.keys(eco.detected || {})
+            const totalPackages = frameworks.reduce((sum, fw) => {
+              return sum + (eco.detected[fw]?.count || 0)
+            }, 0)
+
+            console.log(`   • ${ecoName}: ${totalPackages} packages`)
+
+            if (eco.primary) {
+              primaryEcosystem = ecoName
+            }
           })
-          console.log(`\n🎯 Primary ecosystem: ${ecosystems.primary || 'none'}`)
+
+          if (primaryEcosystem) {
+            console.log(`\n🎯 Primary ecosystem: ${primaryEcosystem}`)
+          }
         }
 
         writePremiumDependabotConfig(configData, dependabotPath)
