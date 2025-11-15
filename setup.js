@@ -705,7 +705,7 @@ HELP:
 
   // Handle dependency monitoring command
   if (isDependencyMonitoringMode) {
-    ;(async () => {
+    return (async () => {
       try {
         await handleDependencyMonitoring()
         process.exit(0)
@@ -724,7 +724,7 @@ HELP:
     isComprehensiveMode
   ) {
     // Handle validation commands and exit
-    ;(async () => {
+    return (async () => {
       try {
         await handleValidationCommands()
       } catch (error) {
@@ -749,6 +749,34 @@ HELP:
         console.error('❌ This must be run in a git repository')
         console.log('Run "git init" first, then try again.')
         process.exit(1)
+      }
+
+      // Validate custom template path BEFORE any mutations
+      if (customTemplatePath) {
+        if (!fs.existsSync(customTemplatePath)) {
+          console.error(
+            `❌ Custom template path does not exist: ${customTemplatePath}`
+          )
+          console.error(
+            '\nWhen using --template, the path must exist and be a valid directory.'
+          )
+          console.error('Please check the path and try again.\n')
+          process.exit(1)
+        }
+
+        const stats = fs.statSync(customTemplatePath)
+        if (!stats.isDirectory()) {
+          console.error(
+            `❌ Custom template path is not a directory: ${customTemplatePath}`
+          )
+          console.error(
+            '\nThe --template path must be a directory containing template files.'
+          )
+          console.error('Please provide a valid directory path.\n')
+          process.exit(1)
+        }
+
+        console.log(`✅ Custom template path validated: ${customTemplatePath}`)
       }
 
       // Check if package.json exists with validation
