@@ -208,17 +208,44 @@ test('--deps flag works on Python-only project', () => {
 
 ---
 
+## Bug #2 Fix (2025-11-15)
+
+**Status**: ✅ FIXED AND VALIDATED
+
+**Solution Implemented**:
+
+1. Added Rust (Cargo.toml) and Ruby (Gemfile) detection functions
+2. Fixed routing logic to use premium generator for ALL projects during free beta
+3. Fixed ecosystems structure access (iterate over ecosystem names, not direct .detected)
+4. Disabled tier check in premium generator during free beta period
+
+**Validation Results**:
+
+```bash
+Integration tests: 6/6 PASS ✅
+- Test 1 (npm-only): PASS
+- Test 2 (Python-only): PASS (was FAILING - NOW FIXED)
+- Test 3 (Rust-only): PASS (was FAILING - NOW FIXED)
+- Test 4 (Polyglot): PASS (was FAILING - NOW FIXED)
+- Test 5 (API contract): PASS
+- Test 6 (Hyphenated packages): PASS
+```
+
+**Commits**:
+
+- 5873f09: fix(deps): critical bug - Python/Rust-only projects now work (Bug #2)
+- cb20431: feat: add opt-in error reporting and crash analytics (integration tests)
+
+---
+
 ## Next Steps
 
 ### Immediate (Before Any Release)
 
 1. ✅ **Commit integration tests as-is** (prove bugs exist)
-2. 🔄 **Fix Bug #2**: Python-only projects
-   - Option A: Add pip support to basic tier generator
-   - Option B: Route Python-only to premium generator (free during beta)
-   - Option C: Explicit error message (better than silent failure)
-3. 🔄 **Run all 6 integration tests** (complete validation)
-4. ✅ **Verify 100% pass rate**
+2. ✅ **Fix Bug #2**: Python-only projects - COMPLETE
+3. ✅ **Run all 6 integration tests** (complete validation) - ALL PASSING
+4. ✅ **Verify 100% pass rate** - VERIFIED
 
 ### Short-Term (Post-Mortem Goals)
 
