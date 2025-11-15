@@ -875,11 +875,26 @@ HELP:
         try {
           const entries = safeReadDir(dir)
 
-          // Check files in current directory
-          const hasPyInCurrentDir = entries.some(
-            dirent => dirent.isFile() && dirent.name.endsWith('.py')
+          // Count .py files in current directory (excluding __pycache__)
+          const pyFiles = entries.filter(
+            dirent =>
+              dirent.isFile() &&
+              dirent.name.endsWith('.py') &&
+              dirent.name !== '__pycache__'
           )
-          if (hasPyInCurrentDir) return true
+
+          // Strong indicators: multiple .py files OR main/app/run patterns
+          const hasMultiplePyFiles = pyFiles.length >= 2
+          const hasMainPattern = pyFiles.some(
+            f =>
+              f.name === 'main.py' ||
+              f.name === 'app.py' ||
+              f.name === 'run.py' ||
+              f.name === '__main__.py'
+          )
+
+          // Require stronger evidence than a single random .py file
+          if (hasMultiplePyFiles || hasMainPattern) return true
 
           // Check subdirectories (skip node_modules, .git, etc.)
           const skipDirs = ['node_modules', '.git', 'dist', 'build', 'coverage']
