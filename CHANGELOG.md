@@ -7,6 +7,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.1.1] - 2025-11-16
+
+### Fixed
+
+- **🐛 Critical Python Parser Bug Fixes**
+  - **HIGH: PEP 621 list-style dependencies never parsed** - Modern Python projects using `dependencies = ["package>=1.0.0"]` format had zero dependencies detected, losing all premium features (Dependabot grouping, framework detection). Parser only matched legacy `package = "^1.0.0"` format.
+  - **HIGH: Inline comments after `]` break PEP 621 parsing** - Files with `]  # end of dependencies` failed to parse, returning empty dependency list.
+  - **MEDIUM: Dotted package names rejected** - Python namespace packages (`zope.interface`, `google.cloud-storage`, `backports.zoneinfo`, `ruamel.yaml`) were parsed as truncated names (`zope`, `google`) with empty versions, breaking framework detection for scientific/cloud packages.
+  - **MEDIUM: Metadata pollution** - Key/value parser treated `[project.urls]` homepage values and other metadata as dependencies, polluting framework counts and Dependabot configuration.
+
+- **📦 Python Parser Enhancements**
+  - Support PEP 621 main `dependencies = [...]` arrays
+  - Support `[project.optional-dependencies]` with hyphenated group names (`lint-tools`, `test-suite`, `docs-build`)
+  - Support dotted package names (`.` in package identifiers)
+  - Support package extras (`fastapi[all]>=0.110.0`, `uvicorn[standard]>=0.24.0`)
+  - Handle inline comments after closing brackets and within dependency lists
+  - Scope legacy key/value parsing to dependency sections only (exclude `[project.urls]`, `[build-system]`, etc.)
+  - Skip Python version specifiers (`python = "^3.8"`)
+
+### Added
+
+- **🧪 Comprehensive Python Parser Test Suites**
+  - `tests/python-parser-fixes.test.js`: 8 test scenarios covering PEP 621, dotted packages, hyphenated groups, real-world files (540+ lines)
+  - `tests/pyproject-parser-bug-reproduction.test.js`: Bug reproduction tests (235 lines)
+  - Test coverage: PEP 621 arrays, dotted names, optional-dependencies, inline comments, metadata exclusion, edge cases
+
+- **📚 Process Improvement Documentation**
+  - `claudedocs/parser-bugs-lessons-learned.md`: Systematic process improvements for future parser work
+  - `claudedocs/bug3-monorepo-subdirectory-design.md`: Design document for deferred monorepo subdirectory detection (v3.2.0)
+  - Research protocol for pre-implementation edge case discovery
+  - Real-world test data methodology
+
+### Notes
+
+- **Monorepo subdirectory detection** (Bug #3) deferred to v3.2.0 - requires architectural changes
+- Workaround: Run CLI in each service directory manually (`cd services/api && npx create-quality-automation --deps`)
+- All 22+ test suites passing with new parser fixes
+
 ## [3.1.0] - 2025-11-15
 
 ### Added
