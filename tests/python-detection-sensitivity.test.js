@@ -22,10 +22,7 @@ console.log('🧪 Testing Python Detection Sensitivity...\n')
  * Create temporary test directory with git
  */
 function createTestDir(name) {
-  const testDir = path.join(
-    os.tmpdir(),
-    `cqa-py-detect-${name}-${Date.now()}`
-  )
+  const testDir = path.join(os.tmpdir(), `cqa-py-detect-${name}-${Date.now()}`)
   fs.mkdirSync(testDir, { recursive: true })
 
   // Initialize git (required by setup.js)
@@ -58,10 +55,7 @@ function testSinglePyFileNoDetection() {
       JSON.stringify({ name: 'js-project', version: '1.0.0' })
     )
     fs.writeFileSync(path.join(testDir, 'index.js'), 'console.log("JS")')
-    fs.writeFileSync(
-      path.join(testDir, 'random_script.py'),
-      'print("utility")'
-    )
+    fs.writeFileSync(path.join(testDir, 'random_script.py'), 'print("utility")')
 
     // Run setup
     const setupPath = path.resolve(__dirname, '..', 'setup.js')
@@ -75,10 +69,14 @@ function testSinglePyFileNoDetection() {
     const hasPythonSetup = fs.existsSync(
       path.join(testDir, '.pre-commit-config.yaml')
     )
-    assert(!hasPythonSetup, 'Should NOT create Python config for single .py file')
+    assert(
+      !hasPythonSetup,
+      'Should NOT create Python config for single .py file'
+    )
 
     // Should mention it's a JS project only
-    const isJSOnly = !output.includes('Python project') && !output.includes('🐍')
+    const isJSOnly =
+      !output.includes('Python project') && !output.includes('🐍')
     assert(isJSOnly, 'Should detect as JS project only')
 
     console.log('  ✅ Single .py file correctly ignored (not a Python project)')
