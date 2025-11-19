@@ -1,0 +1,104 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "description": "Progressive Quality Automation Configuration",
+  "maturity": "auto",
+  "checks": {
+    "prettier": {
+      "enabled": true,
+      "required": true,
+      "description": "Prettier code formatting (always required)"
+    },
+    "eslint": {
+      "enabled": "auto",
+      "required": false,
+      "auto-enable": {
+        "when": "sourceFiles >= 1"
+      },
+      "description": "ESLint linting (enabled when source files exist)"
+    },
+    "stylelint": {
+      "enabled": "auto",
+      "required": false,
+      "auto-enable": {
+        "when": "cssFiles >= 1"
+      },
+      "description": "Stylelint CSS linting (enabled when CSS files exist)"
+    },
+    "tests": {
+      "enabled": "auto",
+      "required": false,
+      "auto-enable": {
+        "when": "testFiles >= 1"
+      },
+      "description": "Test execution (enabled when test files exist)"
+    },
+    "coverage": {
+      "enabled": false,
+      "required": false,
+      "threshold": 80,
+      "auto-enable": {
+        "when": "testFiles >= 3 AND maturity >= development"
+      },
+      "description": "Test coverage checks (enabled for development+ with 3+ test files)"
+    },
+    "security-audit": {
+      "enabled": "auto",
+      "required": false,
+      "auto-enable": {
+        "when": "dependencies >= 1"
+      },
+      "description": "Security audit (enabled when dependencies exist)"
+    },
+    "documentation": {
+      "enabled": false,
+      "required": false,
+      "auto-enable": {
+        "when": "maturity >= production-ready"
+      },
+      "description": "Documentation validation (enabled for production-ready projects)"
+    },
+    "lighthouse": {
+      "enabled": false,
+      "required": false,
+      "auto-enable": {
+        "when": "lighthouseConfig exists"
+      },
+      "description": "Lighthouse CI performance checks (optional)"
+    }
+  },
+  "maturity-levels": {
+    "minimal": {
+      "description": "Just getting started - basic setup only",
+      "checks": ["prettier"]
+    },
+    "bootstrap": {
+      "description": "Early development - has some source files",
+      "checks": ["prettier", "eslint"]
+    },
+    "development": {
+      "description": "Active development - has source files and tests",
+      "checks": ["prettier", "eslint", "stylelint", "tests"]
+    },
+    "production-ready": {
+      "description": "Mature project - full quality automation",
+      "checks": [
+        "prettier",
+        "eslint",
+        "stylelint",
+        "tests",
+        "coverage",
+        "security-audit",
+        "documentation"
+      ]
+    }
+  },
+  "overrides": {
+    "description": "Manual overrides for auto-detection (optional)",
+    "examples": {
+      "force-all-checks": "Set maturity to 'production-ready' to enable all checks",
+      "disable-specific-check": "Set check.enabled to false to disable a specific check",
+      "force-minimal": "Set maturity to 'minimal' to only run basic checks"
+    }
+  }
+}
