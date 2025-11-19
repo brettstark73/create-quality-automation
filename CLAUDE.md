@@ -22,6 +22,8 @@ This project uses Brett Stark's global Claude Code configuration with specific a
 
 - **Setup:** `npm run setup` - Initialize quality automation in target project
 - **Prepare:** `npm run prepare` - Initialize Husky hooks
+- **Validate CLAUDE.md:** `npm run validate:claude` - Validate CLAUDE.md consistency
+- **Validate All:** `npm run validate:all` - Comprehensive validation including CLAUDE.md
 
 ## Quality Automation Features
 
@@ -39,6 +41,20 @@ This project uses Brett Stark's global Claude Code configuration with specific a
 - Setup script is conservative and merge-safe for existing projects
 - Supports Node.js ≥20 with Volta configuration
 - Package is published to npm as an unscoped CLI (`create-quality-automation`)
+
+## CLAUDE.md Maintenance Automation
+
+This project includes automated CLAUDE.md validation to ensure this file stays current and accurate:
+
+- **Pre-commit Hook**: Validates CLAUDE.md on every commit via lint-staged
+- **GitHub Actions**: CI/CD validation on push and PRs (`.github/workflows/claude-md-validation.yml`)
+- **Manual Validation**: `npm run validate:claude` for on-demand checks
+- **Validation Rules**: Checks required sections, package references, script documentation, and outdated patterns
+
+**Validation Script**: `scripts/validate-claude-md.js`
+**Documentation**: `.github/CLAUDE_MD_AUTOMATION.md`
+
+This automation prevents documentation drift and ensures CLAUDE.md accuracy across the project lifecycle.
 
 ## Release Process
 

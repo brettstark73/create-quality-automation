@@ -78,7 +78,10 @@ async function testPythonIntegration() {
     )
     // Add Python config file to ensure detection (after sensitivity fix)
     // eslint-disable-next-line security/detect-non-literal-fs-filename
-    fs.writeFileSync(path.join(mixedDir, 'requirements.txt'), 'requests==2.31.0')
+    fs.writeFileSync(
+      path.join(mixedDir, 'requirements.txt'),
+      'requests==2.31.0'
+    )
 
     execSync('git init', { cwd: mixedDir, stdio: 'ignore' })
     execSync('git config user.email "test@example.com"', {

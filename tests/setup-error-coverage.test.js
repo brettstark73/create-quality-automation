@@ -22,7 +22,10 @@ console.log('🧪 Testing Setup Error Coverage...\n')
  * Create temporary test directory with git
  */
 function createTestDir(name) {
-  const testDir = path.join(os.tmpdir(), `cqa-setup-error-${name}-${Date.now()}`)
+  const testDir = path.join(
+    os.tmpdir(),
+    `cqa-setup-error-${name}-${Date.now()}`
+  )
   fs.mkdirSync(testDir, { recursive: true })
 
   // Initialize git (required by setup.js)
