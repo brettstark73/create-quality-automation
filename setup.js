@@ -1,7 +1,5 @@
 #!/usr/bin/env node
 
-/* eslint-disable security/detect-non-literal-fs-filename */
-
 const fs = require('fs')
 const path = require('path')
 const { execSync } = require('child_process')
