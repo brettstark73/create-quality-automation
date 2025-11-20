@@ -238,12 +238,12 @@ Replace your current `quality.yml` with the progressive version:
 
 ```diff
 - name: ESLint
--   run: npx eslint . --ext .js,.jsx,.ts,.tsx,.html --max-warnings=0
+-   run: npx eslint . --max-warnings=0
 + name: ESLint
 +   if: needs.detect-maturity.outputs.source-count > 0
 +   run: |
 +     echo "🔍 Linting ${{ needs.detect-maturity.outputs.source-count }} source files..."
-+     npx eslint . --ext .js,.jsx,.ts,.tsx,.html --max-warnings=0
++     npx eslint . --max-warnings=0
 ```
 
 ## Testing Scenarios

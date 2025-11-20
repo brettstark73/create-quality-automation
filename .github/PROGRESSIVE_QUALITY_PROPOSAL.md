@@ -91,7 +91,7 @@ Each check should gracefully handle "nothing to check" scenarios.
 ```yaml
 # ❌ FAILS on empty projects
 - name: ESLint
-  run: npx eslint . --ext .js,.jsx,.ts,.tsx,.html --max-warnings=0
+  run: npx eslint . --max-warnings=0
 ```
 
 #### Proposed Improvement
@@ -110,7 +110,7 @@ Each check should gracefully handle "nothing to check" scenarios.
     fi
 
     echo "🔍 Linting $SOURCE_COUNT source files..."
-    npx eslint . --ext .js,.jsx,.ts,.tsx,.html --max-warnings=0
+    npx eslint . --max-warnings=0
 ```
 
 ### Strategy 3: Progressive Enablement Configuration
@@ -234,7 +234,7 @@ jobs:
       - run: npm ci || npm install
 
       - name: ESLint
-        run: npx eslint . --ext .js,.jsx,.ts,.tsx,.html --max-warnings=0
+        run: npx eslint . --max-warnings=0
 
       - name: Stylelint
         run: npx stylelint "**/*.{css,scss,sass,less,pcss}" --allow-empty-input
