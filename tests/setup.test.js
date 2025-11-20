@@ -1,6 +1,4 @@
 'use strict'
-/* eslint-disable security/detect-object-injection */
-/* eslint-disable security/detect-non-literal-fs-filename */
 
 const assert = require('assert')
 const fs = require('fs')

@@ -44,7 +44,7 @@ function testCacheManager() {
     // Test 3: Cache key generation from file content
     console.log('🔍 Testing cache key generation...')
     const testFile = path.join(testDir, 'test.js')
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
+
     fs.writeFileSync(testFile, 'console.log("test");')
 
     const key2 = cache.generateKey(testFile)
@@ -60,7 +60,7 @@ function testCacheManager() {
     console.log(`  ✅ Cache key generation works: ${key2.substring(0, 16)}...`)
 
     // Different content should generate different key
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
+
     fs.writeFileSync(testFile, 'console.log("modified");')
     const key4 = cache.generateKey(testFile)
     if (key2 === key4) {

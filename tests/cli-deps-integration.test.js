@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 
-/* eslint-disable security/detect-non-literal-fs-filename */
 // Test files intentionally use dynamic paths for temporary test directories
 
 /**

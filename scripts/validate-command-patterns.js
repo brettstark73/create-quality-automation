@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 'use strict'
-/* eslint-disable security/detect-non-literal-fs-filename */
 
 /**
  * Validates that command patterns in config/defaults.js
