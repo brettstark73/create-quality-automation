@@ -29,21 +29,25 @@ Bootstrap quality automation in JavaScript/TypeScript and Python projects with c
 Your project is automatically detected as one of 4 maturity levels:
 
 #### 📌 Minimal (0 source files)
+
 - **Checks:** Only Prettier ✨
 - **Use case:** Brand new projects, just got package.json
 - **CI Status:** ✅ Green from day one
 
 #### 🚀 Bootstrap (1-2 source files)
+
 - **Checks:** Prettier + ESLint 🔍
 - **Use case:** Writing your first components
 - **CI Status:** ✅ Linting starts when you add code
 
 #### 🔨 Development (3+ files + tests)
+
 - **Checks:** All linting + Tests + Security 🛡️
 - **Use case:** Active development with test infrastructure
 - **CI Status:** ✅ Comprehensive checks, still no docs required
 
 #### ✅ Production-Ready (10+ files + docs)
+
 - **Checks:** ALL checks enabled 💯
 - **Use case:** Mature projects ready for production
 - **CI Status:** ✅ Full quality validation
@@ -63,6 +67,7 @@ npx create-quality-automation@latest --check-maturity
 ```
 
 **Output:**
+
 ```
 📊 Project Maturity Report
 
@@ -91,11 +96,11 @@ Edit `.qualityrc.json` to override auto-detection:
 ```json
 {
   "version": "1.0.0",
-  "maturity": "production-ready",  // Force all checks
+  "maturity": "production-ready", // Force all checks
   "checks": {
     "prettier": { "enabled": true, "required": true },
     "eslint": { "enabled": "auto", "required": false },
-    "tests": { "enabled": true, "required": true }  // Force enable
+    "tests": { "enabled": true, "required": true } // Force enable
   }
 }
 ```

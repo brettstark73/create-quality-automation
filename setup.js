@@ -1079,9 +1079,7 @@ HELP:
           qualityrcPath,
           JSON.stringify(qualityConfig, null, 2) + '\n'
         )
-        console.log(
-          `✅ Added .qualityrc.json (detected: ${detectedMaturity})`
-        )
+        console.log(`✅ Added .qualityrc.json (detected: ${detectedMaturity})`)
       }
 
       // Load and merge templates (custom + defaults)

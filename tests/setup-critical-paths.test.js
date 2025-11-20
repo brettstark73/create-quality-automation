@@ -91,18 +91,12 @@ function testTelemetryStatus() {
  */
 function testErrorReportingStatus() {
   setupTest()
-  console.log(
-    'Test 2: --error-reporting-status flag displays status correctly'
-  )
+  console.log('Test 2: --error-reporting-status flag displays status correctly')
 
-  const result = spawnSync(
-    NODE_BIN,
-    [SETUP_PATH, '--error-reporting-status'],
-    {
-      cwd: TEST_DIR,
-      encoding: 'utf8',
-    }
-  )
+  const result = spawnSync(NODE_BIN, [SETUP_PATH, '--error-reporting-status'], {
+    cwd: TEST_DIR,
+    encoding: 'utf8',
+  })
 
   const output = result.stdout + result.stderr
 
@@ -362,7 +356,13 @@ function testCustomTemplatePath() {
 
   const result = spawnSync(
     NODE_BIN,
-    [SETUP_PATH, '--template-path', customTemplateDir, '--yes', '--skip-install'],
+    [
+      SETUP_PATH,
+      '--template-path',
+      customTemplateDir,
+      '--yes',
+      '--skip-install',
+    ],
     {
       cwd: TEST_DIR,
       encoding: 'utf8',
