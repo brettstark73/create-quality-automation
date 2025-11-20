@@ -1,9 +1,6 @@
 'use strict'
 /* eslint-disable security/detect-object-injection */
 
-const JS_LINT_EXTENSIONS = '.js,.jsx,.mjs,.cjs,.html'
-const TS_LINT_EXTENSIONS = '.js,.jsx,.mjs,.cjs,.ts,.tsx,.html'
-
 const STYLELINT_EXTENSIONS = ['css', 'scss', 'sass', 'less', 'pcss']
 const DEFAULT_STYLELINT_TARGET = `**/*.{${STYLELINT_EXTENSIONS.join(',')}}`
 
@@ -40,11 +37,11 @@ const stylelintBraceGroup = stylelintTargets => {
   return `{${targets.join(',')}}`
 }
 
-const baseLintScripts = ({ extensions, stylelintTargets }) => {
+const baseLintScripts = ({ stylelintTargets }) => {
   const stylelintTarget = stylelintBraceGroup(stylelintTargets)
   return {
-    lint: `eslint . --ext ${extensions} && stylelint "${stylelintTarget}" --allow-empty-input`,
-    'lint:fix': `eslint . --ext ${extensions} --fix && stylelint "${stylelintTarget}" --fix --allow-empty-input`,
+    lint: `eslint . && stylelint "${stylelintTarget}" --allow-empty-input`,
+    'lint:fix': `eslint . --fix && stylelint "${stylelintTarget}" --fix --allow-empty-input`,
   }
 }
 
@@ -93,11 +90,10 @@ const TS_LINT_STAGED_PATTERN = '**/*.{js,jsx,ts,tsx,mjs,cjs,html}'
 
 const clone = value => JSON.parse(JSON.stringify(value))
 
-function getDefaultScripts({ typescript, stylelintTargets } = {}) {
-  const extensions = typescript ? TS_LINT_EXTENSIONS : JS_LINT_EXTENSIONS
+function getDefaultScripts({ stylelintTargets } = {}) {
   return {
     ...clone(baseScripts),
-    ...baseLintScripts({ extensions, stylelintTargets }),
+    ...baseLintScripts({ stylelintTargets }),
   }
 }
 
