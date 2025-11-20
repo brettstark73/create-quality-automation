@@ -544,16 +544,20 @@ Runs **lint-staged** on staged files only:
 
 ### Pre-push Hook (`.husky/pre-push`)
 
-Runs **full validation** before pushing to remote:
+Runs **comprehensive validation** before pushing to remote:
 
+- ✅ **Pattern Validation** - `npm run test:patterns` (if available) - Catches deprecated command patterns
 - ✅ **Linting** - `npm run lint` (ESLint + Stylelint)
 - ✅ **Formatting** - `npm run format:check` (Prettier)
-- ✅ **Tests** - `npm test` (if test script exists)
+- ✅ **Command Execution** - `npm run test:commands` (if available) - Validates generated commands actually work
+- ✅ **Unit Tests** - `npm test` (if test script exists)
 - 🚫 **Blocks push** if any check fails
 
 **When it runs:** Before every `git push`
 
-**Why this matters:** Catches errors locally before CI runs, saving time and preventing broken builds from reaching your team.
+**Why this matters:** Catches errors locally before CI runs, saving time and preventing broken builds from reaching your team. The hook intelligently detects which scripts are available and only runs what exists.
+
+**Cross-platform:** Uses Node.js for script detection (works on Windows, Mac, Linux).
 
 ### Bypassing Hooks (Emergency Only)
 
