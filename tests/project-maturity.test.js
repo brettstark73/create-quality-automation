@@ -484,11 +484,7 @@ console.log('🧪 Testing ProjectMaturityDetector...\n')
       'number',
       'Should have testCount'
     )
-    assert.strictEqual(
-      typeof output.hasDeps,
-      'boolean',
-      'Should have hasDeps'
-    )
+    assert.strictEqual(typeof output.hasDeps, 'boolean', 'Should have hasDeps')
     assert.strictEqual(
       typeof output.requiredChecks,
       'string',
@@ -573,10 +569,7 @@ console.log('🧪 Testing ProjectMaturityDetector...\n')
     const detector = new ProjectMaturityDetector({ projectPath: tempDir })
     const stats = detector.analyzeProject()
 
-    assert.ok(
-      stats.totalSourceFiles >= 2,
-      'Should find nested source files'
-    )
+    assert.ok(stats.totalSourceFiles >= 2, 'Should find nested source files')
 
     console.log('✅ Test 12 passed: Detects nested source files')
   } catch (error) {

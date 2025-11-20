@@ -84,7 +84,7 @@ async function testPythonPackageJsonError() {
       } else {
         console.log('  ✅ Error handling executed')
       }
-    } catch (error) {
+    } catch {
       console.log('  ✅ Python package.json error path covered')
     }
   } finally {
