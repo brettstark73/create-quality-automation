@@ -1307,6 +1307,15 @@ coverage/
 
 echo "🔍 Running pre-push validation..."
 
+# Validate command patterns (fast - catches deprecated patterns)
+if node -e "const pkg=require('./package.json');process.exit(pkg.scripts['test:patterns']?0:1)" 2>/dev/null; then
+  echo "🔍 Validating command patterns..."
+  npm run test:patterns || {
+    echo "❌ Pattern validation failed! Deprecated patterns detected."
+    exit 1
+  }
+fi
+
 # Run lint (catches errors before CI)
 echo "📝 Linting..."
 npm run lint || {
@@ -1321,9 +1330,18 @@ npm run format:check || {
   exit 1
 }
 
-# Run tests if they exist (--if-present flag)
-if grep -q '"test"' package.json 2>/dev/null; then
-  echo "🧪 Running tests..."
+# Test command execution (CRITICAL - prevents command generation bugs)
+if node -e "const pkg=require('./package.json');process.exit(pkg.scripts['test:commands']?0:1)" 2>/dev/null; then
+  echo "🧪 Testing command execution..."
+  npm run test:commands || {
+    echo "❌ Command execution tests failed! Generated commands are broken."
+    exit 1
+  }
+fi
+
+# Run tests if they exist
+if node -e "const pkg=require('./package.json');process.exit(pkg.scripts.test?0:1)" 2>/dev/null; then
+  echo "🧪 Running unit tests..."
   npm test || {
     echo "❌ Tests failed! Fix failing tests before pushing."
     exit 1
