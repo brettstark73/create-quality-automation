@@ -59,7 +59,11 @@ class ProjectMaturityDetector {
     if (stats.totalSourceFiles === 0) return 'minimal'
     if (stats.totalSourceFiles < 3 && stats.testFiles === 0) return 'bootstrap'
     if (stats.testFiles > 0 && stats.totalSourceFiles >= 3) return 'development'
-    if (stats.hasDocumentation && stats.hasTests && stats.totalSourceFiles >= 10) {
+    if (
+      stats.hasDocumentation &&
+      stats.hasTests &&
+      stats.totalSourceFiles >= 10
+    ) {
       return 'production-ready'
     }
 
@@ -72,7 +76,7 @@ class ProjectMaturityDetector {
       testFiles: this.countTestFiles(projectPath),
       hasDocumentation: this.hasDocumentation(projectPath),
       hasTests: this.hasTests(projectPath),
-      hasDependencies: this.hasDependencies(projectPath)
+      hasDependencies: this.hasDependencies(projectPath),
     }
   }
 }

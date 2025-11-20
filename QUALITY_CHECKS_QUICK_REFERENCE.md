@@ -54,18 +54,18 @@
 
 ## File-by-File Mapping
 
-| Component | File(s) | What it Does | When It Runs |
-|-----------|---------|-------------|--------------|
-| **Pre-commit Hook** | `.husky/pre-commit` | Runs lint-staged | Every `git commit` |
-| **Staged Files Handler** | `package.json` lint-staged config | Auto-fixes & validates staged files | Pre-commit |
-| **ESLint JS** | `eslint.config.cjs` | Lints JavaScript/HTML | Pre-commit, CI/CD |
-| **ESLint TS** | `eslint.config.ts.cjs` | Lints TypeScript (auto-loaded if TS detected) | Pre-commit, CI/CD |
-| **Stylelint** | `.stylelintrc.json` | Lints CSS/SCSS/SASS/Less/PostCSS | Pre-commit, CI/CD |
-| **Prettier** | `.prettierrc` | Code formatting rules | Pre-commit, CI/CD |
-| **Ignore Rules** | `.prettierignore`, `.eslintignore` | What files to skip | Always |
-| **CI/CD Workflow** | `.github/workflows/quality.yml` | Main quality checks in GitHub | Push/PR |
-| **CLAUDE.md Validator** | `.github/workflows/claude-md-validation.yml` | Keeps docs in sync | CLAUDE.md changes |
-| **Release Workflow** | `.github/workflows/release.yml` | Pre-release testing + npm publish | Git tags v* |
+| Component                | File(s)                                      | What it Does                                  | When It Runs       |
+| ------------------------ | -------------------------------------------- | --------------------------------------------- | ------------------ |
+| **Pre-commit Hook**      | `.husky/pre-commit`                          | Runs lint-staged                              | Every `git commit` |
+| **Staged Files Handler** | `package.json` lint-staged config            | Auto-fixes & validates staged files           | Pre-commit         |
+| **ESLint JS**            | `eslint.config.cjs`                          | Lints JavaScript/HTML                         | Pre-commit, CI/CD  |
+| **ESLint TS**            | `eslint.config.ts.cjs`                       | Lints TypeScript (auto-loaded if TS detected) | Pre-commit, CI/CD  |
+| **Stylelint**            | `.stylelintrc.json`                          | Lints CSS/SCSS/SASS/Less/PostCSS              | Pre-commit, CI/CD  |
+| **Prettier**             | `.prettierrc`                                | Code formatting rules                         | Pre-commit, CI/CD  |
+| **Ignore Rules**         | `.prettierignore`, `.eslintignore`           | What files to skip                            | Always             |
+| **CI/CD Workflow**       | `.github/workflows/quality.yml`              | Main quality checks in GitHub                 | Push/PR            |
+| **CLAUDE.md Validator**  | `.github/workflows/claude-md-validation.yml` | Keeps docs in sync                            | CLAUDE.md changes  |
+| **Release Workflow**     | `.github/workflows/release.yml`              | Pre-release testing + npm publish             | Git tags v\*       |
 
 ## Key Configuration Functions
 
@@ -99,12 +99,14 @@
 ## When Checks FAIL (Blocking)
 
 ### Pre-commit (Prevents commit):
+
 1. ESLint errors on JS/TS files
-2. Stylelint errors on CSS files  
+2. Stylelint errors on CSS files
 3. Prettier needs to format files
 4. CLAUDE.md validation fails
 
 ### GitHub Actions (Prevents merge):
+
 1. `npm run format:check` fails
 2. ESLint errors (--max-warnings=0)
 3. Stylelint errors (if CSS exists)
@@ -117,6 +119,7 @@
 ## When Checks PASS (Safe)
 
 ### Projects with:
+
 - NO CSS files → Stylelint passes (--allow-empty-input)
 - NO source files → ESLint finds nothing to check
 - Proper formatting → Prettier is satisfied
@@ -127,6 +130,7 @@
 ## Configuration Override Points
 
 ### 1. Skip Individual Checks (in setup.js)
+
 ```bash
 npx create-quality-automation@latest \
   --no-npm-audit \
@@ -137,12 +141,14 @@ npx create-quality-automation@latest \
 ```
 
 ### 2. Custom Templates
+
 ```bash
 npx create-quality-automation@latest --template ./my-org-standards
 # Overrides specific configs with your own
 ```
 
 ### 3. Per-Project npm Scripts
+
 ```bash
 npm run lint          # ESLint + Stylelint
 npm run lint:fix      # Auto-fix both
@@ -154,33 +160,37 @@ npm run validate:*    # Various validations
 
 ## Special Cases
 
-| Scenario | Behavior | File |
-|----------|----------|------|
-| **Empty CSS project** | Passes with --allow-empty-input | quality.yml:60 |
-| **No Lighthouse config** | Skipped gracefully, not blocking | quality.yml:158 |
-| **Missing package-lock.json** | Warning only, continues with npm install | quality.yml:39 |
-| **Input validation issues** | Warning only, not blocking | quality.yml:127 |
-| **Signature verification unavailable** | Continues with warning | quality.yml:50 |
-| **Python files detected** | Adds black/ruff/isort to lint-staged | config/defaults.js:80 |
-| **TypeScript files detected** | Adds TS extensions to patterns | config/defaults.js:97 |
+| Scenario                               | Behavior                                 | File                  |
+| -------------------------------------- | ---------------------------------------- | --------------------- |
+| **Empty CSS project**                  | Passes with --allow-empty-input          | quality.yml:60        |
+| **No Lighthouse config**               | Skipped gracefully, not blocking         | quality.yml:158       |
+| **Missing package-lock.json**          | Warning only, continues with npm install | quality.yml:39        |
+| **Input validation issues**            | Warning only, not blocking               | quality.yml:127       |
+| **Signature verification unavailable** | Continues with warning                   | quality.yml:50        |
+| **Python files detected**              | Adds black/ruff/isort to lint-staged     | config/defaults.js:80 |
+| **TypeScript files detected**          | Adds TS extensions to patterns           | config/defaults.js:97 |
 
 ## Critical Findings
 
 ### 1. ESLint is STRICT
+
 - `--max-warnings=0` in GitHub Actions
 - Any warning = build fails
 - Local lint-staged runs with --fix (auto-corrects)
 
 ### 2. Stylelint is FORGIVING (for empty projects)
+
 - `--allow-empty-input` flag means CSS-less projects pass
 - But if CSS files exist, errors are still blocking
 
 ### 3. Prettier is REQUIRED
+
 - All file types must be properly formatted
 - No warning-only mode
 - Both local (pre-commit) and CI/CD (format:check)
 
 ### 4. Security is COMPREHENSIVE
+
 - npm audit vulnerabilities (high+)
 - Secret pattern detection (grep-based)
 - XSS vulnerability patterns
@@ -188,6 +198,7 @@ npm run validate:*    # Various validations
 - But input validation is warning-only
 
 ### 5. Documentation is CRITICAL for create-quality-automation itself
+
 - CLAUDE.md validated on every change
 - Prevents drift between code and docs
 - Enforces consistency across project

@@ -198,7 +198,10 @@ const cleanupTempProject = tempDir => {
 
     console.log('✅ Test 4 passed: CLI exit code (0 for success)')
   } catch (error) {
-    console.error('❌ Test 4 failed: CLI exited with non-zero code')
+    console.error(
+      '❌ Test 4 failed: CLI exited with non-zero code:',
+      error.message
+    )
     process.exitCode = 1
   } finally {
     cleanupTempProject(tempDir)
@@ -240,10 +243,7 @@ const cleanupTempProject = tempDir => {
     })
 
     assert.ok(output.includes('Minimal'), 'Should detect minimal maturity')
-    assert.ok(
-      output.includes('Source files: 0'),
-      'Should show 0 source files'
-    )
+    assert.ok(output.includes('Source files: 0'), 'Should show 0 source files')
 
     console.log('✅ Test 6 passed: Maturity level matches project state')
   } catch (error) {
@@ -321,10 +321,7 @@ const cleanupTempProject = tempDir => {
     const output = logs.join('\n')
 
     assert.ok(output.includes('Project Maturity Report'), 'Should print header')
-    assert.ok(
-      output.includes('Maturity Level:'),
-      'Should print maturity level'
-    )
+    assert.ok(output.includes('Maturity Level:'), 'Should print maturity level')
     assert.ok(output.includes('Project Statistics:'), 'Should print statistics')
     assert.ok(output.includes('Quality Checks:'), 'Should print checks')
 
