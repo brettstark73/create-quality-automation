@@ -22,7 +22,7 @@
      - FAILS if any files need formatting
      - Checks all file types configured
      - No conditional skip logic
-   - **ESLint**: `npx eslint . --ext .js,.jsx,.ts,.tsx,.html --max-warnings=0`
+   - **ESLint**: `npx eslint . --max-warnings=0`
      - FAILS on ANY warning or error
      - Includes security plugin rules
      - Strict enforcement with --max-warnings=0
@@ -139,8 +139,8 @@
 
    ```javascript
    {
-     "lint": "eslint . --ext {extensions} && stylelint \"{stylelintTarget}\" --allow-empty-input",
-     "lint:fix": "eslint . --ext {extensions} --fix && stylelint \"{stylelintTarget}\" --fix --allow-empty-input",
+     "lint": "eslint . && stylelint \"{stylelintTarget}\" --allow-empty-input",
+     "lint:fix": "eslint . --fix && stylelint \"{stylelintTarget}\" --fix --allow-empty-input",
      "format": "prettier --write .",
      "format:check": "prettier --check .",
      "security:audit": "npm audit --audit-level high",

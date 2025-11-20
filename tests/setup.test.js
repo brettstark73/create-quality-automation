@@ -285,7 +285,6 @@ try {
   )
 
   assert.deepStrictEqual(pkg.scripts, expectedScripts)
-  assert.strictEqual(pkg.scripts.lint.includes('.ts'), true)
   assert.deepStrictEqual(pkg.devDependencies, expectedDevDependencies)
   assertLintStagedEqual(pkg['lint-staged'], expectedLintStaged)
   assert.ok(pkg['lint-staged']['src/**/*.ts'].includes('custom-ts'))

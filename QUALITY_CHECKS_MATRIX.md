@@ -77,7 +77,7 @@ All checks run during `git commit` on STAGED files only:
 npm run format:check
 
 # 2. ESLint (without the strict --max-warnings=0)
-npx eslint . --ext .js,.jsx,.ts,.tsx,.html
+npx eslint .
 
 # 3. Stylelint
 npx stylelint "**/*.{css,scss,sass,less,pcss}" --allow-empty-input

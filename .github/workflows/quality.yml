@@ -119,7 +119,7 @@ jobs:
       - name: ESLint
         run: |
           echo "🔍 Linting ${{ needs.detect-maturity.outputs.source-count }} source files..."
-          npx eslint . --ext .js,.jsx,.ts,.tsx,.html
+          npx eslint .
 
       - name: Stylelint
         if: needs.detect-maturity.outputs.has-css == 'true'
