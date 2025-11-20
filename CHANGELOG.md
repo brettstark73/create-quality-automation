@@ -5,11 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [4.0.0] - 2025-11-20
 
 ### Added
 
-#### 🎯 Progressive Quality Automation (Preparing for v4.0.0)
+#### 🎯 Progressive Quality Automation
 
 **Major new feature:** Adaptive quality checks that automatically adjust based on project maturity, eliminating false failures in early-stage projects.
 
@@ -81,6 +81,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 **For new projects:** No action needed - progressive checks are default
 
 **For existing projects:**
+
 ```bash
 # Option 1: Update your configuration (recommended)
 npx create-quality-automation@latest --update
