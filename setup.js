@@ -491,6 +491,9 @@ HELP:
     console.log('')
     console.log('Git Hooks (Husky):')
     console.log('  • .husky/pre-commit - Pre-commit hook for lint-staged')
+    console.log(
+      '  • .husky/pre-push - Pre-push validation (lint, format, tests)'
+    )
     console.log('')
     console.log('GitHub Actions:')
     console.log('  • .github/workflows/quality.yml - Quality checks workflow')
@@ -1291,6 +1294,52 @@ coverage/
         console.warn('⚠️ Could not create Husky pre-commit hook:', e.message)
       }
 
+      // Ensure Husky pre-push hook runs validation checks
+      try {
+        const huskyDir = path.join(process.cwd(), '.husky')
+        if (!fs.existsSync(huskyDir)) {
+          fs.mkdirSync(huskyDir, { recursive: true })
+        }
+        const prePushPath = path.join(huskyDir, 'pre-push')
+        if (!fs.existsSync(prePushPath)) {
+          const hook = `#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+echo "🔍 Running pre-push validation..."
+
+# Run lint (catches errors before CI)
+echo "📝 Linting..."
+npm run lint || {
+  echo "❌ Lint failed! Fix errors before pushing."
+  exit 1
+}
+
+# Run format check (ensures code style consistency)
+echo "✨ Checking formatting..."
+npm run format:check || {
+  echo "❌ Format check failed! Run 'npm run format' to fix."
+  exit 1
+}
+
+# Run tests if they exist (--if-present flag)
+if grep -q '"test"' package.json 2>/dev/null; then
+  echo "🧪 Running tests..."
+  npm test || {
+    echo "❌ Tests failed! Fix failing tests before pushing."
+    exit 1
+  }
+fi
+
+echo "✅ Pre-push validation passed!"
+`
+          fs.writeFileSync(prePushPath, hook)
+          fs.chmodSync(prePushPath, 0o755)
+          console.log('✅ Added Husky pre-push hook (validation)')
+        }
+      } catch (e) {
+        console.warn('⚠️ Could not create Husky pre-push hook:', e.message)
+      }
+
       // Ensure engines/volta pins in target package.json (enforce minimums)
       try {
         if (fs.existsSync(packageJsonPath)) {
@@ -1477,7 +1526,8 @@ coverage/
       }
       console.log('\n✨ Your project now has:')
       console.log('  • Prettier code formatting')
-      console.log('  • Pre-commit hooks via Husky')
+      console.log('  • Pre-commit hooks via Husky (lint-staged)')
+      console.log('  • Pre-push validation (lint, format, tests)')
       console.log('  • GitHub Actions quality checks')
       console.log('  • Lint-staged for efficient processing')
     } // End of runMainSetup function
