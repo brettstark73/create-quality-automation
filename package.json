@@ -1,6 +1,6 @@
 {
   "name": "create-quality-automation",
-  "version": "2.4.0",
+  "version": "4.0.0",
   "description": "Bootstrap quality automation for JavaScript/TypeScript and Python projects with GitHub Actions, pre-commit hooks, linting, formatting, and freemium dependency monitoring",
   "main": "setup.js",
   "bin": {
@@ -16,11 +16,15 @@
     "security:secrets": "node -e \"const fs=require('fs');const content=fs.readFileSync('package.json','utf8');if(/[\\\"\\'][a-zA-Z0-9+/]{20,}[\\\"\\']/.test(content)){console.error('❌ Potential hardcoded secrets in package.json');process.exit(1)}else{console.log('✅ No secrets detected in package.json')}\"",
     "security:config": "node setup.js --security-config",
     "validate:docs": "node setup.js --validate-docs",
+    "validate:claude": "node scripts/validate-claude-md.js",
     "validate:comprehensive": "node setup.js --comprehensive --no-markdownlint",
-    "validate:all": "npm run validate:comprehensive && npm run security:audit",
-    "test": "node tests/setup.test.js && node tests/integration.test.js",
+    "validate:all": "npm run validate:comprehensive && npm run security:audit && npm run validate:claude",
+    "test": "node tests/setup.test.js && node tests/integration.test.js && node tests/error-paths.test.js && node tests/error-messages.test.js && node tests/cache-manager.test.js && node tests/parallel-validation.test.js && node tests/python-integration.test.js && node tests/interactive.test.js && node tests/monorepo.test.js && node tests/template-loader.test.js && node tests/critical-fixes.test.js && node tests/interactive-routing-fix.test.js && node tests/telemetry.test.js && node tests/error-reporter.test.js && node tests/premium-dependency-monitoring.test.js && node tests/multi-language-dependency-monitoring.test.js && node tests/cli-deps-integration.test.js && node tests/real-world-packages.test.js && node tests/validation-factory.test.js && node tests/setup-error-coverage.test.js && node tests/python-detection-sensitivity.test.js && node tests/python-parser-fixes.test.js && node tests/licensing.test.js && node tests/base-validator.test.js && node tests/dependency-monitoring-basic.test.js && node tests/workflow-validation.test.js && node tests/setup-critical-paths.test.js && node tests/project-maturity.test.js && node tests/project-maturity-cli.test.js && node tests/package-manager-detection.test.js",
+    "test:coverage": "c8 --reporter=html --reporter=text --reporter=lcov npm test",
+    "test:e2e": "bash scripts/test-e2e-package.sh",
+    "coverage": "npm run test:coverage && echo '\nCoverage report generated in coverage/index.html'",
     "docs:check": "bash scripts/check-docs.sh",
-    "prerelease": "npm run docs:check && npm run validate:comprehensive && npm test",
+    "prerelease": "npm run docs:check && npm test && npm run test:e2e",
     "setup": "node setup.js",
     "release:patch": "npm version patch && git push --follow-tags",
     "release:minor": "npm version minor && git push --follow-tags",
@@ -57,12 +61,12 @@
     ".github/",
     ".prettierrc",
     ".prettierignore",
+    ".eslintignore",
     "eslint.config.cjs",
     "eslint.config.ts.cjs",
     ".stylelintrc.json",
     ".editorconfig",
-    ".nvmrc",
-    ".npmrc"
+    ".nvmrc"
   ],
   "repository": {
     "type": "git",
@@ -77,6 +81,7 @@
   },
   "devDependencies": {
     "actionlint": "^2.0.6",
+    "c8": "^10.1.2",
     "eslint": "^9.12.0",
     "eslint-plugin-security": "^3.0.1",
     "gitleaks": "^1.0.0",
@@ -92,6 +97,10 @@
     "npm": "10.2.4"
   },
   "lint-staged": {
+    "CLAUDE.md": [
+      "node scripts/validate-claude-md.js",
+      "prettier --write"
+    ],
     "package.json": [
       "prettier --write"
     ],

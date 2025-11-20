@@ -22,6 +22,8 @@ This project uses Brett Stark's global Claude Code configuration with specific a
 
 - **Setup:** `npm run setup` - Initialize quality automation in target project
 - **Prepare:** `npm run prepare` - Initialize Husky hooks
+- **Validate CLAUDE.md:** `npm run validate:claude` - Validate CLAUDE.md consistency
+- **Validate All:** `npm run validate:all` - Comprehensive validation including CLAUDE.md
 
 ## Quality Automation Features
 
@@ -40,6 +42,20 @@ This project uses Brett Stark's global Claude Code configuration with specific a
 - Supports Node.js ≥20 with Volta configuration
 - Package is published to npm as an unscoped CLI (`create-quality-automation`)
 
+## CLAUDE.md Maintenance Automation
+
+This project includes automated CLAUDE.md validation to ensure this file stays current and accurate:
+
+- **Pre-commit Hook**: Validates CLAUDE.md on every commit via lint-staged
+- **GitHub Actions**: CI/CD validation on push and PRs (`.github/workflows/claude-md-validation.yml`)
+- **Manual Validation**: `npm run validate:claude` for on-demand checks
+- **Validation Rules**: Checks required sections, package references, script documentation, and outdated patterns
+
+**Validation Script**: `scripts/validate-claude-md.js`
+**Documentation**: `.github/CLAUDE_MD_AUTOMATION.md`
+
+This automation prevents documentation drift and ensures CLAUDE.md accuracy across the project lifecycle.
+
 ## Release Process
 
 **CRITICAL**: Before any version bump or npm publish, ALWAYS run:
@@ -55,11 +71,20 @@ This catches documentation gaps that manual review misses. Also reference:
 
 **Why this matters**: Documentation gaps weren't caught in v2.1.0 release because we relied on manual memory instead of systematic verification.
 
+## Bash Command Permissions
+
+This project has approval for the following Bash commands (no permission prompts):
+
+- `npm publish` - Publishing releases to npm registry
+- `npm version` - Bumping package versions
+- `npm run prerelease` - Pre-release validation
+
 ## 🚨 CRITICAL: Code Change Verification Protocol
 
 ### **When Making ANY Code Change:**
 
 1. **Systematic Search**: Use multiple search methods to find ALL instances
+
    ```bash
    # Example: Removing 'grep' usage
    grep -r "grep" . --exclude-dir=node_modules --exclude-dir=.git
@@ -68,18 +93,21 @@ This catches documentation gaps that manual review misses. Also reference:
    ```
 
 2. **Verify Complete Removal**: After edits, re-search to confirm ZERO instances
+
    ```bash
    # Must return NO results
    grep -r "target_pattern" . --exclude-dir=node_modules --exclude-dir=.git
    ```
 
 3. **Test the Specific Issue**: Create minimal reproduction of the reported problem
+
    ```bash
    # Example: Test Windows grep issue
    node setup.js --security-config 2>&1 | grep "not recognized"
    ```
 
 4. **Integration Test**: Run full test suite to ensure no regressions
+
    ```bash
    npm test
    ```

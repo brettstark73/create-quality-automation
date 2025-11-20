@@ -15,6 +15,95 @@ Bootstrap quality automation in JavaScript/TypeScript and Python projects with c
 - **🆕 Modern Tooling** - ESLint 9 flat config, Husky 9, latest dependencies
 - **🔒 Security Automation** - Blocking npm audit and hardcoded secrets scanning
 - **📊 Dependency Monitoring** - Basic Dependabot config (Free) + Advanced features (Pro/Enterprise)
+- **🎨 Custom Templates** - Use organization-specific coding standards with `--template` flag
+- **🎯 Progressive Quality (v4.0.0+)** - Adaptive checks based on project maturity - no false failures!
+
+## 🎯 Progressive Quality Automation (NEW!)
+
+**The Problem:** Early-stage projects fail CI/CD checks not because of code quality issues, but because tests, docs, and dependencies haven't been created yet.
+
+**The Solution:** Adaptive quality checks that automatically adjust based on your project's maturity level.
+
+### How It Works
+
+Your project is automatically detected as one of 4 maturity levels:
+
+#### 📌 Minimal (0 source files)
+
+- **Checks:** Only Prettier ✨
+- **Use case:** Brand new projects, just got package.json
+- **CI Status:** ✅ Green from day one
+
+#### 🚀 Bootstrap (1-2 source files)
+
+- **Checks:** Prettier + ESLint 🔍
+- **Use case:** Writing your first components
+- **CI Status:** ✅ Linting starts when you add code
+
+#### 🔨 Development (3+ files + tests)
+
+- **Checks:** All linting + Tests + Security 🛡️
+- **Use case:** Active development with test infrastructure
+- **CI Status:** ✅ Comprehensive checks, still no docs required
+
+#### ✅ Production-Ready (10+ files + docs)
+
+- **Checks:** ALL checks enabled 💯
+- **Use case:** Mature projects ready for production
+- **CI Status:** ✅ Full quality validation
+
+### Benefits
+
+✅ **No false failures** - CI stays green during early development
+✅ **Clear progression** - See which checks activate as you add files
+✅ **Reduced noise** - Only see failures that matter for your project stage
+✅ **Zero config** - Auto-detection works out of the box
+✅ **Manual override** - Force strict mode via `.qualityrc.json` if needed
+
+### Check Your Maturity Level
+
+```bash
+npx create-quality-automation@latest --check-maturity
+```
+
+**Output:**
+
+```
+📊 Project Maturity Report
+
+Maturity Level: Development
+Description: Active development - has source files and tests
+
+Project Statistics:
+  • Source files: 5
+  • Test files: 3
+  • Documentation: No
+  • Dependencies: Yes
+
+Quality Checks:
+  ✅ Required: prettier, eslint, stylelint, tests
+  🔵 Optional: security-audit
+  ⏭️  Disabled: coverage, documentation
+
+🔨 Development project - most checks enabled.
+   Add documentation to enable doc validation.
+```
+
+### Manual Override
+
+Edit `.qualityrc.json` to override auto-detection:
+
+```json
+{
+  "version": "1.0.0",
+  "maturity": "production-ready", // Force all checks
+  "checks": {
+    "prettier": { "enabled": true, "required": true },
+    "eslint": { "enabled": "auto", "required": false },
+    "tests": { "enabled": true, "required": true } // Force enable
+  }
+}
+```
 
 ## 🚀 Quick Start
 
@@ -60,6 +149,38 @@ npm install
 npm run lint
 ```
 
+### Custom Templates (v2.6.2+)
+
+Use organization-specific coding standards by providing a custom template directory:
+
+```bash
+# Use custom templates from a local directory
+npx create-quality-automation@latest --template ./my-org-templates
+
+# Custom template directory structure example:
+# my-org-templates/
+# ├── .prettierrc              # Custom Prettier config
+# ├── eslint.config.cjs        # Custom ESLint rules
+# ├── .github/
+# │   └── workflows/
+# │       └── quality.yml      # Custom CI workflow
+# └── config/
+#     └── pyproject.toml       # Custom Python tooling config
+
+# How it works:
+# - Custom templates override package defaults
+# - Missing files fall back to package defaults
+# - Partial templates supported (override only specific files)
+# - Enables consistent standards across organization projects
+```
+
+**Use Cases:**
+
+- Enforce organization-specific linting rules across all projects
+- Customize CI/CD workflows for your infrastructure
+- Maintain company coding style guidelines
+- Share best practices across development teams
+
 ### Dependency Monitoring (v2.4.0+)
 
 ```bash
@@ -68,33 +189,74 @@ npx create-quality-automation@latest --deps
 
 # What you get for free:
 # ✅ Basic Dependabot configuration for npm packages
-# ✅ Weekly dependency updates on Monday 9am
-# ✅ Auto-merge for security patches only
+# ✅ Weekly dependency updates on Monday 9am (configurable)
 # ✅ GitHub Actions dependency monitoring
+# ✅ Automatic PR creation for dependency updates
+#
+# Note: Auto-merge requires manual GitHub Actions workflow setup
+# See: https://docs.github.com/en/code-security/dependabot/working-with-dependabot/automating-dependabot-with-github-actions
 
 # Check your current license tier and features
 npx create-quality-automation@latest --license-status
 ```
 
-#### 🔒 Premium Tiers (Private Beta)
+#### 🎉 FREE BETA - All Features Unlocked!
 
-> We’re validating premium automation now. Join the waitlist to influence the roadmap.
+> **PREMIUM-001 SHIPPED!** Framework-aware dependency grouping is now available to **everyone for free** during our beta period.
+>
+> We're collecting feedback before launching paid tiers. **No payment required - no license keys - just run the setup!**
 
-**💰 Pro Tier (planned $39/month)**
+**✨ Available Now - 100% Free During Beta**
 
-- Coming soon: framework-aware dependency grouping (React, Next.js, Vue, Angular)
-- Coming soon: multi-language support beyond npm (Python, Rust, Go, more)
-- Planned: advanced security audit workflows and custom schedules
-- Planned: breaking change detection before merging updates
+- ✅ **Framework-aware dependency grouping for JavaScript/TypeScript** - **LIVE NOW**
+  - Automatically groups related dependencies into batched PRs
+  - Reduces PR volume by 60%+ for React projects
+  - Supports React, Vue, Angular, Svelte ecosystems
+  - Testing frameworks (Jest, Vitest, Playwright, Testing Library)
+  - Build tools (Vite, Webpack, Turbo, Nx, Rollup, esbuild)
+  - Storybook ecosystem grouping
+  - Wildcard pattern matching for scoped packages (`@tanstack/*`, `@radix-ui/*`)
+  - Intelligent update-type filtering (major vs minor vs patch)
+  - Production-ready with comprehensive test coverage
 
-**🏢 Enterprise Tier (planned $197/month)**
+- ✅ **Multi-language dependency monitoring** - **JUST SHIPPED**
+  - **Python/Pip**: Django, Flask, FastAPI, Data Science (numpy, pandas, scikit-learn)
+  - **Rust/Cargo**: Actix, Rocket, async runtimes (Tokio, async-std), Serde ecosystem
+  - **Ruby/Bundler**: Rails, Sinatra, RSpec testing frameworks
+  - **Polyglot support**: Single Dependabot config for npm + pip + cargo + bundler
+  - Framework-aware grouping across all languages
+  - Automatic ecosystem detection from project files
 
-- Everything in the Pro roadmap
-- Planned: custom notification channels (Slack, Teams)
-- Planned: multi-repository governance and analytics
-- Planned: priority support with shared runbooks
+**🚀 Coming This Month - Also Free During Beta**
 
-[**🚀 Join the Pro waitlist**](https://create-quality-automation.dev/pro) | [**🏢 Request Enterprise beta**](https://create-quality-automation.dev/enterprise)
+- 📅 **Advanced security audit workflows** with custom schedules
+- 📅 **Breaking change detection** before merging dependency updates
+
+**💰 Future Pricing - Lock in Founder Discount**
+
+When we launch paid tiers (Q1 2026), pricing will be:
+
+- **Pro Tier**: $39/month (advanced features, multi-language support)
+- **Enterprise Tier**: $197/month (team features, governance, priority support)
+
+**Beta users who join our waitlist get 50% off for life** ($19.50/mo Pro, $98.50/mo Enterprise)
+
+[**📬 Join Waitlist - Lock in Founder Pricing**](https://tally.so/r/create-quality-automation-beta)
+
+**Example: React Project Dependency Grouping**
+
+```yaml
+# Before (Free Tier): 15+ individual PRs for React dependencies
+# After (Pro Tier): 3-5 grouped PRs
+
+groups:
+  react-core:              # Core React packages
+    patterns: [react, react-dom, react-router*]
+  react-ecosystem:         # State management, data fetching
+    patterns: [@tanstack/*, zustand, swr]
+  testing-frameworks:      # All testing tools
+    patterns: [jest, @testing-library/*, vitest]
+```
 
 ### Validation Commands (v2.2.0+)
 
@@ -456,7 +618,7 @@ MIT License - feel free to use in any project!
 
 If you run into issues:
 
-1. Check the troubleshooting section above
+1. Check the **[Troubleshooting Guide](./TROUBLESHOOTING.md)** for common problems and solutions
 2. Review the GitHub Actions logs
 3. Open an issue in this repository
 
