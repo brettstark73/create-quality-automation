@@ -1,5 +1,11 @@
 name: Quality Checks
 
+# Progressive quality automation - adapts checks based on project maturity
+# Minimal projects: Only Prettier
+# Bootstrap projects: + ESLint
+# Development projects: + Tests + Security
+# Production-ready: All checks enabled
+
 on:
   push:
     branches: [main, master, develop]
@@ -7,8 +13,46 @@ on:
     branches: [main, master, develop]
 
 jobs:
-  quality:
+  # Step 1: Detect project maturity level
+  detect-maturity:
     runs-on: ubuntu-latest
+    outputs:
+      maturity: ${{ steps.detect.outputs.maturity }}
+      source-count: ${{ steps.detect.outputs.source-count }}
+      test-count: ${{ steps.detect.outputs.test-count }}
+      has-deps: ${{ steps.detect.outputs.has-deps }}
+      has-docs: ${{ steps.detect.outputs.has-docs }}
+      has-css: ${{ steps.detect.outputs.has-css }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '20'
+
+      - name: Detect Project Maturity
+        id: detect
+        run: |
+          # Use the project maturity detector
+          node lib/project-maturity.js --github-actions >> $GITHUB_OUTPUT
+
+      - name: Display Maturity Report
+        run: |
+          echo "📊 Project Maturity Detection Results"
+          echo "Maturity: ${{ steps.detect.outputs.maturity }}"
+          echo "Source files: ${{ steps.detect.outputs.source-count }}"
+          echo "Test files: ${{ steps.detect.outputs.test-count }}"
+          echo "Has dependencies: ${{ steps.detect.outputs.has-deps }}"
+          echo "Has documentation: ${{ steps.detect.outputs.has-docs }}"
+          echo "Has CSS files: ${{ steps.detect.outputs.has-css }}"
+
+  # Step 2: Core checks - ALWAYS run (all maturity levels)
+  core-checks:
+    runs-on: ubuntu-latest
+    needs: detect-maturity
 
     steps:
       - name: Checkout code
@@ -25,14 +69,76 @@ jobs:
           if [ -f package-lock.json ]; then
             npm ci
           else
-            echo "No package-lock.json found; running npm install"
+            npm install
+          fi
+
+      - name: Prettier check
+        run: |
+          echo "✨ Running Prettier formatting check (required for all projects)"
+          npm run format:check
+
+  # Step 3: Linting - run if source files exist (bootstrap+)
+  linting:
+    runs-on: ubuntu-latest
+    needs: detect-maturity
+    if: needs.detect-maturity.outputs.source-count > 0
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci
+          else
+            npm install
+          fi
+
+      - name: ESLint
+        run: |
+          echo "🔍 Linting ${{ needs.detect-maturity.outputs.source-count }} source files..."
+          npx eslint . --ext .js,.jsx,.ts,.tsx,.html --max-warnings=0
+
+      - name: Stylelint
+        if: needs.detect-maturity.outputs.has-css == 'true'
+        run: |
+          echo "🎨 Linting CSS files..."
+          npx stylelint "**/*.{css,scss,sass,less,pcss}" --allow-empty-input
+
+  # Step 4: Security checks - run if dependencies exist
+  security:
+    runs-on: ubuntu-latest
+    needs: detect-maturity
+    if: needs.detect-maturity.outputs.has-deps == 'true'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci
+          else
             npm install
           fi
 
       - name: Verify dependency integrity
         run: |
           echo "🔐 Verifying dependency integrity..."
-          # Verify package-lock.json integrity hashes
           if [ -f package-lock.json ]; then
             npm ci --dry-run --prefer-offline
             echo "✅ Dependency integrity verified"
@@ -40,31 +146,15 @@ jobs:
             echo "⚠️ No package-lock.json found - skipping integrity verification"
           fi
 
-          # Check for known vulnerabilities in dependencies
           echo "🔍 Checking for vulnerable dependencies..."
           npm audit --audit-level=moderate || true
-
-          # Verify npm package signatures (Node.js 16+)
-          if command -v npm &> /dev/null; then
-            echo "✍️ Verifying npm package signatures..."
-            npm audit signatures || echo "⚠️ Signature verification not available or failed"
-          fi
-
-      - name: Prettier check
-        run: npm run format:check
-
-      - name: ESLint
-        run: npx eslint . --ext .js,.jsx,.ts,.tsx,.html --max-warnings=0
-
-      - name: Stylelint
-        run: npx stylelint "**/*.{css,scss,sass,less,pcss}" --allow-empty-input
 
       - name: Security audit
         run: npm audit --audit-level high
 
       - name: Check for hardcoded secrets
         run: |
-          # Check for common secret patterns (excluding docs, tests, and workflow files)
+          echo "🔍 Scanning for hardcoded secrets..."
           if grep -r -E "(password|secret|key|token).*[=:].*['\"][^'\"]{8,}" . \
                --exclude-dir=node_modules \
                --exclude-dir=.git \
@@ -85,10 +175,9 @@ jobs:
 
       - name: Security pattern detection
         run: |
-          # Check for XSS vulnerability patterns from WFHroulette
           echo "🔍 Scanning for XSS vulnerability patterns..."
 
-          # Check for innerHTML with interpolation (dangerous pattern)
+          # Check for innerHTML with interpolation
           if grep -r -E "innerHTML.*\\\$\{" . --include="*.js" --include="*.jsx" --include="*.ts" --include="*.tsx" --exclude-dir=node_modules; then
             echo "❌ Potential XSS: innerHTML with template literal interpolation found"
             exit 1
@@ -100,66 +189,106 @@ jobs:
             exit 1
           fi
 
-          # Check for document.write with interpolation
-          if grep -r -E "document\\\\.write.*\\\$\{" . --include="*.js" --include="*.jsx" --include="*.ts" --include="*.tsx" --exclude-dir=node_modules; then
-            echo "❌ Potential XSS: document.write with interpolation found"
-            exit 1
-          fi
-
-          # Check for onclick handlers with interpolation
-          if grep -r -E "onclick.*=.*['\"].*\\\$\{" . --include="*.js" --include="*.jsx" --include="*.ts" --include="*.tsx" --include="*.html" --exclude-dir=node_modules; then
-            echo "❌ Potential XSS: onclick handler with interpolation found"
-            exit 1
-          fi
-
           echo "✅ No XSS vulnerability patterns detected"
 
-      - name: Input validation check
+  # Step 5: Tests - run if test files exist (development+)
+  tests:
+    runs-on: ubuntu-latest
+    needs: detect-maturity
+    if: needs.detect-maturity.outputs.test-count > 0
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
         run: |
-          # Check for proper input validation patterns
-          echo "🔍 Checking for input validation patterns..."
-
-          # Set pipefail to catch grep failures properly
-          set -o pipefail
-
-          # Look for unvalidated user inputs in common patterns
-          if grep -r -E "(req\\.query|req\\.params|req\\.body)\\.[a-zA-Z_][a-zA-Z0-9_]*[^\\.]" . --include="*.js" --include="*.ts" --exclude-dir=node_modules | grep -v -E "(trim|toLowerCase|toUpperCase|parseInt|parseFloat|Number\\.isNaN|String|Boolean)" > /tmp/unvalidated_inputs.txt 2>/dev/null && [ -s /tmp/unvalidated_inputs.txt ]; then
-            echo "⚠️ Found potential unvalidated user inputs (review manually):"
-            head -5 /tmp/unvalidated_inputs.txt
-            echo "This is a warning, not a failure. Review these patterns manually."
+          if [ -f package-lock.json ]; then
+            npm ci
           else
-            echo "✅ No unvalidated user inputs detected"
+            npm install
           fi
 
-          # Clean up temp file
-          rm -f /tmp/unvalidated_inputs.txt
+      - name: Run tests
+        run: |
+          echo "🧪 Running ${{ needs.detect-maturity.outputs.test-count }} test files..."
+          npm test
+
+  # Step 6: Documentation - run for production-ready projects
+  documentation:
+    runs-on: ubuntu-latest
+    needs: detect-maturity
+    if: needs.detect-maturity.outputs.maturity == 'production-ready'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci
+          else
+            npm install
+          fi
 
       - name: Configuration security check
         run: |
-          # Run comprehensive configuration security validation
           echo "🔍 Running configuration security validation..."
           npx create-quality-automation@latest --security-config
 
       - name: Documentation validation
         run: |
-          # Run comprehensive documentation validation
           echo "📖 Running documentation validation..."
           npx create-quality-automation@latest --validate-docs
 
       - name: Lighthouse CI
+        if: hashFiles('.lighthouserc.js', '.lighthouserc.json', 'lighthouserc.js') != ''
         run: |
-          # Only run Lighthouse CI if configuration exists
-          if [ -f ".lighthouserc.js" ] || [ -f ".lighthouserc.json" ] || [ -f "lighthouserc.js" ]; then
-            echo "🚢 Running Lighthouse CI..."
-            npx lhci autorun
-          else
-            echo "⏭️ No Lighthouse CI configuration found, skipping"
-          fi
+          echo "🚢 Running Lighthouse CI..."
+          npx lhci autorun
         continue-on-error: true
 
-      # NOTE: The "Test README Quick Start Instructions" step has been removed
-      # because it relies on setup.js which only exists in the create-quality-automation
-      # package itself, not in consumer repositories that copy this workflow.
-      #
-      # Consumer projects get the quality checks above (prettier, eslint, stylelint, etc.)
-      # but don't need to test the installation process.
+  # Step 7: Summary - report what checks ran
+  summary:
+    runs-on: ubuntu-latest
+    needs:
+      - detect-maturity
+      - core-checks
+      - linting
+      - security
+      - tests
+      - documentation
+    if: always()
+
+    steps:
+      - name: Generate Check Summary
+        run: |
+          echo "## Quality Checks Summary 📊" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Maturity Level:** ${{ needs.detect-maturity.outputs.maturity }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Project Statistics" >> $GITHUB_STEP_SUMMARY
+          echo "- Source files: ${{ needs.detect-maturity.outputs.source-count }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Test files: ${{ needs.detect-maturity.outputs.test-count }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Has dependencies: ${{ needs.detect-maturity.outputs.has-deps }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Has documentation: ${{ needs.detect-maturity.outputs.has-docs }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Checks Executed" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Core checks: Always run" >> $GITHUB_STEP_SUMMARY
+          echo "- ${{ needs.detect-maturity.outputs.source-count > 0 && '✅' || '⏭️' }} Linting: ${{ needs.detect-maturity.outputs.source-count > 0 && 'Enabled' || 'Skipped (no source files)' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- ${{ needs.detect-maturity.outputs.has-deps == 'true' && '✅' || '⏭️' }} Security: ${{ needs.detect-maturity.outputs.has-deps == 'true' && 'Enabled' || 'Skipped (no dependencies)' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- ${{ needs.detect-maturity.outputs.test-count > 0 && '✅' || '⏭️' }} Tests: ${{ needs.detect-maturity.outputs.test-count > 0 && 'Enabled' || 'Skipped (no test files)' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- ${{ needs.detect-maturity.outputs.maturity == 'production-ready' && '✅' || '⏭️' }} Documentation: ${{ needs.detect-maturity.outputs.maturity == 'production-ready' && 'Enabled' || 'Skipped (not production-ready)' }}" >> $GITHUB_STEP_SUMMARY

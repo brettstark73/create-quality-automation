@@ -242,6 +242,7 @@ function parseArguments(rawArgs) {
   const isErrorReportingStatusMode = sanitizedArgs.includes(
     '--error-reporting-status'
   )
+  const isCheckMaturityMode = sanitizedArgs.includes('--check-maturity')
   const isDryRun = sanitizedArgs.includes('--dry-run')
 
   // Custom template directory - use raw args to preserve valid path characters (&, <, >, etc.)
@@ -270,6 +271,7 @@ function parseArguments(rawArgs) {
     isLicenseStatusMode,
     isTelemetryStatusMode,
     isErrorReportingStatusMode,
+    isCheckMaturityMode,
     isDryRun,
     customTemplatePath,
     disableNpmAudit,
@@ -301,6 +303,7 @@ function parseArguments(rawArgs) {
     isLicenseStatusMode,
     isTelemetryStatusMode,
     isErrorReportingStatusMode,
+    isCheckMaturityMode,
     isDryRun,
     customTemplatePath,
     disableNpmAudit,
@@ -367,6 +370,7 @@ function parseArguments(rawArgs) {
       isLicenseStatusMode,
       isTelemetryStatusMode,
       isErrorReportingStatusMode,
+      isCheckMaturityMode,
       isDryRun,
       customTemplatePath,
       disableNpmAudit,
@@ -412,6 +416,7 @@ VALIDATION OPTIONS:
   --comprehensive   Run all validation checks
   --security-config Run configuration security checks only
   --validate-docs   Run documentation validation only
+  --check-maturity  Detect and display project maturity level
 
 LICENSE, TELEMETRY & ERROR REPORTING:
   --license-status          Show current license tier and available features
@@ -440,6 +445,9 @@ EXAMPLES:
 
   npx create-quality-automation@latest --error-reporting-status
     → Show error reporting status and crash analytics information
+
+  npx create-quality-automation@latest --check-maturity
+    → Detect project maturity level (minimal, bootstrap, development, production-ready)
 
   npx create-quality-automation@latest --comprehensive --no-gitleaks
     → Run validation but skip gitleaks secret scanning
@@ -700,6 +708,17 @@ HELP:
   // Handle license status command
   if (isLicenseStatusMode) {
     showLicenseStatus()
+    process.exit(0)
+  }
+
+  // Handle check maturity command
+  if (isCheckMaturityMode) {
+    const { ProjectMaturityDetector } = require('./lib/project-maturity')
+    const detector = new ProjectMaturityDetector({
+      projectPath: process.cwd(),
+      verbose: true,
+    })
+    detector.printReport()
     process.exit(0)
   }
 
@@ -1011,6 +1030,58 @@ HELP:
       if (!fs.existsSync(npmrcPath)) {
         fs.writeFileSync(npmrcPath, 'engine-strict = true\n')
         console.log('✅ Added .npmrc (engine-strict)')
+      }
+
+      // Generate .qualityrc.json with detected maturity level
+      const qualityrcPath = path.join(process.cwd(), '.qualityrc.json')
+      if (!fs.existsSync(qualityrcPath)) {
+        const { ProjectMaturityDetector } = require('./lib/project-maturity')
+        const detector = new ProjectMaturityDetector({
+          projectPath: process.cwd(),
+        })
+        const detectedMaturity = detector.detect()
+        const stats = detector.analyzeProject()
+
+        const qualityConfig = {
+          version: '1.0.0',
+          maturity: 'auto',
+          detected: {
+            level: detectedMaturity,
+            sourceFiles: stats.totalSourceFiles,
+            testFiles: stats.testFiles,
+            hasDocumentation: stats.hasDocumentation,
+            hasDependencies: stats.hasDependencies,
+            detectedAt: new Date().toISOString(),
+          },
+          checks: {
+            prettier: { enabled: true, required: true },
+            eslint: { enabled: 'auto', required: false },
+            stylelint: { enabled: 'auto', required: false },
+            tests: { enabled: 'auto', required: false },
+            coverage: { enabled: false, required: false, threshold: 80 },
+            'security-audit': { enabled: 'auto', required: false },
+            documentation: { enabled: false, required: false },
+            lighthouse: { enabled: false, required: false },
+          },
+          override: {
+            comment:
+              'Set maturity to a specific level to override auto-detection',
+            options: [
+              'minimal',
+              'bootstrap',
+              'development',
+              'production-ready',
+            ],
+          },
+        }
+
+        fs.writeFileSync(
+          qualityrcPath,
+          JSON.stringify(qualityConfig, null, 2) + '\n'
+        )
+        console.log(
+          `✅ Added .qualityrc.json (detected: ${detectedMaturity})`
+        )
       }
 
       // Load and merge templates (custom + defaults)
