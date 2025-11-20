@@ -4,3 +4,6 @@
 node_modules/
 *.log
 ROADMAP.md
+coverage/
+.nyc_output/
+.create-quality-automation-cache/
