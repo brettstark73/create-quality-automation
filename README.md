@@ -1,12 +1,13 @@
 # Create Quality Automation 🚀
 
-Bootstrap quality automation in JavaScript/TypeScript and Python projects with comprehensive tooling. Features GitHub Actions, pre-commit hooks, lint-staged processing, security scanning, SEO validation, and freemium dependency monitoring with smart project detection.
+Bootstrap quality automation in JavaScript/TypeScript and Python projects with comprehensive tooling. Features GitHub Actions, pre-commit and pre-push hooks, lint-staged processing, security scanning, SEO validation, and freemium dependency monitoring with smart project detection.
 
 ## ✨ Features
 
 - **🔧 Prettier Code Formatting** - Consistent code style across your project
-- **🪝 Husky Pre-commit Hooks** - Automatic quality checks before commits
+- **🪝 Husky Git Hooks** - Pre-commit (lint-staged) and pre-push (validation)
 - **⚡ Lint-staged Processing** - Only process changed files for speed
+- **✅ Pre-push Validation** - Prevents broken code from reaching CI (lint, format, tests)
 - **🤖 GitHub Actions** - Automated quality checks in CI/CD
 - **📦 One Command Setup** - `npx create-quality-automation@latest`
 - **🔄 TypeScript Smart** - Auto-detects and configures TypeScript projects
@@ -514,6 +515,7 @@ After setup, your project will have these scripts:
 
 ### Enhanced Validation (v2.2.0+)
 
+- `npm run validate:pre-push` - Pre-push validation (lint + format + tests) - used by git hook
 - `npm run validate:docs` - Validate documentation accuracy (README file references, npm scripts)
 - `npm run validate:comprehensive` - Run all validation checks (security + documentation)
 - `npm run validate:all` - Full validation suite including security audit
@@ -524,6 +526,54 @@ After setup, your project will have these scripts:
 - `npm run python:lint` - Lint Python code with Ruff
 - `npm run python:type-check` - Type check with mypy
 - `npm run python:test` - Run Python tests with pytest
+
+## 🪝 Git Hooks (Husky)
+
+This tool automatically sets up two Husky git hooks to enforce quality before code leaves your machine:
+
+### Pre-commit Hook (`.husky/pre-commit`)
+
+Runs **lint-staged** on staged files only:
+
+- ✅ ESLint --fix on JS/TS files
+- ✅ Stylelint --fix on CSS/SCSS files
+- ✅ Prettier --write on all staged files
+- ⚡ **Fast** - only processes files you changed
+
+**When it runs:** Before every `git commit`
+
+### Pre-push Hook (`.husky/pre-push`)
+
+Runs **full validation** before pushing to remote:
+
+- ✅ **Linting** - `npm run lint` (ESLint + Stylelint)
+- ✅ **Formatting** - `npm run format:check` (Prettier)
+- ✅ **Tests** - `npm test` (if test script exists)
+- 🚫 **Blocks push** if any check fails
+
+**When it runs:** Before every `git push`
+
+**Why this matters:** Catches errors locally before CI runs, saving time and preventing broken builds from reaching your team.
+
+### Bypassing Hooks (Emergency Only)
+
+```bash
+# Skip pre-commit (not recommended)
+git commit --no-verify
+
+# Skip pre-push (not recommended)
+git push --no-verify
+```
+
+⚠️ **Warning:** Bypassing hooks defeats the purpose of quality automation. Only use in genuine emergencies.
+
+### Manual Validation
+
+Test what the pre-push hook will run:
+
+```bash
+npm run validate:pre-push
+```
 
 ## 🤖 GitHub Actions Workflows
 
