@@ -19,9 +19,9 @@ async function testPythonIntegration() {
 
   try {
     // Create Python project markers
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
+
     fs.writeFileSync(path.join(pythonDir, 'main.py'), 'print("Hello World")')
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
+
     fs.writeFileSync(
       path.join(pythonDir, 'package.json'),
       JSON.stringify({ name: 'test', version: '1.0.0' }, null, 2)
@@ -50,7 +50,7 @@ async function testPythonIntegration() {
 
     for (const file of expectedPythonFiles) {
       const filePath = path.join(pythonDir, file)
-      // eslint-disable-next-line security/detect-non-literal-fs-filename
+
       if (!fs.existsSync(filePath)) {
         throw new Error(`Expected Python file not created: ${file}`)
       }
@@ -67,17 +67,17 @@ async function testPythonIntegration() {
 
   try {
     // Create both JS and Python files
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
+
     fs.writeFileSync(path.join(mixedDir, 'index.js'), 'console.log("JS")')
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
+
     fs.writeFileSync(path.join(mixedDir, 'script.py'), 'print("Python")')
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
+
     fs.writeFileSync(
       path.join(mixedDir, 'package.json'),
       JSON.stringify({ name: 'test', version: '1.0.0' }, null, 2)
     )
     // Add Python config file to ensure detection (after sensitivity fix)
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
+
     fs.writeFileSync(
       path.join(mixedDir, 'requirements.txt'),
       'requests==2.31.0'
@@ -105,7 +105,7 @@ async function testPythonIntegration() {
 
     for (const file of expectedFiles) {
       const filePath = path.join(mixedDir, file)
-      // eslint-disable-next-line security/detect-non-literal-fs-filename
+
       if (!fs.existsSync(filePath)) {
         throw new Error(`Expected mixed project file not created: ${file}`)
       }
@@ -121,9 +121,8 @@ async function testPythonIntegration() {
   const configDir = fs.mkdtempSync(path.join(os.tmpdir(), 'py-config-test-'))
 
   try {
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
     fs.writeFileSync(path.join(configDir, 'app.py'), 'def main(): pass')
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
+
     fs.writeFileSync(
       path.join(configDir, 'package.json'),
       JSON.stringify({ name: 'test', version: '1.0.0' }, null, 2)
@@ -142,7 +141,7 @@ async function testPythonIntegration() {
     execSync(`node "${setupPath}"`, { cwd: configDir, stdio: 'pipe' })
 
     // Check pyproject.toml contains expected tools
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
+
     const pyprojectContent = fs.readFileSync(
       path.join(configDir, 'pyproject.toml'),
       'utf8'
@@ -156,7 +155,7 @@ async function testPythonIntegration() {
     }
 
     // Check .pre-commit-config.yaml contains hooks
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
+
     const preCommitContent = fs.readFileSync(
       path.join(configDir, '.pre-commit-config.yaml'),
       'utf8'

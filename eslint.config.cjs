@@ -64,4 +64,13 @@ configs.push({
   },
 })
 
+// Override for test files - disable filesystem security warnings
+configs.push({
+  files: ['tests/**/*.js', 'scripts/**/*.js'],
+  rules: {
+    'security/detect-non-literal-fs-filename': 'off',
+    'security/detect-object-injection': 'off',
+  },
+})
+
 module.exports = configs

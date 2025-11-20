@@ -34,12 +34,11 @@ function createTempProject(files) {
   Object.entries(files).forEach(([filename, content]) => {
     const filePath = path.join(tempDir, filename)
     const fileDir = path.dirname(filePath)
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
+
     if (!fs.existsSync(fileDir)) {
-      // eslint-disable-next-line security/detect-non-literal-fs-filename
       fs.mkdirSync(fileDir, { recursive: true })
     }
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
+
     fs.writeFileSync(filePath, content)
   })
   return tempDir

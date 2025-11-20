@@ -1,5 +1,4 @@
 'use strict'
-/* eslint-disable security/detect-non-literal-fs-filename */
 
 /**
  * CRITICAL TEST: Verify that generated commands ACTUALLY WORK
