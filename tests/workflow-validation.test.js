@@ -54,7 +54,7 @@ async function testMissingWorkflowDirectory() {
     console.error('  ❌ Should have thrown error for missing directory')
     teardownTest()
     process.exit(1)
-  } catch {
+  } catch (error) {
     if (
       error.message.includes('Workflow validation failed') &&
       validator.issues.some(issue =>
@@ -332,7 +332,7 @@ jobs:
       teardownTest()
       process.exit(1)
     }
-  } catch {
+  } catch (error) {
     console.error('  ❌ Valid workflow should not throw:', error.message)
     teardownTest()
     process.exit(1)
@@ -537,7 +537,7 @@ jobs:
       teardownTest()
       process.exit(1)
     }
-  } catch {
+  } catch (error) {
     console.error('  ❌ Should not throw with valid workflow:', error.message)
     teardownTest()
     process.exit(1)
