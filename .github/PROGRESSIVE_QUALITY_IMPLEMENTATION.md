@@ -11,6 +11,7 @@ This implementation provides **adaptive quality checks** that automatically adju
 A comprehensive Node.js module that analyzes your project and determines its maturity level.
 
 **Features:**
+
 - Counts source files, test files, and CSS files
 - Detects documentation presence
 - Checks for dependencies
@@ -132,12 +133,15 @@ A comprehensive 200+ line design document explaining:
 **What it means:** Project just created, only package.json exists
 
 **Checks enabled:**
+
 - ✅ Prettier (basic formatting)
 
 **Checks disabled:**
+
 - ⏭️ ESLint, Stylelint, Tests, Security, Documentation
 
 **User experience:**
+
 ```
 ⚡ Minimal project - only basic formatting checks enabled.
    Add source files to enable linting.
@@ -148,13 +152,16 @@ A comprehensive 200+ line design document explaining:
 **What it means:** Early development, writing first components
 
 **Checks enabled:**
+
 - ✅ Prettier
 - ✅ ESLint
 
 **Checks disabled:**
+
 - ⏭️ Tests, Coverage, Security (optional), Documentation
 
 **User experience:**
+
 ```
 🚀 Bootstrap project - linting enabled.
    Add tests to enable test coverage checks.
@@ -165,6 +172,7 @@ A comprehensive 200+ line design document explaining:
 **What it means:** Active development with test infrastructure
 
 **Checks enabled:**
+
 - ✅ Prettier
 - ✅ ESLint
 - ✅ Stylelint (if CSS files exist)
@@ -173,9 +181,11 @@ A comprehensive 200+ line design document explaining:
 - 🔵 Coverage (optional)
 
 **Checks disabled:**
+
 - ⏭️ Documentation validation
 
 **User experience:**
+
 ```
 🔨 Development project - most checks enabled.
    Add documentation to enable doc validation.
@@ -186,6 +196,7 @@ A comprehensive 200+ line design document explaining:
 **What it means:** Mature project ready for production
 
 **Checks enabled:**
+
 - ✅ All checks enabled
 - ✅ Documentation validation
 - ✅ Security audits
@@ -193,6 +204,7 @@ A comprehensive 200+ line design document explaining:
 - 🔵 Lighthouse CI (if configured)
 
 **User experience:**
+
 ```
 ✅ Production-ready project - all quality checks enabled.
 ```
@@ -304,6 +316,7 @@ node /path/to/lib/project-maturity.js
 ### Immediate (Ready to Use)
 
 1. **Test the detector:**
+
    ```bash
    node lib/project-maturity.js --verbose
    ```

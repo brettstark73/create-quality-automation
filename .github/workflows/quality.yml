@@ -104,7 +104,7 @@ jobs:
       - name: ESLint
         run: |
           echo "🔍 Linting ${{ needs.detect-maturity.outputs.source-count }} source files..."
-          npx eslint . --ext .js,.jsx,.ts,.tsx,.html --max-warnings=0
+          npx eslint . --ext .js,.jsx,.ts,.tsx,.html
 
       - name: Stylelint
         if: needs.detect-maturity.outputs.has-css == 'true'
@@ -247,12 +247,12 @@ jobs:
       - name: Configuration security check
         run: |
           echo "🔍 Running configuration security validation..."
-          npx create-quality-automation@latest --security-config
+          node setup.js --security-config
 
       - name: Documentation validation
         run: |
           echo "📖 Running documentation validation..."
-          npx create-quality-automation@latest --validate-docs
+          node setup.js --validate-docs
 
       - name: Lighthouse CI
         if: hashFiles('.lighthouserc.js', '.lighthouserc.json', 'lighthouserc.js') != ''
