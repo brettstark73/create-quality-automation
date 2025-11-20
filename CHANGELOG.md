@@ -7,6 +7,95 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+#### 🎯 Progressive Quality Automation (Preparing for v4.0.0)
+
+**Major new feature:** Adaptive quality checks that automatically adjust based on project maturity, eliminating false failures in early-stage projects.
+
+- **Project Maturity Detection** (`lib/project-maturity.js`)
+  - Auto-detects 4 maturity levels: minimal, bootstrap, development, production-ready
+  - Counts source files, test files, CSS files
+  - Detects documentation presence and dependencies
+  - CLI command: `npx create-quality-automation@latest --check-maturity`
+  - GitHub Actions compatible output format (`--github-actions`)
+  - 84%+ code coverage with 23 comprehensive tests
+
+- **Progressive Workflow** (`.github/workflows/quality.yml`)
+  - **Minimal projects** (0 source files): Only Prettier runs
+  - **Bootstrap projects** (1-2 files): + ESLint
+  - **Development projects** (3+ files + tests): + Tests + Security audits
+  - **Production-ready** (10+ files + docs): All checks enabled
+  - Conditional job execution saves CI time and eliminates noise
+  - Summary job reports what checks ran and why in PR summaries
+
+- **Manual Override Support** (`.qualityrc.json`)
+  - Auto-generated during setup with detected maturity
+  - Set `maturity: "production-ready"` to force all checks
+  - Set `maturity: "minimal"` to disable most checks
+  - Per-check `enabled: true/false/"auto"` configuration
+  - Tracks detection metadata (source count, test count, detected timestamp)
+
+- **Existing Project Migration**
+  - `--update` flag automatically upgrades to progressive workflow
+  - Generates `.qualityrc.json` with current project state
+  - Zero breaking changes - auto-detection ensures smooth transition
+  - Old workflow preserved as `.github/workflows/quality-legacy.yml.backup`
+
+### Changed
+
+- **Default workflow** is now progressive (was strict)
+  - New projects get adaptive checks by default
+  - Early-stage projects no longer fail CI with false negatives
+  - Old behavior available via `.qualityrc.json` manual override
+
+- **Setup process** now includes maturity detection
+  - Shows detected level during setup
+  - Generates `.qualityrc.json` automatically
+  - Explains which checks will run at current maturity level
+
+### Fixed
+
+- Early-stage projects failing CI/CD checks unnecessarily
+- Noise from checks on projects without assets (tests, docs, dependencies)
+- Unclear which failures matter vs. expected for project stage
+
+### Testing
+
+- Added 23 comprehensive tests (84.71% statement coverage, 93.33% function coverage)
+  - `tests/project-maturity.test.js` - 15 unit tests for maturity detection
+  - `tests/project-maturity-cli.test.js` - 8 CLI integration tests
+  - Tests all 4 maturity levels with realistic project structures
+  - Tests edge cases (no package.json, nested files, TypeScript, multiple test locations)
+
+### Documentation
+
+- `.github/PROGRESSIVE_QUALITY_PROPOSAL.md` - Full design document (200+ lines)
+- `.github/PROGRESSIVE_QUALITY_IMPLEMENTATION.md` - Integration guide with testing scenarios
+- `QUALITY_CHECKS_OVERVIEW.md` - Current check breakdown and workflows
+- `QUALITY_CHECKS_QUICK_REFERENCE.md` - Visual flow diagrams
+- `QUALITY_CHECKS_MATRIX.md` - Failure matrix with debugging commands
+
+### Upgrading
+
+**For new projects:** No action needed - progressive checks are default
+
+**For existing projects:**
+```bash
+# Option 1: Update your configuration (recommended)
+npx create-quality-automation@latest --update
+
+# Option 2: Check your maturity level
+npx create-quality-automation@latest --check-maturity
+
+# Option 3: Force strict mode (disable progressive)
+# Edit .qualityrc.json: set "maturity": "production-ready"
+```
+
+**Breaking Changes:** None - auto-detection ensures backward compatibility
+
+---
+
 ## [3.1.1] - 2025-11-16
 
 ### Fixed
