@@ -18,7 +18,7 @@ const baseScripts = {
     'npx create-quality-automation@latest --comprehensive',
   'validate:all': 'npm run validate:comprehensive && npm run security:audit',
   'validate:pre-push':
-    'npm run lint && npm run format:check && npm run test --if-present',
+    'npm run test:patterns --if-present && npm run lint && npm run format:check && npm run test:commands --if-present && npm test --if-present',
 }
 
 const normalizeStylelintTargets = stylelintTargets => {
