@@ -6,15 +6,17 @@ This document captures common pitfalls, anti-patterns, and best practices for se
 
 create-quality-automation includes reference workflow templates that implement these patterns:
 
-- **`.github/workflows/pnpm-ci.yml`** - Modern pnpm workflow with correct action order, caching, and monorepo support
-- **`.github/workflows/python-ci.yml`** - Python CI with Ruff, Black, mypy, pytest, and matrix testing
+- **`.github/workflows/pnpm-ci.yml.example`** - Modern pnpm workflow with correct action order, caching, and monorepo support
+- **`.github/workflows/python-ci.yml.example`** - Python CI with Ruff, Black, mypy, pytest, and matrix testing
 - **`config/.pre-commit-config.yaml`** - Comprehensive pre-commit hooks for Python + JavaScript/TypeScript
 
 These templates are included in the npm package and can be copied from:
 
 ```bash
-node_modules/create-quality-automation/.github/workflows/
-node_modules/create-quality-automation/config/.pre-commit-config.yaml
+# Copy and rename to use
+cp node_modules/create-quality-automation/.github/workflows/pnpm-ci.yml.example .github/workflows/ci.yml
+cp node_modules/create-quality-automation/.github/workflows/python-ci.yml.example .github/workflows/ci.yml
+cp node_modules/create-quality-automation/config/.pre-commit-config.yaml .pre-commit-config.yaml
 ```
 
 Or view them on [GitHub](https://github.com/brettstark73/create-quality-automation/tree/main/.github/workflows).
