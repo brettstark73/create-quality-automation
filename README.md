@@ -106,6 +106,43 @@ Copy `.qualityrc.json.example` to create your own quality config file and overri
 }
 ```
 
+### Progressive Testing Strategy
+
+create-quality-automation includes **smart test placeholders** to prevent early-stage project failures:
+
+**✅ What's Included:**
+
+- Test scripts with `--passWithNoTests` flag (CI won't fail on empty test directories)
+- Placeholder test files with `describe.skip()` and `it.todo()` examples
+- Clear documentation on when to remove placeholders
+- CI warnings when test count is low (visibility without blocking)
+
+**📁 Example Generated Test:**
+
+```javascript
+// tests/placeholder.test.js
+import { describe, it, expect } from 'vitest'
+
+describe.skip('Example test suite (placeholder)', () => {
+  it.todo('should test core functionality')
+  it.todo('should handle edge cases')
+})
+
+describe('Test framework validation', () => {
+  it('should confirm Vitest is properly configured', () => {
+    expect(true).toBe(true) // Ensures test runner works
+  })
+})
+```
+
+**🎯 Progressive Tightening:**
+
+1. **Start (Lenient):** Tests pass even with placeholders - focus on building features
+2. **Development:** Replace `it.todo()` with real tests as you build
+3. **Production:** Remove `--passWithNoTests` flag to enforce test coverage
+
+**💡 Tip:** Your CI will show warnings like `⚠️ Only 2 test file(s) found - consider adding more tests` to maintain visibility without blocking development.
+
 ## 🚀 Quick Start
 
 ### Requirements

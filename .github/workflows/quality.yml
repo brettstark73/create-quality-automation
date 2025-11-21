@@ -223,6 +223,13 @@ jobs:
       - name: Run tests
         run: |
           echo "🧪 Running ${{ needs.detect-maturity.outputs.test-count }} test files..."
+
+          # Warn if test count is suspiciously low
+          TEST_COUNT=${{ needs.detect-maturity.outputs.test-count }}
+          if [ "$TEST_COUNT" -lt 5 ]; then
+            echo "::warning::Only $TEST_COUNT test file(s) found - consider adding more tests for better coverage"
+          fi
+
           npm test
 
   # Step 6: Documentation - run for production-ready projects
