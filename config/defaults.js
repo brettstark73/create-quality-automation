@@ -7,6 +7,9 @@ const DEFAULT_STYLELINT_TARGET = `**/*.{${STYLELINT_EXTENSIONS.join(',')}}`
 const baseScripts = {
   format: 'prettier --write .',
   'format:check': 'prettier --check .',
+  test: 'vitest run --passWithNoTests',
+  'test:watch': 'vitest',
+  'test:coverage': 'vitest run --coverage',
   'security:audit': 'npm audit --audit-level high',
   'security:secrets':
     "node -e \"const fs=require('fs');const content=fs.readFileSync('package.json','utf8');if(/[\\\"\\'][a-zA-Z0-9+/]{20,}[\\\"\\']/.test(content)){console.error('❌ Potential hardcoded secrets in package.json');process.exit(1)}else{console.log('✅ No secrets detected in package.json')}\"",
@@ -57,6 +60,8 @@ const baseDevDependencies = {
   stylelint: '^16.8.0',
   'stylelint-config-standard': '^37.0.0',
   '@lhci/cli': '^0.14.0',
+  vitest: '^2.1.8',
+  '@vitest/coverage-v8': '^2.1.8',
 }
 
 const typeScriptDevDependencies = {
