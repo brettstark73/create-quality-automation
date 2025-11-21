@@ -59,7 +59,7 @@ Your project is automatically detected as one of 4 maturity levels:
 ✅ **Clear progression** - See which checks activate as you add files
 ✅ **Reduced noise** - Only see failures that matter for your project stage
 ✅ **Zero config** - Auto-detection works out of the box
-✅ **Manual override** - Force strict mode via `.qualityrc.json` (see `.qualityrc.json.example`)
+✅ **Manual override** - Force strict mode via config file (see `.qualityrc.json.example` for template)
 
 ### Check Your Maturity Level
 
@@ -92,7 +92,7 @@ Quality Checks:
 
 ### Manual Override
 
-Create `.qualityrc.json` (see `.qualityrc.json.example`) to override auto-detection:
+Copy `.qualityrc.json.example` to create your own quality config file and override auto-detection:
 
 ```json
 {
