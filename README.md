@@ -1,12 +1,13 @@
 # Create Quality Automation 🚀
 
-Bootstrap quality automation in JavaScript/TypeScript and Python projects with comprehensive tooling. Features GitHub Actions, pre-commit hooks, lint-staged processing, security scanning, SEO validation, and freemium dependency monitoring with smart project detection.
+Bootstrap quality automation in JavaScript/TypeScript and Python projects with comprehensive tooling. Features GitHub Actions, pre-commit and pre-push hooks, lint-staged processing, security scanning, SEO validation, and freemium dependency monitoring with smart project detection.
 
 ## ✨ Features
 
 - **🔧 Prettier Code Formatting** - Consistent code style across your project
-- **🪝 Husky Pre-commit Hooks** - Automatic quality checks before commits
+- **🪝 Husky Git Hooks** - Pre-commit (lint-staged) and pre-push (validation)
 - **⚡ Lint-staged Processing** - Only process changed files for speed
+- **✅ Pre-push Validation** - Prevents broken code from reaching CI (lint, format, tests)
 - **🤖 GitHub Actions** - Automated quality checks in CI/CD
 - **📦 One Command Setup** - `npx create-quality-automation@latest`
 - **🔄 TypeScript Smart** - Auto-detects and configures TypeScript projects
@@ -58,7 +59,7 @@ Your project is automatically detected as one of 4 maturity levels:
 ✅ **Clear progression** - See which checks activate as you add files
 ✅ **Reduced noise** - Only see failures that matter for your project stage
 ✅ **Zero config** - Auto-detection works out of the box
-✅ **Manual override** - Force strict mode via `.qualityrc.json` if needed
+✅ **Manual override** - Force strict mode via config file (see `.qualityrc.json.example` for template)
 
 ### Check Your Maturity Level
 
@@ -91,7 +92,7 @@ Quality Checks:
 
 ### Manual Override
 
-Edit `.qualityrc.json` to override auto-detection:
+Copy `.qualityrc.json.example` to create your own quality config file and override auto-detection:
 
 ```json
 {
@@ -104,6 +105,43 @@ Edit `.qualityrc.json` to override auto-detection:
   }
 }
 ```
+
+### Progressive Testing Strategy
+
+create-quality-automation includes **smart test placeholders** to prevent early-stage project failures:
+
+**✅ What's Included:**
+
+- Test scripts with `--passWithNoTests` flag (CI won't fail on empty test directories)
+- Placeholder test files with `describe.skip()` and `it.todo()` examples
+- Clear documentation on when to remove placeholders
+- CI warnings when test count is low (visibility without blocking)
+
+**📁 Example Generated Test:**
+
+```javascript
+// tests/placeholder.test.js
+import { describe, it, expect } from 'vitest'
+
+describe.skip('Example test suite (placeholder)', () => {
+  it.todo('should test core functionality')
+  it.todo('should handle edge cases')
+})
+
+describe('Test framework validation', () => {
+  it('should confirm Vitest is properly configured', () => {
+    expect(true).toBe(true) // Ensures test runner works
+  })
+})
+```
+
+**🎯 Progressive Tightening:**
+
+1. **Start (Lenient):** Tests pass even with placeholders - focus on building features
+2. **Development:** Replace `it.todo()` with real tests as you build
+3. **Production:** Remove `--passWithNoTests` flag to enforce test coverage
+
+**💡 Tip:** Your CI will show warnings like `⚠️ Only 2 test file(s) found - consider adding more tests` to maintain visibility without blocking development.
 
 ## 🚀 Quick Start
 
@@ -514,6 +552,7 @@ After setup, your project will have these scripts:
 
 ### Enhanced Validation (v2.2.0+)
 
+- `npm run validate:pre-push` - Pre-push validation (lint + format + tests) - used by git hook
 - `npm run validate:docs` - Validate documentation accuracy (README file references, npm scripts)
 - `npm run validate:comprehensive` - Run all validation checks (security + documentation)
 - `npm run validate:all` - Full validation suite including security audit
@@ -524,6 +563,58 @@ After setup, your project will have these scripts:
 - `npm run python:lint` - Lint Python code with Ruff
 - `npm run python:type-check` - Type check with mypy
 - `npm run python:test` - Run Python tests with pytest
+
+## 🪝 Git Hooks (Husky)
+
+This tool automatically sets up two Husky git hooks to enforce quality before code leaves your machine:
+
+### Pre-commit Hook (`.husky/pre-commit`)
+
+Runs **lint-staged** on staged files only:
+
+- ✅ ESLint --fix on JS/TS files
+- ✅ Stylelint --fix on CSS/SCSS files
+- ✅ Prettier --write on all staged files
+- ⚡ **Fast** - only processes files you changed
+
+**When it runs:** Before every `git commit`
+
+### Pre-push Hook (`.husky/pre-push`)
+
+Runs **comprehensive validation** before pushing to remote:
+
+- ✅ **Pattern Validation** - `npm run test:patterns` (if available) - Catches deprecated command patterns
+- ✅ **Linting** - `npm run lint` (ESLint + Stylelint)
+- ✅ **Formatting** - `npm run format:check` (Prettier)
+- ✅ **Command Execution** - `npm run test:commands` (if available) - Validates generated commands actually work
+- ✅ **Unit Tests** - `npm test` (if test script exists)
+- 🚫 **Blocks push** if any check fails
+
+**When it runs:** Before every `git push`
+
+**Why this matters:** Catches errors locally before CI runs, saving time and preventing broken builds from reaching your team. The hook intelligently detects which scripts are available and only runs what exists.
+
+**Cross-platform:** Uses Node.js for script detection (works on Windows, Mac, Linux).
+
+### Bypassing Hooks (Emergency Only)
+
+```bash
+# Skip pre-commit (not recommended)
+git commit --no-verify
+
+# Skip pre-push (not recommended)
+git push --no-verify
+```
+
+⚠️ **Warning:** Bypassing hooks defeats the purpose of quality automation. Only use in genuine emergencies.
+
+### Manual Validation
+
+Test what the pre-push hook will run:
+
+```bash
+npm run validate:pre-push
+```
 
 ## 🤖 GitHub Actions Workflows
 

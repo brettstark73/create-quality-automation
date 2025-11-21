@@ -45,7 +45,7 @@ async function testTemplatePathValidation() {
 
   // Test 3: File (not directory) should be invalid
   const testFile = path.join(os.tmpdir(), 'test-file.txt')
-  // eslint-disable-next-line security/detect-non-literal-fs-filename
+
   fs.writeFileSync(testFile, 'test')
   try {
     if (loader.isValidTemplatePath(testFile)) {
@@ -67,7 +67,7 @@ async function testTemplatePathValidation() {
 
   // Test 5: Directory with special characters should be valid
   const specialCharDir = path.join(os.tmpdir(), 'template-test-special-&-chars')
-  // eslint-disable-next-line security/detect-non-literal-fs-filename
+
   fs.mkdirSync(specialCharDir)
   try {
     if (!loader.isValidTemplatePath(specialCharDir)) {
@@ -104,9 +104,8 @@ async function testTemplateStructureValidation() {
   // Test 2: Directory with config files should be valid
   const validDir = fs.mkdtempSync(path.join(os.tmpdir(), 'valid-template-'))
   try {
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
     fs.writeFileSync(path.join(validDir, '.prettierrc'), '{}')
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
+
     fs.writeFileSync(
       path.join(validDir, 'eslint.config.cjs'),
       'module.exports = {}'
@@ -123,9 +122,8 @@ async function testTemplateStructureValidation() {
   // Test 3: Directory with non-config files should still be valid
   const mixedDir = fs.mkdtempSync(path.join(os.tmpdir(), 'mixed-template-'))
   try {
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
     fs.writeFileSync(path.join(mixedDir, 'README.md'), '# Template')
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
+
     fs.writeFileSync(path.join(mixedDir, 'random.txt'), 'content')
 
     const isValid = await loader.validateTemplateStructure(mixedDir)
@@ -152,14 +150,14 @@ async function testTemplateLoading() {
 
   try {
     const prettierConfig = { semi: false, singleQuote: true }
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
+
     fs.writeFileSync(
       path.join(templateDir, '.prettierrc'),
       JSON.stringify(prettierConfig, null, 2)
     )
 
     const eslintConfig = 'module.exports = { rules: { "no-console": "warn" } }'
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
+
     fs.writeFileSync(path.join(templateDir, 'eslint.config.cjs'), eslintConfig)
 
     // Load template
@@ -200,7 +198,6 @@ async function testPartialTemplateOverride() {
   )
 
   try {
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
     fs.writeFileSync(path.join(templateDir, '.prettierrc'), '{"semi": false}')
 
     // Create default templates directory
@@ -209,9 +206,8 @@ async function testPartialTemplateOverride() {
     )
 
     try {
-      // eslint-disable-next-line security/detect-non-literal-fs-filename
       fs.writeFileSync(path.join(defaultsDir, '.prettierrc'), '{"semi": true}')
-      // eslint-disable-next-line security/detect-non-literal-fs-filename
+
       fs.writeFileSync(
         path.join(defaultsDir, 'eslint.config.cjs'),
         'module.exports = {}'
@@ -254,7 +250,6 @@ async function testInvalidTemplateFallback() {
   )
 
   try {
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
     fs.writeFileSync(path.join(defaultsDir, '.prettierrc'), '{"semi": true}')
 
     const merged = await loader.mergeTemplates(
@@ -292,10 +287,9 @@ async function testTemplateFileMerging() {
   try {
     // Create .github/workflows directory
     const workflowDir = path.join(templateDir, '.github', 'workflows')
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
+
     fs.mkdirSync(workflowDir, { recursive: true })
 
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
     fs.writeFileSync(
       path.join(workflowDir, 'quality.yml'),
       'name: Custom Quality'

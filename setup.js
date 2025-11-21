@@ -1,7 +1,5 @@
 #!/usr/bin/env node
 
-/* eslint-disable security/detect-non-literal-fs-filename */
-
 const fs = require('fs')
 const path = require('path')
 const { execSync } = require('child_process')
@@ -493,6 +491,9 @@ HELP:
     console.log('')
     console.log('Git Hooks (Husky):')
     console.log('  • .husky/pre-commit - Pre-commit hook for lint-staged')
+    console.log(
+      '  • .husky/pre-push - Pre-push validation (lint, format, tests)'
+    )
     console.log('')
     console.log('GitHub Actions:')
     console.log('  • .github/workflows/quality.yml - Quality checks workflow')
@@ -1293,6 +1294,70 @@ coverage/
         console.warn('⚠️ Could not create Husky pre-commit hook:', e.message)
       }
 
+      // Ensure Husky pre-push hook runs validation checks
+      try {
+        const huskyDir = path.join(process.cwd(), '.husky')
+        if (!fs.existsSync(huskyDir)) {
+          fs.mkdirSync(huskyDir, { recursive: true })
+        }
+        const prePushPath = path.join(huskyDir, 'pre-push')
+        if (!fs.existsSync(prePushPath)) {
+          const hook = `#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+echo "🔍 Running pre-push validation..."
+
+# Validate command patterns (fast - catches deprecated patterns)
+if node -e "const pkg=require('./package.json');process.exit(pkg.scripts['test:patterns']?0:1)" 2>/dev/null; then
+  echo "🔍 Validating command patterns..."
+  npm run test:patterns || {
+    echo "❌ Pattern validation failed! Deprecated patterns detected."
+    exit 1
+  }
+fi
+
+# Run lint (catches errors before CI)
+echo "📝 Linting..."
+npm run lint || {
+  echo "❌ Lint failed! Fix errors before pushing."
+  exit 1
+}
+
+# Run format check (ensures code style consistency)
+echo "✨ Checking formatting..."
+npm run format:check || {
+  echo "❌ Format check failed! Run 'npm run format' to fix."
+  exit 1
+}
+
+# Test command execution (CRITICAL - prevents command generation bugs)
+if node -e "const pkg=require('./package.json');process.exit(pkg.scripts['test:commands']?0:1)" 2>/dev/null; then
+  echo "🧪 Testing command execution..."
+  npm run test:commands || {
+    echo "❌ Command execution tests failed! Generated commands are broken."
+    exit 1
+  }
+fi
+
+# Run tests if they exist
+if node -e "const pkg=require('./package.json');process.exit(pkg.scripts.test?0:1)" 2>/dev/null; then
+  echo "🧪 Running unit tests..."
+  npm test || {
+    echo "❌ Tests failed! Fix failing tests before pushing."
+    exit 1
+  }
+fi
+
+echo "✅ Pre-push validation passed!"
+`
+          fs.writeFileSync(prePushPath, hook)
+          fs.chmodSync(prePushPath, 0o755)
+          console.log('✅ Added Husky pre-push hook (validation)')
+        }
+      } catch (e) {
+        console.warn('⚠️ Could not create Husky pre-push hook:', e.message)
+      }
+
       // Ensure engines/volta pins in target package.json (enforce minimums)
       try {
         if (fs.existsSync(packageJsonPath)) {
@@ -1446,6 +1511,79 @@ coverage/
         }
       }
 
+      // Generate placeholder test file with helpful documentation
+      const testsDir = path.join(process.cwd(), 'tests')
+      const testExtension = usesTypeScript ? 'ts' : 'js'
+      const placeholderTestPath = path.join(
+        testsDir,
+        `placeholder.test.${testExtension}`
+      )
+
+      if (!fs.existsSync(testsDir)) {
+        fs.mkdirSync(testsDir, { recursive: true })
+      }
+
+      if (!fs.existsSync(placeholderTestPath)) {
+        const placeholderContent = `import { describe, it, expect } from 'vitest'
+
+/**
+ * PLACEHOLDER TEST FILE
+ *
+ * This file ensures your test suite passes even when you're just getting started.
+ * Replace these placeholders with real tests as you build your application.
+ *
+ * Progressive Testing Strategy:
+ * 1. Start: Use describe.skip() placeholders (tests pass but are marked as skipped)
+ * 2. Planning: Convert to it.todo() when you know what to test
+ * 3. Implementation: Write actual test implementations
+ * 4. Tighten: Remove --passWithNoTests flag once you have real tests
+ *
+ * To tighten enforcement, update package.json:
+ * - Change: "test": "vitest run --passWithNoTests"
+ * - To:     "test": "vitest run" (fails if no tests exist)
+ */
+
+describe.skip('Example test suite (placeholder)', () => {
+  /**
+   * These tests are skipped by default to prevent false positives.
+   * Remove .skip and implement these tests when you're ready.
+   */
+
+  it.todo('should test core functionality')
+
+  it.todo('should handle edge cases')
+
+  it.todo('should validate error conditions')
+})
+
+// Example of a passing test (demonstrates test framework is working)
+describe('Test framework validation', () => {
+  it('should confirm Vitest is properly configured', () => {
+    expect(true).toBe(true)
+  })
+})
+
+/**
+ * Next Steps:
+ * 1. Create feature-specific test files (e.g., user.test.${testExtension}, api.test.${testExtension})
+ * 2. Move these it.todo() placeholders to appropriate test files
+ * 3. Implement actual test logic
+ * 4. Delete this placeholder.test.${testExtension} file when you have real tests
+ *
+ * Resources:
+ * - Vitest Docs: https://vitest.dev/guide/
+ * - Testing Best Practices: https://github.com/goldbergyoni/javascript-testing-best-practices
+ */
+`
+        fs.writeFileSync(placeholderTestPath, placeholderContent)
+        console.log(
+          `✅ Added placeholder test file (tests/placeholder.test.${testExtension})`
+        )
+        console.log(
+          '   💡 Replace with real tests as you build your application'
+        )
+      }
+
       console.log('\n🎉 Quality automation setup complete!')
 
       // Record telemetry completion event (opt-in only, fails silently)
@@ -1479,7 +1617,8 @@ coverage/
       }
       console.log('\n✨ Your project now has:')
       console.log('  • Prettier code formatting')
-      console.log('  • Pre-commit hooks via Husky')
+      console.log('  • Pre-commit hooks via Husky (lint-staged)')
+      console.log('  • Pre-push validation (lint, format, tests)')
       console.log('  • GitHub Actions quality checks')
       console.log('  • Lint-staged for efficient processing')
     } // End of runMainSetup function
