@@ -9,6 +9,7 @@ const {
   mergeLintStaged,
 } = require('./lib/package-utils')
 const { showProgress } = require('./lib/ui-helpers')
+const { NODE_VERSION, SCAN_LIMITS } = require('./config/constants')
 
 /**
  * Check Node version and lazily load @npmcli/package-json
@@ -18,9 +19,9 @@ function checkNodeVersionAndLoadPackageJson() {
   const nodeVersion = process.version
   const majorVersion = parseInt(nodeVersion.split('.')[0].slice(1))
 
-  if (majorVersion < 20) {
+  if (majorVersion < NODE_VERSION.MIN_MAJOR) {
     console.error(
-      `❌ Node.js ${nodeVersion} is not supported. This tool requires Node.js 20 or higher.`
+      `❌ Node.js ${nodeVersion} is not supported. This tool requires Node.js ${NODE_VERSION.MIN_MAJOR} or higher.`
     )
     console.log('Please upgrade Node.js and try again.')
     console.log('Visit https://nodejs.org/ to download the latest version.')
@@ -100,7 +101,7 @@ const STYLELINT_SCAN_EXCLUDES = new Set([
   'coverage',
   'node_modules',
 ])
-const MAX_STYLELINT_SCAN_DEPTH = 4
+const MAX_STYLELINT_SCAN_DEPTH = SCAN_LIMITS.STYLELINT_MAX_DEPTH
 
 /**
  * Safely reads directory contents without throwing on permission errors
