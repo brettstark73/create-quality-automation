@@ -51,7 +51,7 @@ async function testNpmWorkspaces() {
       private: true,
       workspaces: ['packages/*'],
     }
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
+
     fs.writeFileSync(
       path.join(testDir, 'package.json'),
       JSON.stringify(rootPackageJson, null, 2)
@@ -59,21 +59,21 @@ async function testNpmWorkspaces() {
 
     // Create workspace package
     const packagesDir = path.join(testDir, 'packages', 'app')
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
+
     fs.mkdirSync(packagesDir, { recursive: true })
 
     const workspacePackageJson = {
       name: '@monorepo/app',
       version: '1.0.0',
     }
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
+
     fs.writeFileSync(
       path.join(packagesDir, 'package.json'),
       JSON.stringify(workspacePackageJson, null, 2)
     )
 
     // Create index file to make it a valid package
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
+
     fs.writeFileSync(path.join(packagesDir, 'index.js'), 'module.exports = {}')
 
     // Run setup in workspace root
@@ -88,7 +88,7 @@ async function testNpmWorkspaces() {
 
     for (const file of expectedRootFiles) {
       const filePath = path.join(testDir, file)
-      // eslint-disable-next-line security/detect-non-literal-fs-filename
+
       if (!fs.existsSync(filePath)) {
         throw new Error(`Expected root config file not created: ${file}`)
       }
@@ -96,7 +96,7 @@ async function testNpmWorkspaces() {
 
     // Verify workspace package does NOT have duplicate configs
     const workspaceConfigPath = path.join(packagesDir, '.prettierrc')
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
+
     if (fs.existsSync(workspaceConfigPath)) {
       throw new Error(
         'Workspace package should not have duplicate config files'
@@ -133,7 +133,7 @@ async function testPnpmWorkspaces() {
     const pnpmWorkspaceConfig = `packages:
   - 'packages/*'
 `
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
+
     fs.writeFileSync(
       path.join(testDir, 'pnpm-workspace.yaml'),
       pnpmWorkspaceConfig
@@ -145,7 +145,7 @@ async function testPnpmWorkspaces() {
       version: '1.0.0',
       private: true,
     }
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
+
     fs.writeFileSync(
       path.join(testDir, 'package.json'),
       JSON.stringify(rootPackageJson, null, 2)
@@ -153,16 +153,14 @@ async function testPnpmWorkspaces() {
 
     // Create workspace package
     const packagesDir = path.join(testDir, 'packages', 'lib')
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
+
     fs.mkdirSync(packagesDir, { recursive: true })
 
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
     fs.writeFileSync(
       path.join(packagesDir, 'package.json'),
       JSON.stringify({ name: '@monorepo/lib', version: '1.0.0' }, null, 2)
     )
 
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
     fs.writeFileSync(path.join(packagesDir, 'index.js'), 'module.exports = {}')
 
     // Run setup
@@ -170,14 +168,14 @@ async function testPnpmWorkspaces() {
 
     // Verify pnpm-workspace.yaml still exists and wasn't modified
     const workspaceYamlPath = path.join(testDir, 'pnpm-workspace.yaml')
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
+
     if (!fs.existsSync(workspaceYamlPath)) {
       throw new Error('pnpm-workspace.yaml should not be removed')
     }
 
     // Verify configs are at root
     const prettierrcPath = path.join(testDir, '.prettierrc')
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
+
     if (!fs.existsSync(prettierrcPath)) {
       throw new Error('Root .prettierrc should be created')
     }
@@ -215,7 +213,7 @@ async function testYarnWorkspaces() {
       private: true,
       workspaces: ['packages/*'],
     }
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
+
     fs.writeFileSync(
       path.join(testDir, 'package.json'),
       JSON.stringify(rootPackageJson, null, 2)
@@ -223,16 +221,14 @@ async function testYarnWorkspaces() {
 
     // Create workspace packages
     const packagesDir = path.join(testDir, 'packages', 'utils')
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
+
     fs.mkdirSync(packagesDir, { recursive: true })
 
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
     fs.writeFileSync(
       path.join(packagesDir, 'package.json'),
       JSON.stringify({ name: '@monorepo/utils', version: '1.0.0' }, null, 2)
     )
 
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
     fs.writeFileSync(path.join(packagesDir, 'index.js'), 'module.exports = {}')
 
     // Run setup
@@ -240,7 +236,7 @@ async function testYarnWorkspaces() {
 
     // Verify root configs exist
     const eslintConfigPath = path.join(testDir, 'eslint.config.cjs')
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
+
     if (!fs.existsSync(eslintConfigPath)) {
       throw new Error('Root eslint.config.cjs should be created')
     }
@@ -277,7 +273,7 @@ async function testLernaMonorepo() {
       packages: ['packages/*'],
       npmClient: 'npm',
     }
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
+
     fs.writeFileSync(
       path.join(testDir, 'lerna.json'),
       JSON.stringify(lernaConfig, null, 2)
@@ -292,7 +288,7 @@ async function testLernaMonorepo() {
         lerna: '^8.0.0',
       },
     }
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
+
     fs.writeFileSync(
       path.join(testDir, 'package.json'),
       JSON.stringify(rootPackageJson, null, 2)
@@ -300,16 +296,14 @@ async function testLernaMonorepo() {
 
     // Create lerna package
     const packagesDir = path.join(testDir, 'packages', 'core')
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
+
     fs.mkdirSync(packagesDir, { recursive: true })
 
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
     fs.writeFileSync(
       path.join(packagesDir, 'package.json'),
       JSON.stringify({ name: '@monorepo/core', version: '1.0.0' }, null, 2)
     )
 
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
     fs.writeFileSync(path.join(packagesDir, 'index.js'), 'module.exports = {}')
 
     // Run setup
@@ -317,14 +311,14 @@ async function testLernaMonorepo() {
 
     // Verify lerna.json still exists
     const lernaJsonPath = path.join(testDir, 'lerna.json')
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
+
     if (!fs.existsSync(lernaJsonPath)) {
       throw new Error('lerna.json should not be removed')
     }
 
     // Verify configs are at root
     const editorconfigPath = path.join(testDir, '.editorconfig')
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
+
     if (!fs.existsSync(editorconfigPath)) {
       throw new Error('Root .editorconfig should be created')
     }
@@ -360,7 +354,7 @@ async function testNestedPackageJson() {
       name: 'root-project',
       version: '1.0.0',
     }
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
+
     fs.writeFileSync(
       path.join(testDir, 'package.json'),
       JSON.stringify(rootPackageJson, null, 2)
@@ -368,20 +362,19 @@ async function testNestedPackageJson() {
 
     // Create nested directory with its own package.json
     const nestedDir = path.join(testDir, 'nested', 'project')
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
+
     fs.mkdirSync(nestedDir, { recursive: true })
 
     const nestedPackageJson = {
       name: 'nested-project',
       version: '1.0.0',
     }
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
+
     fs.writeFileSync(
       path.join(nestedDir, 'package.json'),
       JSON.stringify(nestedPackageJson, null, 2)
     )
 
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
     fs.writeFileSync(path.join(nestedDir, 'index.js'), 'module.exports = {}')
 
     // Run setup at root
@@ -389,14 +382,14 @@ async function testNestedPackageJson() {
 
     // Verify configs at root
     const rootPrettierPath = path.join(testDir, '.prettierrc')
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
+
     if (!fs.existsSync(rootPrettierPath)) {
       throw new Error('Root .prettierrc should be created')
     }
 
     // Verify nested directory doesn't get its own configs
     const nestedPrettierPath = path.join(nestedDir, '.prettierrc')
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
+
     if (fs.existsSync(nestedPrettierPath)) {
       throw new Error('Nested directory should not get duplicate configs')
     }
@@ -436,23 +429,21 @@ async function testWorkspacePackageSetup() {
       private: true,
       workspaces: ['packages/*'],
     }
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
+
     fs.writeFileSync(
       path.join(testDir, 'package.json'),
       JSON.stringify(rootPackageJson, null, 2)
     )
 
     const workspaceDir = path.join(testDir, 'packages', 'web')
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
+
     fs.mkdirSync(workspaceDir, { recursive: true })
 
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
     fs.writeFileSync(
       path.join(workspaceDir, 'package.json'),
       JSON.stringify({ name: '@workspace/web', version: '1.0.0' }, null, 2)
     )
 
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
     fs.writeFileSync(path.join(workspaceDir, 'index.js'), 'module.exports = {}')
 
     // Run setup FROM workspace package directory (not root)
@@ -462,7 +453,7 @@ async function testWorkspacePackageSetup() {
     // (Since we're in a git repo but in a subdirectory with package.json,
     // it should treat it as the project root)
     const workspacePrettierPath = path.join(workspaceDir, '.prettierrc')
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
+
     if (!fs.existsSync(workspacePrettierPath)) {
       throw new Error('Workspace package should get its own configs')
     }
@@ -502,7 +493,7 @@ async function testMixedLanguageMonorepo() {
       private: true,
       workspaces: ['packages/*'],
     }
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
+
     fs.writeFileSync(
       path.join(testDir, 'package.json'),
       JSON.stringify(rootPackageJson, null, 2)
@@ -510,16 +501,14 @@ async function testMixedLanguageMonorepo() {
 
     // Create JavaScript package
     const jsPackageDir = path.join(testDir, 'packages', 'js-app')
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
+
     fs.mkdirSync(jsPackageDir, { recursive: true })
 
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
     fs.writeFileSync(
       path.join(jsPackageDir, 'package.json'),
       JSON.stringify({ name: '@monorepo/js-app', version: '1.0.0' }, null, 2)
     )
 
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
     fs.writeFileSync(
       path.join(jsPackageDir, 'index.js'),
       'console.log("JS app")'
@@ -527,16 +516,14 @@ async function testMixedLanguageMonorepo() {
 
     // Create Python package
     const pyPackageDir = path.join(testDir, 'packages', 'py-lib')
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
+
     fs.mkdirSync(pyPackageDir, { recursive: true })
 
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
     fs.writeFileSync(
       path.join(pyPackageDir, '__init__.py'),
       'print("Python lib")'
     )
 
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
     fs.writeFileSync(
       path.join(pyPackageDir, 'main.py'),
       'def main():\n    pass'
@@ -555,7 +542,7 @@ async function testMixedLanguageMonorepo() {
 
     for (const file of expectedFiles) {
       const filePath = path.join(testDir, file)
-      // eslint-disable-next-line security/detect-non-literal-fs-filename
+
       if (!fs.existsSync(filePath)) {
         throw new Error(
           `Expected ${file} for mixed language monorepo at root level`
@@ -565,7 +552,6 @@ async function testMixedLanguageMonorepo() {
 
     // Verify package.json was updated with scripts for both languages
     const updatedPackageJson = JSON.parse(
-      // eslint-disable-next-line security/detect-non-literal-fs-filename
       fs.readFileSync(path.join(testDir, 'package.json'), 'utf8')
     )
 

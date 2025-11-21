@@ -191,9 +191,50 @@ fi
 
 # Conditional references with guards are OK (will fallback in consumer repos)
 
-# 8. Test --dry-run mode
+# 8. NEW: Actually run the generated commands (catches broken CLI flags!)
 echo ""
-echo "🧪 Step 8: Testing --dry-run mode..."
+echo "🚀 Step 8: Testing generated commands actually work..."
+echo "  This step would have caught the ESLint --ext bug!"
+
+# Create test files for commands to process
+echo "const x = 1;" > test.js
+echo "body { color: red; }" > test.css
+
+# Test format:check
+echo "  Testing: npm run format:check"
+if npm run format:check 2>&1 >/dev/null; then
+  pass "  format:check works"
+else
+  fail "  format:check failed (check Prettier flags!)"
+fi
+
+# Test lint (CRITICAL: this would have caught --ext bug!)
+echo "  Testing: npm run lint"
+if npm run lint 2>&1 >/dev/null; then
+  pass "  lint works"
+else
+  fail "  lint failed (check for deprecated flags like --ext!)"
+fi
+
+# Test direct ESLint
+echo "  Testing: npx eslint test.js"
+if npx eslint test.js 2>&1 >/dev/null; then
+  pass "  Direct ESLint works"
+else
+  fail "  Direct ESLint failed"
+fi
+
+# Test stylelint
+echo "  Testing: npx stylelint test.css"
+if npx stylelint test.css 2>&1 >/dev/null; then
+  pass "  Stylelint works"
+else
+  fail "  Stylelint failed"
+fi
+
+# 9. Test --dry-run mode
+echo ""
+echo "🧪 Step 9: Testing --dry-run mode..."
 cd "$OLDPWD"
 if node ./setup.js --dry-run 2>&1 | grep -q "DRY RUN MODE"; then
   pass "--dry-run mode works"
