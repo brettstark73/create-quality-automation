@@ -511,9 +511,18 @@ Comprehensive security scanning built into the workflow:
 **Vulnerability Detection**:
 
 - **npm audit** - Blocks deployment on high-severity vulnerabilities
-- **Hardcoded secrets** - Scans for exposed passwords, API keys, tokens
+- **Hardcoded secrets** - Scans for exposed passwords, API keys, tokens with pinned gitleaks v8.28.0
 - **XSS patterns** - Detects dangerous innerHTML, eval, document.write usage
 - **Input validation** - Warns about unvalidated user inputs
+
+**Supply Chain Security**:
+
+- **Pinned gitleaks binary** - Uses gitleaks v8.28.0 with verified SHA256 checksum verification
+- **Binary resolution fallback** - `GITLEAKS_PATH` → global installation → cached pinned version → fail with clear error
+- **Checksum verification** - All downloaded binaries verified against known-good SHA256 hashes before execution
+- **No silent fallbacks** - Fails securely instead of falling back to latest unpinned versions
+- **Escape hatch** - Use `--allow-latest-gitleaks` flag only when explicitly accepting supply chain risk
+- **Reproducible scanning** - Same gitleaks version across all environments eliminates scan drift
 
 **Security patterns checked**:
 

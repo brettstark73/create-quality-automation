@@ -504,8 +504,8 @@ assert.ok(
   'Workflow should include secrets detection'
 )
 assert.ok(
-  workflowContent.includes('XSS vulnerability patterns'),
-  'Workflow should include XSS pattern detection'
+  workflowContent.includes('Security pattern detection'),
+  'Workflow should include security pattern detection'
 )
 
 console.log('✅ All security pattern tests passed!')
