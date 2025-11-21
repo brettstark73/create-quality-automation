@@ -156,6 +156,25 @@ describe('Test framework validation', () => {
 > - Using nvm: `nvm install 20 && nvm use 20`
 > - npm cache permission errors (`EPERM` on `~/.npm`): either fix ownership (`sudo chown -R $(id -u):$(id -g) ~/.npm`) or point npm to a writable cache (`npm_config_cache=$PWD/.npm-cache npm install`).
 
+### Environment Variables (Optional)
+
+Configure optional behavior with environment variables:
+
+- `NO_EMOJI=true` - Use text-only mode for screen readers and accessibility (e.g., `[OK]` instead of ✅)
+- `SCREEN_READER=true` - Enable screen reader friendly output (same as NO_EMOJI)
+- `CQA_TELEMETRY=true` - Enable local usage tracking (opt-in only)
+- `CQA_ERROR_REPORTING=true` - Enable local error reporting (opt-in only)
+
+**Example usage:**
+
+```bash
+# Run with accessibility mode enabled
+NO_EMOJI=true npx create-quality-automation@latest
+
+# Run with telemetry enabled
+CQA_TELEMETRY=true npx create-quality-automation@latest
+```
+
 ### For Any Project (Recommended)
 
 ```bash
