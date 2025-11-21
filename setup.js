@@ -1110,7 +1110,7 @@ HELP:
             '⚠️  Warning: Generated config has validation issues (this should not happen):'
           )
           validationResult.errors.forEach(error => {
-            console.warn(`   - ${error.message}`)
+            console.warn(`   - ${error}`)
           })
         }
       } else {
@@ -1121,7 +1121,7 @@ HELP:
             '⚠️  Warning: Existing .qualityrc.json has validation issues:'
           )
           validationResult.errors.forEach(error => {
-            console.warn(`   - ${error.message}`)
+            console.warn(`   - ${error}`)
           })
           console.warn(
             '   Setup will continue, but you may want to fix these issues.\n'
@@ -1695,26 +1695,36 @@ describe('Test framework validation', () => {
 
   // Close the main async function and handle errors
 })().catch(error => {
-  // Record telemetry failure event (opt-in only, fails silently)
-  const telemetry = new TelemetrySession()
-  telemetry.recordFailure(error, {
-    errorLocation: error.stack ? error.stack.split('\n')[1] : 'unknown',
-  })
+  try {
+    // Record telemetry failure event (opt-in only, fails silently)
+    const telemetry = new TelemetrySession()
+    telemetry.recordFailure(error, {
+      errorLocation: error?.stack ? error.stack.split('\n')[1] : 'unknown',
+    })
 
-  // Capture and report error (opt-in only, fails silently)
-  const errorReporter = new ErrorReporter('setup')
-  const reportId = errorReporter.captureError(error, {
-    operation: 'setup',
-    errorLocation: error.stack ? error.stack.split('\n')[1] : 'unknown',
-  })
+    // Capture and report error (opt-in only, fails silently)
+    const errorReporter = new ErrorReporter('setup')
+    const reportId = errorReporter.captureError(error, {
+      operation: 'setup',
+      errorLocation: error?.stack ? error.stack.split('\n')[1] : 'unknown',
+    })
 
-  // Show friendly error message with category
-  errorReporter.promptErrorReport(error)
+    // Show friendly error message with category
+    errorReporter.promptErrorReport(error)
 
-  // If report was captured, show location
-  if (reportId) {
-    console.log(`\n📊 Error report saved: ${reportId}`)
-    console.log(`View at: ~/.create-quality-automation/error-reports.json`)
+    // If report was captured, show location
+    if (reportId) {
+      console.log(`\n📊 Error report saved: ${reportId}`)
+      console.log(`View at: ~/.create-quality-automation/error-reports.json`)
+    }
+  } catch {
+    // Error in error reporting - fallback to basic error display
+    console.error('\n❌ Setup failed with error:')
+    console.error(error?.message || error || 'Unknown error')
+    if (error?.stack) {
+      console.error('\nStack trace:')
+      console.error(error.stack)
+    }
   }
 
   process.exit(1)
