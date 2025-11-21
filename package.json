@@ -83,6 +83,16 @@
   "engines": {
     "node": ">=20"
   },
+  "overrides": {
+    "ajv-formats": {
+      "ajv": "$ajv"
+    },
+    "stylelint": {
+      "table": {
+        "ajv": "$ajv"
+      }
+    }
+  },
   "devDependencies": {
     "actionlint": "^2.0.6",
     "c8": "^10.1.2",
