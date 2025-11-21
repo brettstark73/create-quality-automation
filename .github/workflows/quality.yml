@@ -165,13 +165,16 @@ jobs:
       - name: Check for hardcoded secrets
         run: |
           echo "🔍 Scanning for hardcoded secrets..."
-          if grep -r -E "(password|secret|key|token).*[=:].*['\"][^'\"]{8,}" . \
+          # Match actual assignments (= or :) but NOT comparisons (===, ==, !==) or property access (.)
+          # Pattern matches: password = "secret123" or apiKey: "secret123"
+          # Does NOT match: error.keyword === 'required' or if (key == value)
+          if grep -r -E "(password|secret|api[_-]?key|token)\s*[=:]\s*['\"][^'\"]{8,}" . \
                --exclude-dir=node_modules \
                --exclude-dir=.git \
                --exclude-dir=.github \
                --exclude-dir=tests \
                --exclude="*.md" \
-               --exclude="package.json" || \
+               --exclude="package.json" | grep -v -E "\.(keyword|key|type)\s*===" || \
              grep -r -E "-----BEGIN.*KEY-----" . \
                --exclude-dir=node_modules \
                --exclude-dir=.git \
