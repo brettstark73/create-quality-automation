@@ -1115,18 +1115,19 @@ HELP:
         }
       } else {
         // Config exists, validate it
-        const validationResult = validateQualityConfig(qualityrcPath)
-        if (!validationResult.valid) {
-          console.warn(
-            '⚠️  Warning: Existing .qualityrc.json has validation issues:'
-          )
-          validationResult.errors.forEach(error => {
-            console.warn(`   - ${error}`)
-          })
-          console.warn(
-            '   Setup will continue, but you may want to fix these issues.\n'
-          )
-        }
+        // Temporarily disabled - debugging
+        // const validationResult = validateQualityConfig(qualityrcPath)
+        // if (!validationResult.valid) {
+        //   console.warn(
+        //     '⚠️  Warning: Existing .qualityrc.json has validation issues:'
+        //   )
+        //   validationResult.errors.forEach(error => {
+        //     console.warn(`   - ${error}`)
+        //   })
+        //   console.warn(
+        //     '   Setup will continue, but you may want to fix these issues.\n'
+        //   )
+        // }
       }
 
       // Load and merge templates (custom + defaults)
