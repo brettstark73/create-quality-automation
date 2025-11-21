@@ -9,6 +9,7 @@ const {
   mergeLintStaged,
 } = require('./lib/package-utils')
 const { showProgress } = require('./lib/ui-helpers')
+const { NODE_VERSION, SCAN_LIMITS } = require('./config/constants')
 
 /**
  * Check Node version and lazily load @npmcli/package-json
@@ -18,9 +19,9 @@ function checkNodeVersionAndLoadPackageJson() {
   const nodeVersion = process.version
   const majorVersion = parseInt(nodeVersion.split('.')[0].slice(1))
 
-  if (majorVersion < 20) {
+  if (majorVersion < NODE_VERSION.MIN_MAJOR) {
     console.error(
-      `❌ Node.js ${nodeVersion} is not supported. This tool requires Node.js 20 or higher.`
+      `❌ Node.js ${nodeVersion} is not supported. This tool requires Node.js ${NODE_VERSION.MIN_MAJOR} or higher.`
     )
     console.log('Please upgrade Node.js and try again.')
     console.log('Visit https://nodejs.org/ to download the latest version.')
@@ -100,8 +101,22 @@ const STYLELINT_SCAN_EXCLUDES = new Set([
   'coverage',
   'node_modules',
 ])
-const MAX_STYLELINT_SCAN_DEPTH = 4
+const MAX_STYLELINT_SCAN_DEPTH = SCAN_LIMITS.STYLELINT_MAX_DEPTH
 
+/**
+ * Safely reads directory contents without throwing on permission errors
+ *
+ * Wraps fs.readdirSync with error handling to prevent crashes when
+ * encountering permission denied errors or non-existent directories.
+ *
+ * @param {string} dir - Directory path to read
+ * @returns {fs.Dirent[]} Array of directory entries, empty array on error
+ *
+ * @example
+ * const entries = safeReadDir('./src')
+ * // Returns: [Dirent { name: 'index.js', ... }, ...]
+ * // On error: []
+ */
 const safeReadDir = dir => {
   try {
     return fs.readdirSync(dir, { withFileTypes: true })
@@ -110,6 +125,20 @@ const safeReadDir = dir => {
   }
 }
 
+/**
+ * Checks if a filename has a Stylelint-supported extension
+ *
+ * Validates whether a file should be linted by Stylelint based on
+ * its extension. Supports: css, scss, sass, less, pcss
+ *
+ * @param {string} fileName - Name of the file to check (e.g., 'styles.css')
+ * @returns {boolean} True if file has a supported CSS extension
+ *
+ * @example
+ * isStylelintFile('styles.css')     // true
+ * isStylelintFile('index.js')       // false
+ * isStylelintFile('theme.scss')     // true
+ */
 const isStylelintFile = fileName => {
   const ext = path.extname(fileName).slice(1).toLowerCase()
   return STYLELINT_EXTENSION_SET.has(ext)
@@ -145,6 +174,33 @@ const directoryContainsStylelintFiles = (dir, depth = 0) => {
   return false
 }
 
+/**
+ * Intelligently discovers Stylelint target directories in a project
+ *
+ * Scans the root directory to find which subdirectories contain CSS/SCSS files
+ * and generates optimized glob patterns for Stylelint. Avoids scanning excluded
+ * directories like node_modules and skips symbolic links for safety.
+ *
+ * Algorithm:
+ * 1. Scan root directory for CSS files and relevant subdirectories
+ * 2. Skip excluded dirs (node_modules, .git, etc.) and symlinks
+ * 3. Recursively check subdirs up to MAX_STYLELINT_SCAN_DEPTH
+ * 4. Generate specific globs for dirs with CSS files
+ * 5. Fall back to default glob if no CSS files found
+ *
+ * @param {string} rootDir - Root directory to scan
+ * @returns {string[]} Array of glob patterns for Stylelint targets
+ *
+ * @example
+ * findStylelintTargets('/project')
+ * // Project has CSS in root and src/:
+ * // ['**\/*.{css,scss,sass,less,pcss}', 'src/**\/*.{css,scss,sass,less,pcss}']
+ *
+ * @example
+ * findStylelintTargets('/empty-project')
+ * // No CSS files found:
+ * // ['**\/*.{css,scss,sass,less,pcss}'] (default fallback)
+ */
 const findStylelintTargets = rootDir => {
   const entries = safeReadDir(rootDir)
   const targets = new Set()
