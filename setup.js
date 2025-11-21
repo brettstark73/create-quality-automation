@@ -667,9 +667,9 @@ HELP:
     // During free beta (v3.0.0), ALL projects use premium generator
     // After beta: Pro/Enterprise use premium, Free tier uses basic (npm-only)
     const shouldUsePremium =
-      license.tier === 'pro' ||
-      license.tier === 'enterprise' ||
-      license.tier === 'free' // Free beta: all projects get premium features
+      license.tier === 'PRO' ||
+      license.tier === 'ENTERPRISE' ||
+      license.tier === 'FREE' // Free beta: all projects get premium features
 
     if (shouldUsePremium) {
       console.log(
