@@ -64,10 +64,65 @@ const DEPENDENCY_MONITORING = {
   MAX_REQUIREMENTS_FILE_SIZE: 10 * 1024 * 1024,
 }
 
+/**
+ * Directory exclusion lists for scanning operations
+ *
+ * Centralized lists of directories to skip during various scanning operations
+ * (Stylelint, template loading, project maturity analysis).
+ */
+const EXCLUDE_DIRECTORIES = {
+  /** Directories to exclude during Stylelint scanning */
+  STYLELINT: [
+    '.git',
+    '.github',
+    '.husky',
+    '.next',
+    '.nuxt',
+    '.output',
+    '.turbo',
+    '.vercel',
+    '.cache',
+    '.pnpm-store',
+    'coverage',
+    'node_modules',
+  ],
+
+  /** Directories to skip during template loading */
+  TEMPLATE_LOADING: [
+    'node_modules',
+    '.git',
+    '.next',
+    '.nuxt',
+    '.turbo',
+    '.vercel',
+    '.cache',
+    'dist',
+    'build',
+    'coverage',
+    '.pnpm-store',
+    '.yarn',
+  ],
+
+  /** Directories to exclude during project maturity file counting */
+  PROJECT_MATURITY: [
+    'node_modules',
+    '.git',
+    'dist',
+    'build',
+    'coverage',
+    '.next',
+    '.nuxt',
+  ],
+
+  /** Directories allowed for template scanning from package directory */
+  TEMPLATE_WHITELIST: ['.github', 'config', 'dotfiles'],
+}
+
 module.exports = {
   NODE_VERSION,
   SCAN_LIMITS,
   REPORTING_LIMITS,
   MATURITY_THRESHOLDS,
   DEPENDENCY_MONITORING,
+  EXCLUDE_DIRECTORIES,
 }

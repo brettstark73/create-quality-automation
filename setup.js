@@ -9,7 +9,11 @@ const {
   mergeLintStaged,
 } = require('./lib/package-utils')
 const { showProgress } = require('./lib/ui-helpers')
-const { NODE_VERSION, SCAN_LIMITS } = require('./config/constants')
+const {
+  NODE_VERSION,
+  SCAN_LIMITS,
+  EXCLUDE_DIRECTORIES,
+} = require('./config/constants')
 
 /**
  * Check Node version and lazily load @npmcli/package-json
@@ -87,20 +91,7 @@ const {
 const STYLELINT_EXTENSION_SET = new Set(STYLELINT_EXTENSIONS)
 const STYLELINT_DEFAULT_TARGET = `**/*.{${STYLELINT_EXTENSIONS.join(',')}}`
 const STYLELINT_EXTENSION_GLOB = `*.{${STYLELINT_EXTENSIONS.join(',')}}`
-const STYLELINT_SCAN_EXCLUDES = new Set([
-  '.git',
-  '.github',
-  '.husky',
-  '.next',
-  '.nuxt',
-  '.output',
-  '.turbo',
-  '.vercel',
-  '.cache',
-  '.pnpm-store',
-  'coverage',
-  'node_modules',
-])
+const STYLELINT_SCAN_EXCLUDES = new Set(EXCLUDE_DIRECTORIES.STYLELINT)
 const MAX_STYLELINT_SCAN_DEPTH = SCAN_LIMITS.STYLELINT_MAX_DEPTH
 
 /**
