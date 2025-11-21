@@ -484,11 +484,12 @@ LICENSE, TELEMETRY & ERROR REPORTING:
   --error-reporting-status  Show error reporting status and privacy information
 
 GRANULAR TOOL CONTROL:
-  --no-npm-audit       Disable npm audit dependency vulnerability checks
-  --no-gitleaks        Disable gitleaks secret scanning
-  --no-actionlint      Disable actionlint GitHub Actions workflow validation
-  --no-markdownlint    Disable markdownlint markdown formatting checks
-  --no-eslint-security Disable ESLint security rule checking
+  --no-npm-audit         Disable npm audit dependency vulnerability checks
+  --no-gitleaks          Disable gitleaks secret scanning
+  --allow-latest-gitleaks  Allow unpinned latest gitleaks (NOT RECOMMENDED - supply chain risk)
+  --no-actionlint        Disable actionlint GitHub Actions workflow validation
+  --no-markdownlint      Disable markdownlint markdown formatting checks
+  --no-eslint-security   Disable ESLint security rule checking
 
 EXAMPLES:
   npx create-quality-automation@latest
@@ -514,6 +515,9 @@ EXAMPLES:
 
   npx create-quality-automation@latest --comprehensive --no-gitleaks
     → Run validation but skip gitleaks secret scanning
+
+  npx create-quality-automation@latest --security-config --allow-latest-gitleaks
+    → Run security checks with unpinned gitleaks (NOT RECOMMENDED - supply chain risk)
 
   npx create-quality-automation@latest --security-config --no-npm-audit
     → Run security checks but skip npm audit

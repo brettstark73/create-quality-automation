@@ -1,0 +1,5 @@
+#!/bin/bash
+# Test fixture: Mock gitleaks binary for checksum verification testing
+# This is a minimal executable that serves as a test fixture
+echo "Mock gitleaks v8.28.0 - test fixture for checksum verification"
+exit 0

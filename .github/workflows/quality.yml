@@ -128,6 +128,14 @@ jobs:
           npx stylelint "**/*.{css,scss,sass,less,pcss}" --allow-empty-input
 
   # Step 4: Security checks - run if dependencies exist
+  #
+  # Optional Enhanced Token Configuration:
+  # - GITLEAKS_TOKEN: Enhanced GitHub token for gitleaks (fallback: GITHUB_TOKEN)
+  # - GITLEAKS_LICENSE: Commercial gitleaks license key for advanced features
+  # - SEMGREP_APP_TOKEN: Semgrep app token for enhanced scanning and rate limits
+  #
+  # These are optional - workflow functions with defaults but enhanced tokens
+  # provide better reliability on GHES/self-hosted and unlock premium features
   security:
     runs-on: ubuntu-latest
     needs: detect-maturity
@@ -149,60 +157,88 @@ jobs:
       - name: Verify dependency integrity
         run: |
           echo "🔐 Verifying dependency integrity..."
-          if [ -f package-lock.json ]; then
-            npm ci --dry-run --prefer-offline
-            echo "✅ Dependency integrity verified"
-          else
-            echo "⚠️ No package-lock.json found - skipping integrity verification"
-          fi
+          PACKAGE_MANAGER="${{ needs.detect-maturity.outputs.package-manager }}"
+
+          case "$PACKAGE_MANAGER" in
+            "pnpm")
+              if [ -f pnpm-lock.yaml ]; then
+                pnpm install --frozen-lockfile --dry-run
+                echo "✅ Dependency integrity verified (pnpm)"
+              else
+                echo "⚠️ No pnpm-lock.yaml found - skipping integrity verification"
+              fi
+              ;;
+            "yarn")
+              if [ -f yarn.lock ]; then
+                yarn install --frozen-lockfile --dry-run
+                echo "✅ Dependency integrity verified (yarn)"
+              else
+                echo "⚠️ No yarn.lock found - skipping integrity verification"
+              fi
+              ;;
+            "bun")
+              if [ -f bun.lockb ]; then
+                bun install --frozen-lockfile --dry-run
+                echo "✅ Dependency integrity verified (bun)"
+              else
+                echo "⚠️ No bun.lockb found - skipping integrity verification"
+              fi
+              ;;
+            "npm"|*)
+              if [ -f package-lock.json ]; then
+                npm ci --dry-run --prefer-offline
+                echo "✅ Dependency integrity verified (npm)"
+              else
+                echo "⚠️ No package-lock.json found - skipping integrity verification"
+              fi
+              ;;
+          esac
 
           echo "🔍 Checking for vulnerable dependencies..."
-          npm audit --audit-level=moderate || true
+          case "$PACKAGE_MANAGER" in
+            "pnpm") pnpm audit --audit-level=moderate ;;
+            "yarn") yarn audit --level=moderate ;;
+            "bun") bun audit --audit-level=moderate ;;
+            "npm"|*) npm audit --audit-level=moderate ;;
+          esac
 
       - name: Security audit
-        run: npm audit --audit-level high
+        run: |
+          PACKAGE_MANAGER="${{ needs.detect-maturity.outputs.package-manager }}"
+          echo "🔐 Running security audit with $PACKAGE_MANAGER..."
+
+          case "$PACKAGE_MANAGER" in
+            "pnpm") pnpm audit --audit-level high ;;
+            "yarn") yarn audit --level high ;;
+            "bun") bun audit --audit-level high ;;
+            "npm"|*) npm audit --audit-level high ;;
+          esac
 
       - name: Check for hardcoded secrets
-        run: |
-          echo "🔍 Scanning for hardcoded secrets..."
-          # Match actual assignments (= or :) but NOT comparisons (===, ==, !==) or property access (.)
-          # Pattern matches: password = "secret123" or apiKey: "secret123"
-          # Does NOT match: error.keyword === 'required' or if (key == value)
-          if grep -r -E "(password|secret|api[_-]?key|token)\s*[=:]\s*['\"][^'\"]{8,}" . \
-               --exclude-dir=node_modules \
-               --exclude-dir=.git \
-               --exclude-dir=.github \
-               --exclude-dir=tests \
-               --exclude="*.md" \
-               --exclude="package.json" | grep -v -E "\.(keyword|key|type)\s*===" || \
-             grep -r -E "-----BEGIN.*KEY-----" . \
-               --exclude-dir=node_modules \
-               --exclude-dir=.git \
-               --exclude-dir=.github \
-               --exclude-dir=tests; then
-            echo "❌ Potential hardcoded secrets found"
-            exit 1
-          else
-            echo "✅ No hardcoded secrets detected"
-          fi
+        uses: gitleaks/gitleaks-action@ff98106e4c7b2bc287b24eaf42907196329070c7 # v2.3.9
+        env:
+          # Use enhanced token if available, fallback to default GitHub token
+          # GITLEAKS_LICENSE can be set for commercial features
+          GITHUB_TOKEN: ${{ secrets.GITLEAKS_TOKEN || secrets.GITHUB_TOKEN }}
+          GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
+        with:
+          args: --redact --verbose
 
       - name: Security pattern detection
-        run: |
-          echo "🔍 Scanning for XSS vulnerability patterns..."
-
-          # Check for innerHTML with interpolation
-          if grep -r -E "innerHTML.*\\\$\{" . --include="*.js" --include="*.jsx" --include="*.ts" --include="*.tsx" --exclude-dir=node_modules; then
-            echo "❌ Potential XSS: innerHTML with template literal interpolation found"
-            exit 1
-          fi
-
-          # Check for eval with interpolation
-          if grep -r -E "eval\\\(.*\\\$\{" . --include="*.js" --include="*.jsx" --include="*.ts" --include="*.tsx" --exclude-dir=node_modules; then
-            echo "❌ Potential code injection: eval with interpolation found"
-            exit 1
-          fi
-
-          echo "✅ No XSS vulnerability patterns detected"
+        uses: semgrep/semgrep-action@713efdd345f3035192eaa63f56867b88e63e4e5d # v1
+        with:
+          config: >
+            p/security-audit@1.85.0
+            p/javascript@1.85.0
+          cache: true
+          cache-key: semgrep-security-audit-1.85.0-javascript-1.85.0-${{ env.SEMGREP_VERSION }}
+        env:
+          # Use Semgrep app token if available for enhanced features and rate limits
+          # Falls back to GitHub token for basic functionality
+          SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN || secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SEMGREP_VERSION: '1.85.0'
+          SEMGREP_ENABLE_VERSION_CHECK: 'false'
 
   # Step 5: Tests - run if test files exist (development+)
   tests:
@@ -235,6 +271,22 @@ jobs:
 
           npm test
 
+      - name: Cache gitleaks binary for real download test
+        if: runner.os == 'Linux'
+        uses: actions/cache@v5
+        with:
+          path: ~/.cache/create-quality-automation/gitleaks
+          key: gitleaks-8.28.0-linux-x64-a65b5253-${{ hashFiles('lib/validation/config-security.js') }}
+          restore-keys: |
+            gitleaks-8.28.0-linux-x64-a65b5253-
+            gitleaks-8.28.0-linux-x64-
+
+      - name: Run real gitleaks binary verification test
+        if: runner.os == 'Linux'
+        run: |
+          echo "🔐 Running real gitleaks binary verification test..."
+          RUN_REAL_BINARY_TEST=1 node tests/gitleaks-real-binary-test.js
+
   # Step 6: Documentation - run for production-ready projects
   documentation:
     runs-on: ubuntu-latest
@@ -263,6 +315,12 @@ jobs:
         run: |
           echo "📖 Running documentation validation..."
           node setup.js --validate-docs
+
+      - name: Documentation consistency and security audit freshness
+        run: |
+          echo "🔐 Running comprehensive documentation validation..."
+          # This includes security audit freshness check with proper git-based validation
+          bash scripts/check-docs.sh
 
       - name: Lighthouse CI
         if: hashFiles('.lighthouserc.js', '.lighthouserc.json', 'lighthouserc.js') != ''
