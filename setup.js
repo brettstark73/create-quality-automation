@@ -303,10 +303,11 @@ function parseArguments(rawArgs) {
   const isDryRun = sanitizedArgs.includes('--dry-run')
 
   // Custom template directory - use raw args to preserve valid path characters (&, <, >, etc.)
+  // Normalize path to prevent traversal attacks and make absolute
   const templateFlagIndex = sanitizedArgs.findIndex(arg => arg === '--template')
   const customTemplatePath =
     templateFlagIndex !== -1 && rawArgs[templateFlagIndex + 1]
-      ? rawArgs[templateFlagIndex + 1]
+      ? path.resolve(rawArgs[templateFlagIndex + 1])
       : null
 
   // Granular tool disable options
