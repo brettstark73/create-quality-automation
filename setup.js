@@ -1697,6 +1697,12 @@ describe('Test framework validation', () => {
   // Close the main async function and handle errors
 })().catch(error => {
   try {
+    // Always show stack trace for debugging
+    if (error?.stack) {
+      console.error('\n🐛 Error stack trace:')
+      console.error(error.stack)
+    }
+
     // Record telemetry failure event (opt-in only, fails silently)
     const telemetry = new TelemetrySession()
     telemetry.recordFailure(error, {
@@ -1718,13 +1724,20 @@ describe('Test framework validation', () => {
       console.log(`\n📊 Error report saved: ${reportId}`)
       console.log(`View at: ~/.create-quality-automation/error-reports.json`)
     }
-  } catch {
+  } catch (reportingError) {
     // Error in error reporting - fallback to basic error display
     console.error('\n❌ Setup failed with error:')
     console.error(error?.message || error || 'Unknown error')
     if (error?.stack) {
       console.error('\nStack trace:')
       console.error(error.stack)
+    }
+    // Show error reporting failure for debugging
+    if (process.env.DEBUG) {
+      console.error('\n⚠️  Error reporting also failed:')
+      console.error(
+        reportingError?.stack || reportingError?.message || reportingError
+      )
     }
   }
 
