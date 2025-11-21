@@ -1,0 +1,6 @@
+#!/bin/bash
+# Test fixture: Mock gitleaks binary for checksum verification testing
+echo "Mock gitleaks v8.28.0 - deterministic test fixture"
+echo "Platform: $(uname -s)-$(uname -m)"
+echo "Version: test-fixture-1.0.0"
+exit 0

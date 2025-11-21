@@ -25,6 +25,31 @@ Use this checklist before any version bump or npm publication.
 - [ ] Usage instructions clear and complete
 - [ ] Security features properly documented
 
+### Security Audit Compliance
+
+- [ ] `KEYFLASH_INSPIRED_SECURITY_AUDIT.md` findings remain resolved
+- [ ] **CRITICAL**: Gitleaks checksums are real SHA256 values, not placeholders
+- [ ] `lib/validation/config-security.js` GITLEAKS_CHECKSUMS contains verified hashes
+- [ ] No "PLACEHOLDER_CHECKSUM" strings exist in security validation code
+- [ ] Gitleaks pinned version in code matches documented security version
+- [ ] No new security vulnerabilities introduced since audit
+- [ ] All security fixes from audit still in place
+- [ ] Security audit document references current version (or base version for pre-releases like `4.0.1-rc.1`)
+
+### Real Binary Verification
+
+- [ ] **CRITICAL**: Nightly gitleaks verification workflow is enabled and passing
+- [ ] Check last run of `.github/workflows/nightly-gitleaks-verification.yml`
+- [ ] No open issues from failed nightly verification runs
+- [ ] Production checksums validated in `tests/gitleaks-production-checksums.test.js`
+- [ ] Real binary download test passes: `RUN_REAL_BINARY_TEST=1 node tests/gitleaks-real-binary-test.js`
+- [ ] CI real binary verification test passes on Linux
+- [ ] **BLOCKERS**: If nightly verification failed within 7 days, investigate before release:
+  - [ ] Check if gitleaks v8.28.0 assets were modified upstream
+  - [ ] Verify checksums against known good values
+  - [ ] Ensure no supply chain compromise indicators
+  - [ ] Update checksums only if legitimate upstream change confirmed
+
 ### Workflow Documentation Alignment
 
 - [ ] GitHub Actions steps match actual workflow files
