@@ -149,38 +149,92 @@ jobs:
       - name: Verify dependency integrity
         run: |
           echo "🔐 Verifying dependency integrity..."
-          if [ -f package-lock.json ]; then
-            npm ci --dry-run --prefer-offline
-            echo "✅ Dependency integrity verified"
-          else
-            echo "⚠️ No package-lock.json found - skipping integrity verification"
-          fi
+          PACKAGE_MANAGER="${{ needs.detect-maturity.outputs.package-manager }}"
+
+          case "$PACKAGE_MANAGER" in
+            "pnpm")
+              if [ -f pnpm-lock.yaml ]; then
+                pnpm install --frozen-lockfile --dry-run
+                echo "✅ Dependency integrity verified (pnpm)"
+              else
+                echo "⚠️ No pnpm-lock.yaml found - skipping integrity verification"
+              fi
+              ;;
+            "yarn")
+              if [ -f yarn.lock ]; then
+                yarn install --frozen-lockfile --dry-run
+                echo "✅ Dependency integrity verified (yarn)"
+              else
+                echo "⚠️ No yarn.lock found - skipping integrity verification"
+              fi
+              ;;
+            "bun")
+              if [ -f bun.lockb ]; then
+                bun install --frozen-lockfile --dry-run
+                echo "✅ Dependency integrity verified (bun)"
+              else
+                echo "⚠️ No bun.lockb found - skipping integrity verification"
+              fi
+              ;;
+            "npm"|*)
+              if [ -f package-lock.json ]; then
+                npm ci --dry-run --prefer-offline
+                echo "✅ Dependency integrity verified (npm)"
+              else
+                echo "⚠️ No package-lock.json found - skipping integrity verification"
+              fi
+              ;;
+          esac
 
           echo "🔍 Checking for vulnerable dependencies..."
-          npm audit --audit-level=moderate || true
+          case "$PACKAGE_MANAGER" in
+            "pnpm") pnpm audit --audit-level=moderate || true ;;
+            "yarn") yarn audit --level=moderate || true ;;
+            "bun") bun audit --audit-level=moderate || true ;;
+            "npm"|*) npm audit --audit-level=moderate || true ;;
+          esac
 
       - name: Security audit
-        run: npm audit --audit-level high
+        run: |
+          PACKAGE_MANAGER="${{ needs.detect-maturity.outputs.package-manager }}"
+          echo "🔐 Running security audit with $PACKAGE_MANAGER..."
+
+          case "$PACKAGE_MANAGER" in
+            "pnpm") pnpm audit --audit-level high ;;
+            "yarn") yarn audit --level high ;;
+            "bun") bun audit --audit-level high ;;
+            "npm"|*) npm audit --audit-level high ;;
+          esac
 
       - name: Check for hardcoded secrets
         run: |
           echo "🔍 Scanning for hardcoded secrets..."
-          if grep -r -E "(password|secret|key|token).*[=:].*['\"][^'\"]{8,}" . \
-               --exclude-dir=node_modules \
-               --exclude-dir=.git \
-               --exclude-dir=.github \
-               --exclude-dir=tests \
-               --exclude="*.md" \
-               --exclude="package.json" || \
-             grep -r -E "-----BEGIN.*KEY-----" . \
-               --exclude-dir=node_modules \
-               --exclude-dir=.git \
-               --exclude-dir=.github \
-               --exclude-dir=tests; then
-            echo "❌ Potential hardcoded secrets found"
+
+          # Count secret patterns without revealing their content
+          SECRET_COUNT=$(grep -r -E "(password|secret|key|token).*[=:].*['\"][^'\"]{8,}" . \
+                           --exclude-dir=node_modules \
+                           --exclude-dir=.git \
+                           --exclude-dir=.github \
+                           --exclude-dir=tests \
+                           --exclude="*.md" \
+                           --exclude="package.json" 2>/dev/null | wc -l || echo "0")
+
+          KEY_COUNT=$(grep -r -E "-----BEGIN.*KEY-----" . \
+                        --exclude-dir=node_modules \
+                        --exclude-dir=.git \
+                        --exclude-dir=.github \
+                        --exclude-dir=tests 2>/dev/null | wc -l || echo "0")
+
+          TOTAL_SECRETS=$((SECRET_COUNT + KEY_COUNT))
+
+          if [ "$TOTAL_SECRETS" -gt 0 ]; then
+            echo "❌ Found $TOTAL_SECRETS potential secret pattern(s) in codebase"
+            echo "   Secret patterns: $SECRET_COUNT"
+            echo "   Key patterns: $KEY_COUNT"
+            echo "   Review your code for hardcoded credentials and move them to environment variables"
             exit 1
           else
-            echo "✅ No hardcoded secrets detected"
+            echo "✅ No hardcoded secret patterns detected"
           fi
 
       - name: Security pattern detection

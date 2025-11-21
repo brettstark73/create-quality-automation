@@ -213,7 +213,16 @@ function testWriteBasicConfigCreatesDir() {
     'Test 7: writeBasicDependabotConfig() creates directory if needed'
   )
 
-  const config = { version: 2, updates: [] }
+  const config = {
+    version: 2,
+    updates: [
+      {
+        'package-ecosystem': 'npm',
+        directory: '/',
+        schedule: { interval: 'weekly' },
+      },
+    ],
+  }
   const outputPath = path.join(TEST_DIR, 'nested', 'dir', 'config.yml')
 
   writeBasicDependabotConfig(config, outputPath)
@@ -239,6 +248,13 @@ function testYamlConversionObject() {
   const config = {
     version: 2,
     name: 'test',
+    updates: [
+      {
+        'package-ecosystem': 'npm',
+        directory: '/',
+        schedule: { interval: 'weekly' },
+      },
+    ],
   }
 
   const outputPath = path.join(TEST_DIR, 'test.yml')
@@ -266,7 +282,15 @@ function testYamlConversionArray() {
   console.log('Test 9: YAML conversion for array')
 
   const config = {
+    version: 2,
     items: ['item1', 'item2'],
+    updates: [
+      {
+        'package-ecosystem': 'npm',
+        directory: '/',
+        schedule: { interval: 'weekly' },
+      },
+    ],
   }
 
   const outputPath = path.join(TEST_DIR, 'array.yml')
@@ -294,11 +318,19 @@ function testYamlConversionNested() {
   console.log('Test 10: YAML conversion for nested objects')
 
   const config = {
+    version: 2,
     outer: {
       inner: {
         value: 'test',
       },
     },
+    updates: [
+      {
+        'package-ecosystem': 'npm',
+        directory: '/',
+        schedule: { interval: 'weekly' },
+      },
+    ],
   }
 
   const outputPath = path.join(TEST_DIR, 'nested.yml')
