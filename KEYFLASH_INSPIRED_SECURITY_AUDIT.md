@@ -247,6 +247,6 @@ This proactive security approach ensures create-quality-automation remains a tru
 
 ---
 
-**Version**: 4.0.0
+**Version**: 4.1.0
 **Audit Status**: Current - All findings resolved and integrated into development process
 **Next Review**: Due with next major version or significant security changes

@@ -29,6 +29,7 @@
     "test:all": "npm run test:patterns && npm test && npm run test:commands && npm run test:e2e",
     "coverage": "npm run test:coverage && echo '\nCoverage report generated in coverage/index.html'",
     "docs:check": "bash scripts/check-docs.sh",
+    "git:sync": "bash .github/git-sync.sh",
     "prerelease": "npm run docs:check && npm run test:patterns && npm test && npm run test:commands && npm run test:e2e",
     "setup": "node setup.js",
     "release:patch": "npm version patch && git push --follow-tags",
