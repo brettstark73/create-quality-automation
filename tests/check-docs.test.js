@@ -42,6 +42,31 @@ const createTempProject = config => {
     fs.writeFileSync(path.join(tempDir, 'setup.js'), config.setupJs)
   }
 
+  // Create security audit document (required for check-docs.sh)
+  const packageVersion = config.packageJson?.version || '1.0.0'
+  fs.writeFileSync(
+    path.join(tempDir, 'KEYFLASH_INSPIRED_SECURITY_AUDIT.md'),
+    `# Security Audit
+
+## Version
+**Version**: ${packageVersion}
+
+Test security audit document for check-docs validation.
+`
+  )
+
+  // Create .github directory and release checklist (required for security audit check)
+  const githubDir = path.join(tempDir, '.github')
+  fs.mkdirSync(githubDir, { recursive: true })
+  fs.writeFileSync(
+    path.join(githubDir, 'RELEASE_CHECKLIST.md'),
+    `# Release Checklist
+
+## Security Review
+- [ ] Review KEYFLASH_INSPIRED_SECURITY_AUDIT.md
+`
+  )
+
   return tempDir
 }
 
