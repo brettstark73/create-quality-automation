@@ -9,7 +9,11 @@ const {
   mergeLintStaged,
 } = require('./lib/package-utils')
 const { showProgress } = require('./lib/ui-helpers')
-const { NODE_VERSION, SCAN_LIMITS } = require('./config/constants')
+const {
+  NODE_VERSION,
+  SCAN_LIMITS,
+  EXCLUDE_DIRECTORIES,
+} = require('./config/constants')
 
 /**
  * Check Node version and lazily load @npmcli/package-json
@@ -87,20 +91,7 @@ const {
 const STYLELINT_EXTENSION_SET = new Set(STYLELINT_EXTENSIONS)
 const STYLELINT_DEFAULT_TARGET = `**/*.{${STYLELINT_EXTENSIONS.join(',')}}`
 const STYLELINT_EXTENSION_GLOB = `*.{${STYLELINT_EXTENSIONS.join(',')}}`
-const STYLELINT_SCAN_EXCLUDES = new Set([
-  '.git',
-  '.github',
-  '.husky',
-  '.next',
-  '.nuxt',
-  '.output',
-  '.turbo',
-  '.vercel',
-  '.cache',
-  '.pnpm-store',
-  'coverage',
-  'node_modules',
-])
+const STYLELINT_SCAN_EXCLUDES = new Set(EXCLUDE_DIRECTORIES.STYLELINT)
 const MAX_STYLELINT_SCAN_DEPTH = SCAN_LIMITS.STYLELINT_MAX_DEPTH
 
 /**
@@ -303,10 +294,11 @@ function parseArguments(rawArgs) {
   const isDryRun = sanitizedArgs.includes('--dry-run')
 
   // Custom template directory - use raw args to preserve valid path characters (&, <, >, etc.)
+  // Normalize path to prevent traversal attacks and make absolute
   const templateFlagIndex = sanitizedArgs.findIndex(arg => arg === '--template')
   const customTemplatePath =
     templateFlagIndex !== -1 && rawArgs[templateFlagIndex + 1]
-      ? rawArgs[templateFlagIndex + 1]
+      ? path.resolve(rawArgs[templateFlagIndex + 1])
       : null
 
   // Granular tool disable options
@@ -675,9 +667,9 @@ HELP:
     // During free beta (v3.0.0), ALL projects use premium generator
     // After beta: Pro/Enterprise use premium, Free tier uses basic (npm-only)
     const shouldUsePremium =
-      license.tier === 'pro' ||
-      license.tier === 'enterprise' ||
-      license.tier === 'free' // Free beta: all projects get premium features
+      license.tier === 'PRO' ||
+      license.tier === 'ENTERPRISE' ||
+      license.tier === 'FREE' // Free beta: all projects get premium features
 
     if (shouldUsePremium) {
       console.log(

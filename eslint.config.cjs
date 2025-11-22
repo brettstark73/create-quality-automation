@@ -27,6 +27,15 @@ const baseRules = {
   'no-implied-eval': 'error',
   'no-new-func': 'error',
   'no-script-url': 'error',
+  // Allow intentionally unused variables prefixed with underscore
+  'no-unused-vars': [
+    'error',
+    {
+      argsIgnorePattern: '^_',
+      varsIgnorePattern: '^_',
+      caughtErrorsIgnorePattern: '^_',
+    },
+  ],
 }
 
 // Security rules only if plugin is loaded
