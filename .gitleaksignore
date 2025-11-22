@@ -1,0 +1,8 @@
+# .gitleaksignore
+# Ignore false positive secret detections in test files
+
+# Test license keys in licensing.test.js are mock values for testing
+621c321d17b62afd62cb280efb79083722502f7d:tests/licensing.test.js:generic-api-key:597
+
+# Test cache keys in cache-manager.test.js are mock values for testing
+754a9f3c027f2fd4aac44281d579a6fcf6a8d897:tests/cache-manager.test.js:generic-api-key:21
