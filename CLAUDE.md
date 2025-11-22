@@ -285,6 +285,69 @@ When gaps are found:
 
 This ensures the development process continuously improves and prevents repeated gaps.
 
+## 🔄 **Git Workflow Standards (Post-Divergent Branch Prevention)**
+
+**Context**: After resolving divergent branch issues that caused merge conflicts during v4.1.0 development.
+
+### **Daily Sync Protocol**
+
+**CRITICAL**: Run before starting any development work to prevent divergent branches:
+
+```bash
+# Automated sync command:
+npm run git:sync
+
+# Or manually:
+git fetch origin                          # Get latest remote state
+git status                               # Check local state
+git log --oneline origin/master..HEAD   # Check unpushed work
+git push                                 # Push completed work
+```
+
+### **Git Configuration Standards**
+
+Repository is configured with safe defaults:
+
+```bash
+# Auto-push tags with commits
+git config push.followTags true
+
+# Track remote branches automatically
+git config branch.autosetupmerge always
+
+# Rebase by default on pull (avoid merge commits)
+git config pull.rebase true
+```
+
+### **Branch Protection Workflow**
+
+For major features, use feature branches:
+
+```bash
+git checkout -b feature/my-work        # Create feature branch
+git push -u origin feature/my-work     # Push branch immediately
+# Work → commit → push frequently
+# Create PR when complete
+```
+
+### **Repository Health Checks**
+
+Weekly maintenance:
+
+```bash
+git remote update                      # Update all remote refs
+git branch -vv                        # Show tracking branch status
+git log --graph --oneline --all -20   # Visual history
+npm run prerelease                     # Comprehensive validation
+```
+
+### **Prevention Rules**
+
+1. **Never work directly on main/master** - Always use feature branches for non-trivial changes
+2. **Always sync before starting** - `npm run git:sync` before any development
+3. **Push frequently** - Don't let local commits accumulate
+4. **Validate before release** - `npm run prerelease` catches issues early
+
 ---
 
 _Inherits all global preferences from Brett Stark's universal Claude Code configuration_
