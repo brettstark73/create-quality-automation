@@ -1182,20 +1182,10 @@ HELP:
             eslint: { enabled: 'auto', required: false },
             stylelint: { enabled: 'auto', required: false },
             tests: { enabled: 'auto', required: false },
-            coverage: { enabled: false, required: false, threshold: 80 },
+            coverage: { enabled: false, required: false },
             'security-audit': { enabled: 'auto', required: false },
             documentation: { enabled: false, required: false },
             lighthouse: { enabled: false, required: false },
-          },
-          override: {
-            comment:
-              'Set maturity to a specific level to override auto-detection',
-            options: [
-              'minimal',
-              'bootstrap',
-              'development',
-              'production-ready',
-            ],
           },
         }
 
