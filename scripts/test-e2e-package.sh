@@ -52,7 +52,6 @@ REQUIRED_FILES=(
   "setup.js"
   ".prettierrc"
   ".prettierignore"
-  ".eslintignore"
   "eslint.config.cjs"
   "eslint.config.ts.cjs"
   ".stylelintrc.json"
@@ -109,7 +108,10 @@ pass "Package installed"
 # 3. Run setup
 echo ""
 echo "🚀 Step 3: Running setup..."
-node ./node_modules/create-quality-automation/setup.js 2>&1 | grep -q "Setting up Quality Automation" && pass "Setup executed" || fail "Setup failed"
+SETUP_OUTPUT=$(node ./node_modules/create-quality-automation/setup.js 2>&1)
+echo "$SETUP_OUTPUT" | grep -q "Setting up Quality Automation" && pass "Setup executed" || fail "Setup failed"
+echo "  Setup output:"
+echo "$SETUP_OUTPUT" | head -20
 
 # 4. Verify generated files
 echo ""
@@ -196,12 +198,20 @@ echo ""
 echo "🚀 Step 8: Testing generated commands actually work..."
 echo "  This step would have caught the ESLint --ext bug!"
 
+# Install devDependencies first
+echo "  Installing devDependencies..."
+npm install --silent > /dev/null 2>&1 || {
+  fail "  npm install failed"
+}
+
 # Create test files for commands to process
 echo "const x = 1;" > test.js
 echo "body { color: red; }" > test.css
 
-# Test format:check
+# Test format:check - should work (even if files need formatting)
 echo "  Testing: npm run format:check"
+# Format the files first so format:check passes
+npm run format >/dev/null 2>&1
 if npm run format:check 2>&1 >/dev/null; then
   pass "  format:check works"
 else
@@ -210,10 +220,13 @@ fi
 
 # Test lint (CRITICAL: this would have caught --ext bug!)
 echo "  Testing: npm run lint"
-if npm run lint 2>&1 >/dev/null; then
-  pass "  lint works"
-else
+LINT_OUTPUT=$(npm run lint 2>&1)
+if echo "$LINT_OUTPUT" | grep -q "error"; then
   fail "  lint failed (check for deprecated flags like --ext!)"
+  echo "  ESLint error output:"
+  echo "$LINT_OUTPUT" | grep -A 5 "error" | head -10
+else
+  pass "  lint works"
 fi
 
 # Test direct ESLint
