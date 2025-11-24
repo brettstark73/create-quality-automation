@@ -5,6 +5,84 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.2.0] - 2025-11-24
+
+### Added
+
+#### 💰 SaaS Monetization System
+
+- **Complete Revenue System Template** (`create-saas-monetization.js`)
+  - Full SaaS monetization template generator for any project
+  - Stripe payment integration with webhook handlers
+  - License key generation and validation
+  - Customer billing dashboard
+  - Email campaign templates
+  - Legal compliance documents (terms, privacy, copyright)
+  - Battle-tested revenue model ($1,750-2,500/month potential)
+
+- **SHA256 Integrity Verification** (`lib/licensing.js`, `lib/license-validator.js`)
+  - Mandatory cryptographic checksums for license databases
+  - Prevents license database tampering
+  - License validator rejects databases without valid checksums
+  - Webhook handlers automatically calculate and embed checksums
+  - Security bulletin CQA-2024-001 addressing validation bypass vulnerabilities
+
+- **License Management Tools** (`admin-license.js`)
+  - Command-line tool for license database management
+  - Add legitimate license keys after purchase
+  - SHA256 checksum generation and verification
+  - Database integrity validation
+
+- **Security Tests** (`tests/security-licensing.test.js`, `tests/real-purchase-flow.test.js`)
+  - Comprehensive security-focused licensing tests
+  - License validation bypass prevention tests
+  - Stripe initialization security tests
+  - License signature validation tests
+  - Local license file tampering detection
+  - End-to-end purchase flow validation
+
+- **Documentation** (`SAAS_TEMPLATE_GUIDE.md`, `REVENUE_SYSTEM_SUMMARY.md`)
+  - Complete SaaS template integration guide
+  - Revenue system architecture documentation
+  - Security advisory and migration guides
+  - Implementation examples and patterns
+
+### Changed
+
+- **ESLint 9 Compatibility** (`eslint.config.cjs`)
+  - Migrated deprecated `.eslintignore` to flat config `ignores` array
+  - Eliminated ESLintIgnoreWarning during lint runs
+  - Comprehensive ignore patterns with improved ESLint 9 support
+  - Removed deprecated `.eslintignore` file
+
+### Security
+
+- **Critical Security Fixes**
+  - Fixed license validation bypass vulnerability (CVE-pending)
+  - Added mandatory SHA256 integrity verification
+  - Cryptographic signature validation for license files
+  - Tamper detection for local license files
+  - Network-based license validation with offline fallback
+
+## [4.1.1] - 2025-11-23
+
+### Fixed
+
+- **Gitleaks Binary Resolution** (`lib/gitleaks-manager.js`)
+  - Improved reliability of gitleaks binary resolution tests
+  - Better handling of network failures during binary downloads
+  - Added `.gitleaksignore` to resolve false positives in test files
+
+- **YAML Generation** (`lib/dependency-monitoring-premium.js`, `lib/dependency-monitoring-basic.js`)
+  - Fixed inconsistent YAML generation by using `js-yaml` consistently
+  - Removed dependency on `yaml` package
+  - More reliable YAML output formatting
+
+- **Test Isolation** (`tests/licensing.test.js`)
+  - Fixed EPERM errors in parallel test runs
+  - Proper temporary directory isolation for licensing tests
+  - Improved test cleanup and teardown
+
 ## [4.1.0] - 2025-11-21
 
 ### Added
