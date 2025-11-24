@@ -3,6 +3,12 @@ const assert = require('node:assert')
 const fs = require('fs')
 const os = require('os')
 
+const path = require('path')
+
+// Use temp directory to avoid permission issues and keep tests isolated
+const tempErrorDir = path.join(os.tmpdir(), 'cqa-error-reporter-test')
+process.env.CQA_ERROR_DIR = tempErrorDir
+
 const {
   ErrorReporter,
   ErrorCategory,

@@ -291,6 +291,7 @@ function parseArguments(rawArgs) {
   )
   const isCheckMaturityMode = sanitizedArgs.includes('--check-maturity')
   const isValidateConfigMode = sanitizedArgs.includes('--validate-config')
+  const isActivateLicenseMode = sanitizedArgs.includes('--activate-license')
   const isDryRun = sanitizedArgs.includes('--dry-run')
 
   // Custom template directory - use raw args to preserve valid path characters (&, <, >, etc.)
@@ -322,6 +323,7 @@ function parseArguments(rawArgs) {
     isErrorReportingStatusMode,
     isCheckMaturityMode,
     isValidateConfigMode,
+    isActivateLicenseMode,
     isDryRun,
     customTemplatePath,
     disableNpmAudit,
@@ -355,6 +357,7 @@ function parseArguments(rawArgs) {
     isErrorReportingStatusMode,
     isCheckMaturityMode,
     isValidateConfigMode,
+    isActivateLicenseMode,
     isDryRun,
     customTemplatePath,
     disableNpmAudit,
@@ -472,6 +475,7 @@ VALIDATION OPTIONS:
 
 LICENSE, TELEMETRY & ERROR REPORTING:
   --license-status          Show current license tier and available features
+  --activate-license        Activate Pro/Enterprise license key from Stripe purchase
   --telemetry-status        Show telemetry status and opt-in instructions
   --error-reporting-status  Show error reporting status and privacy information
 
@@ -492,6 +496,9 @@ EXAMPLES:
 
   npx create-quality-automation@latest --license-status
     → Show current license tier and upgrade options
+
+  npx create-quality-automation@latest --activate-license
+    → Activate Pro/Enterprise license after Stripe purchase
 
   npx create-quality-automation@latest --telemetry-status
     → Show telemetry status and privacy information
@@ -668,12 +675,25 @@ HELP:
     const dependabotPath = path.join(projectPath, '.github', 'dependabot.yml')
 
     // Use premium or basic config based on license tier
-    // During free beta (v3.0.0), ALL projects use premium generator
-    // After beta: Pro/Enterprise use premium, Free tier uses basic (npm-only)
+    // Free beta ended with v4.1.1 - Premium features now require Pro/Enterprise tier
+    // Pro/Enterprise: Framework-aware dependency monitoring with grouping
+    // Free: Basic npm-only dependency monitoring
     const shouldUsePremium =
-      license.tier === 'PRO' ||
-      license.tier === 'ENTERPRISE' ||
-      license.tier === 'FREE' // Free beta: all projects get premium features
+      license.tier === 'PRO' || license.tier === 'ENTERPRISE'
+
+    // Free tier only supports npm projects. Fail fast with a clear message.
+    if (!shouldUsePremium && !hasNpm && (hasPython || hasRust || hasRuby)) {
+      console.error(
+        '❌ Dependency monitoring for this project requires a Pro or Enterprise license.'
+      )
+      console.error(
+        '   Free tier supports npm projects only. Detected non-npm ecosystems.'
+      )
+      console.error(
+        '   Options: add npm/package.json, or upgrade and re-run: npx create-quality-automation@latest --deps after activation.'
+      )
+      process.exit(1)
+    }
 
     if (shouldUsePremium) {
       console.log(
@@ -771,6 +791,36 @@ HELP:
   // Handle license status command
   if (isLicenseStatusMode) {
     showLicenseStatus()
+    process.exit(0)
+  }
+
+  // Handle license activation command
+  if (isActivateLicenseMode) {
+    const { promptLicenseActivation } = require('./lib/licensing')
+
+    console.log('🔑 Create Quality Automation - License Activation')
+    console.log('════════════════════════════════════════════════')
+
+    try {
+      const result = await promptLicenseActivation()
+
+      if (result.success) {
+        console.log('\n🎉 Success! Premium features are now available.')
+        console.log('\nNext steps:')
+        console.log('• Run: npx create-quality-automation@latest --deps')
+        console.log('• Enable framework-aware dependency grouping')
+        console.log('• Enjoy 60%+ reduction in dependency PRs!')
+      } else {
+        console.log('\n❌ License activation failed.')
+        console.log('• Check your license key format (CQA-XXXX-XXXX-XXXX-XXXX)')
+        console.log('• Verify your email address')
+        console.log('• Contact support: hello@aibuilderlab.com')
+      }
+    } catch (error) {
+      console.error('\n❌ License activation error:', error.message)
+      console.log('Contact support for assistance: hello@aibuilderlab.com')
+    }
+
     process.exit(0)
   }
 

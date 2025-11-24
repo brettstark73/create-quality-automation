@@ -3,9 +3,11 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>
-      Create Quality Automation - Professional Code Quality Tools in Minutes
-    </title>
+    <title>Create Quality Automation Pro - Reduce Dependency PRs by 60%</title>
+    <meta
+      name="description"
+      content="Framework-aware dependency grouping for React, Vue, and Angular projects. Reduce Dependabot PRs by 60% with intelligent package management."
+    />
     <style>
       * {
         margin: 0;
@@ -15,20 +17,11 @@
 
       body {
         font-family:
-          -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
-          'Helvetica Neue', Arial, sans-serif;
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         line-height: 1.6;
         color: #333;
-        background: #fff;
       }
 
-      .container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 0 20px;
-      }
-
-      /* Hero Section */
       .hero {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
@@ -37,257 +30,278 @@
       }
 
       .hero h1 {
-        font-size: 3rem;
-        font-weight: 700;
+        font-size: 3.5rem;
+        font-weight: 900;
         margin-bottom: 20px;
         line-height: 1.2;
       }
 
-      .hero p {
+      .hero .subtitle {
         font-size: 1.5rem;
-        margin-bottom: 30px;
-        opacity: 0.95;
-      }
-
-      .hero .tagline {
-        font-size: 1.1rem;
-        margin-bottom: 40px;
+        margin-bottom: 15px;
         opacity: 0.9;
       }
 
-      .cta-buttons {
-        display: flex;
-        gap: 20px;
-        justify-content: center;
-        flex-wrap: wrap;
-        margin-top: 30px;
+      .hero .problem {
+        font-size: 1.2rem;
+        margin-bottom: 40px;
+        opacity: 0.8;
       }
 
-      .btn {
-        display: inline-block;
-        padding: 15px 40px;
-        font-size: 1.1rem;
-        font-weight: 600;
-        text-decoration: none;
-        border-radius: 8px;
-        transition: all 0.3s ease;
-        cursor: pointer;
-      }
-
-      .btn-primary {
-        background: white;
-        color: #667eea;
-      }
-
-      .btn-primary:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-      }
-
-      .btn-secondary {
-        background: transparent;
+      .cta-button {
+        background: #ff6b6b;
         color: white;
+        padding: 20px 40px;
+        font-size: 1.3rem;
+        font-weight: bold;
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+        margin: 10px;
+      }
+
+      .cta-button:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(255, 107, 107, 0.3);
+      }
+
+      .cta-button.secondary {
+        background: rgba(255, 255, 255, 0.2);
         border: 2px solid white;
       }
 
-      .btn-secondary:hover {
-        background: white;
-        color: #667eea;
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
       }
 
-      /* Installation Section */
-      .installation {
-        background: #f8f9fa;
-        padding: 40px 20px;
-        text-align: center;
-      }
-
-      .code-block {
-        background: #2d3748;
-        color: #48bb78;
-        padding: 20px 30px;
-        border-radius: 8px;
-        font-family: 'Monaco', 'Menlo', monospace;
-        font-size: 1.2rem;
-        margin: 20px auto;
-        max-width: 600px;
-        overflow-x: auto;
-      }
-
-      /* Features Section */
-      .features {
+      .section {
         padding: 80px 20px;
       }
 
-      .section-title {
-        text-align: center;
+      .section h2 {
         font-size: 2.5rem;
+        text-align: center;
         margin-bottom: 50px;
-        color: #2d3748;
+        color: #333;
+      }
+
+      .problem-solution {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 50px;
+        align-items: center;
+        margin-bottom: 60px;
+      }
+
+      .before-after {
+        background: #f8f9fa;
+        padding: 30px;
+        border-radius: 12px;
+        border-left: 5px solid #ff6b6b;
+      }
+
+      .before-after.after {
+        border-left-color: #28a745;
+      }
+
+      .before-after h3 {
+        font-size: 1.5rem;
+        margin-bottom: 15px;
+        color: #333;
+      }
+
+      .before-after .stats {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #ff6b6b;
+        margin: 15px 0;
+      }
+
+      .before-after.after .stats {
+        color: #28a745;
       }
 
       .features-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
         gap: 30px;
-        margin-top: 40px;
+        margin: 50px 0;
       }
 
       .feature-card {
         background: white;
-        padding: 30px;
+        border: 2px solid #e9ecef;
         border-radius: 12px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        transition: transform 0.3s ease;
+        padding: 30px;
+        text-align: center;
+        transition: all 0.3s ease;
       }
 
       .feature-card:hover {
+        border-color: #667eea;
         transform: translateY(-5px);
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.1);
       }
 
-      .feature-icon {
-        font-size: 2.5rem;
-        margin-bottom: 15px;
+      .feature-card .icon {
+        font-size: 3rem;
+        margin-bottom: 20px;
       }
 
       .feature-card h3 {
-        font-size: 1.5rem;
+        font-size: 1.3rem;
         margin-bottom: 15px;
-        color: #2d3748;
+        color: #333;
       }
 
-      .feature-card p {
-        color: #666;
-        line-height: 1.6;
-      }
-
-      .feature-badge {
-        display: inline-block;
-        background: #48bb78;
-        color: white;
-        padding: 4px 12px;
-        border-radius: 12px;
-        font-size: 0.8rem;
-        font-weight: 600;
-        margin-left: 10px;
-      }
-
-      /* Pricing Section */
-      .pricing {
+      .pricing-section {
         background: #f8f9fa;
-        padding: 80px 20px;
+        text-align: center;
       }
 
-      .pricing-grid {
+      .pricing-cards {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        grid-template-columns: 1fr 1fr;
         gap: 30px;
-        max-width: 900px;
+        max-width: 800px;
         margin: 0 auto;
       }
 
       .pricing-card {
         background: white;
-        padding: 40px;
         border-radius: 12px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        text-align: center;
+        padding: 40px;
+        position: relative;
+        border: 2px solid #e9ecef;
+        transition: all 0.3s ease;
       }
 
-      .pricing-card.featured {
-        border: 3px solid #667eea;
+      .pricing-card.popular {
+        border-color: #667eea;
         transform: scale(1.05);
       }
 
+      .pricing-card.popular::before {
+        content: 'MOST POPULAR';
+        position: absolute;
+        top: -15px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #667eea;
+        color: white;
+        padding: 8px 20px;
+        border-radius: 20px;
+        font-weight: bold;
+        font-size: 0.9rem;
+      }
+
       .pricing-card h3 {
-        font-size: 2rem;
+        font-size: 1.8rem;
         margin-bottom: 10px;
-        color: #2d3748;
       }
 
       .price {
         font-size: 3rem;
-        font-weight: 700;
+        font-weight: bold;
         color: #667eea;
-        margin: 20px 0;
+        margin-bottom: 10px;
       }
 
-      .price-period {
+      .price .period {
         font-size: 1rem;
         color: #666;
-        font-weight: normal;
       }
 
-      .features-list {
-        list-style: none;
-        margin: 30px 0;
-        text-align: left;
-      }
-
-      .features-list li {
-        padding: 12px 0;
-        border-bottom: 1px solid #e2e8f0;
-        color: #4a5568;
-      }
-
-      .features-list li:before {
-        content: '✓ ';
-        color: #48bb78;
-        font-weight: bold;
-        margin-right: 10px;
-      }
-
-      .features-list li.unavailable {
-        color: #cbd5e0;
-      }
-
-      .features-list li.unavailable:before {
-        content: '✗ ';
-        color: #cbd5e0;
-      }
-
-      /* GitHub Section */
-      .github-cta {
-        background: #2d3748;
+      .founder-badge {
+        background: linear-gradient(135deg, #f093fb, #f5576c);
         color: white;
-        padding: 60px 20px;
+        padding: 10px 15px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: bold;
+        margin: 15px 0;
+        display: inline-block;
+      }
+
+      .pricing-features {
+        text-align: left;
+        margin: 30px 0;
+      }
+
+      .pricing-features li {
+        list-style: none;
+        padding: 8px 0;
+        position: relative;
+        padding-left: 25px;
+      }
+
+      .pricing-features li::before {
+        content: '✅';
+        position: absolute;
+        left: 0;
+      }
+
+      .final-cta {
+        background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+        color: white;
         text-align: center;
       }
 
-      .github-cta h2 {
+      .guarantee {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        padding: 20px;
+        margin: 30px auto;
+        max-width: 500px;
+      }
+
+      .stats-bar {
+        background: #333;
+        color: white;
+        padding: 20px;
+        text-align: center;
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 30px;
+        max-width: 800px;
+        margin: 0 auto;
+      }
+
+      .stat {
+        text-align: center;
+      }
+
+      .stat .number {
         font-size: 2.5rem;
-        margin-bottom: 20px;
+        font-weight: bold;
+        color: #667eea;
       }
 
-      .github-cta p {
-        font-size: 1.2rem;
-        margin-bottom: 30px;
-        opacity: 0.9;
+      .stat .label {
+        font-size: 0.9rem;
+        opacity: 0.8;
       }
 
-      /* Responsive */
       @media (max-width: 768px) {
         .hero h1 {
-          font-size: 2rem;
+          font-size: 2.5rem;
         }
-
-        .hero p {
-          font-size: 1.2rem;
+        .problem-solution {
+          grid-template-columns: 1fr;
         }
-
-        .cta-buttons {
-          flex-direction: column;
-          align-items: center;
+        .pricing-cards {
+          grid-template-columns: 1fr;
         }
-
-        .btn {
-          width: 100%;
-          max-width: 300px;
-        }
-
-        .pricing-card.featured {
-          transform: scale(1);
+        .pricing-card.popular {
+          transform: none;
         }
       }
     </style>
@@ -296,185 +310,235 @@
     <!-- Hero Section -->
     <section class="hero">
       <div class="container">
-        <h1>Create Quality Automation</h1>
-        <p>Professional code quality tools in minutes, not hours</p>
-        <p class="tagline">
-          Bootstrap ESLint, Prettier, Stylelint, Husky, and GitHub Actions in
-          any project with a single command
+        <h1>Stop Managing 15+ Dependency PRs</h1>
+        <p class="subtitle">
+          Get 3-5 grouped PRs instead with framework-aware dependency monitoring
         </p>
-        <div class="cta-buttons">
-          <a
-            href="https://github.com/brettstark73/quality-automation-template"
-            class="btn btn-primary"
-            target="_blank"
-            >View on GitHub</a
-          >
-          <a href="#install" class="btn btn-secondary">Get Started</a>
+        <p class="problem">
+          React projects get flooded with individual Dependabot PRs. Every React
+          Router update, every Testing Library patch, every build tool bump =
+          separate PR.
+        </p>
+
+        <a href="https://www.aibuilderlab.com/cqa-upgrade" class="cta-button"
+          >Start Pro - $19.50/month</a
+        >
+        <a href="#demo" class="cta-button secondary">See 60% Reduction Demo</a>
+      </div>
+    </section>
+
+    <!-- Stats Bar -->
+    <section class="stats-bar">
+      <div class="container">
+        <div class="stats-grid">
+          <div class="stat">
+            <div class="number">60%+</div>
+            <div class="label">Fewer dependency PRs</div>
+          </div>
+          <div class="stat">
+            <div class="number">100+</div>
+            <div class="label">React frameworks supported</div>
+          </div>
+          <div class="stat">
+            <div class="number">5 min</div>
+            <div class="label">Setup time</div>
+          </div>
+          <div class="stat">
+            <div class="number">50%</div>
+            <div class="label">Founder discount (limited time)</div>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- Installation Section -->
-    <section class="installation" id="install">
+    <!-- Problem/Solution -->
+    <section class="section" id="demo">
       <div class="container">
-        <h2>Get Started in Seconds</h2>
-        <div class="code-block">npx create-quality-automation@latest</div>
-        <p style="color: #666; margin-top: 20px">
-          Requires Node.js ≥20 • Works with any JavaScript/TypeScript project
-        </p>
+        <h2>The Dependency PR Problem</h2>
+
+        <div class="problem-solution">
+          <div class="before-after">
+            <h3>❌ Without Pro (Basic Dependabot)</h3>
+            <div class="stats">15+ Individual PRs</div>
+            <p>Every React dependency update creates a separate PR:</p>
+            <ul>
+              <li>React 18.2.0 → 18.3.0</li>
+              <li>React DOM 18.2.0 → 18.3.0</li>
+              <li>React Router 6.8.0 → 6.9.0</li>
+              <li>React Router DOM 6.8.0 → 6.9.0</li>
+              <li>Testing Library React 13.4.0 → 14.0.0</li>
+              <li>Jest 29.5.0 → 29.6.0</li>
+              <li>And 9 more individual PRs...</li>
+            </ul>
+          </div>
+
+          <div class="before-after after">
+            <h3>✅ With Pro (Framework Grouping)</h3>
+            <div class="stats">3-5 Grouped PRs</div>
+            <p>Related dependencies grouped intelligently:</p>
+            <ul>
+              <li><strong>React Core:</strong> React + ReactDOM</li>
+              <li><strong>React Router:</strong> All routing packages</li>
+              <li><strong>React Testing:</strong> Testing Library + Jest</li>
+              <li><strong>React Build:</strong> Vite + Webpack tools</li>
+              <li><strong>React Storybook:</strong> All Storybook addons</li>
+            </ul>
+          </div>
+        </div>
       </div>
     </section>
 
-    <!-- Features Section -->
-    <section class="features">
+    <!-- Features -->
+    <section class="section">
       <div class="container">
-        <h2 class="section-title">Everything You Need for Code Quality</h2>
+        <h2>Why Developers Choose Pro</h2>
 
         <div class="features-grid">
           <div class="feature-card">
-            <div class="feature-icon">🔍</div>
-            <h3>
-              ESLint 9 Flat Config <span class="feature-badge">FREE</span>
-            </h3>
+            <div class="icon">⚡</div>
+            <h3>Framework-Aware Grouping</h3>
             <p>
-              Modern ESLint configuration with automatic TypeScript detection.
-              Supports both JavaScript and TypeScript projects out of the box.
+              Automatically detects React, Vue, Angular, and Svelte projects.
+              Groups related packages intelligently using ecosystem knowledge.
             </p>
           </div>
 
           <div class="feature-card">
-            <div class="feature-icon">🎨</div>
-            <h3>Stylelint <span class="feature-badge">FREE</span></h3>
+            <div class="icon">🎯</div>
+            <h3>Smart Package Detection</h3>
             <p>
-              Comprehensive CSS linting for CSS, SCSS, Sass, Less, and PostCSS.
-              Maintains consistent styling across your project.
+              Recognizes framework patterns like @tanstack/*, @radix-ui/*, and
+              scoped packages. No manual configuration required.
             </p>
           </div>
 
           <div class="feature-card">
-            <div class="feature-icon">✨</div>
-            <h3>Prettier <span class="feature-badge">FREE</span></h3>
+            <div class="icon">🚀</div>
+            <h3>Multi-Language Support</h3>
             <p>
-              Opinionated code formatting that works automatically. Never debate
-              code style again.
+              Python (Django, Flask), Rust (Tokio, Serde), Ruby (Rails) - all
+              with framework-aware grouping. Single Dependabot config.
             </p>
           </div>
 
           <div class="feature-card">
-            <div class="feature-icon">🐕</div>
-            <h3>
-              Husky 9 Pre-commit Hooks <span class="feature-badge">FREE</span>
-            </h3>
+            <div class="icon">🛡️</div>
+            <h3>Production-Ready Security</h3>
             <p>
-              Automated quality checks before every commit. Catch issues before
-              they reach your repository.
+              Comprehensive test coverage, security scanning, and battle-tested
+              in 100+ projects. Enterprise-grade reliability.
             </p>
           </div>
 
           <div class="feature-card">
-            <div class="feature-icon">📦</div>
-            <h3>lint-staged <span class="feature-badge">FREE</span></h3>
+            <div class="icon">⏰</div>
+            <h3>Time-Saving Automation</h3>
             <p>
-              Run linters only on staged files for lightning-fast commits. No
-              more waiting for full project linting.
+              Reduce code review overhead by 60%. Spend more time building
+              features, less time managing dependencies.
             </p>
           </div>
 
           <div class="feature-card">
-            <div class="feature-icon">🚀</div>
-            <h3>
-              GitHub Actions Workflows <span class="feature-badge">FREE</span>
-            </h3>
+            <div class="icon">📞</div>
+            <h3>Priority Support</h3>
             <p>
-              CI/CD workflows with automated quality checks. Ensure code quality
-              on every pull request.
+              Email support with 48-hour response time. Get help from the
+              creator when you need it most.
             </p>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Pricing Section -->
-    <section class="pricing">
+    <!-- Pricing -->
+    <section class="section pricing-section" id="pricing">
       <div class="container">
-        <h2 class="section-title">Simple, Transparent Pricing</h2>
-
-        <div class="pricing-grid">
-          <!-- Free Tier -->
-          <div class="pricing-card featured">
-            <h3>Open Source</h3>
-            <div class="price">
-              $0
-              <span class="price-period">forever</span>
-            </div>
-            <p style="color: #666; margin-bottom: 20px">
-              Perfect for individual developers and open source projects
-            </p>
-            <ul class="features-list">
-              <li>ESLint 9 Flat Config</li>
-              <li>Stylelint for CSS/SCSS/Sass/Less</li>
-              <li>Prettier formatting</li>
-              <li>Husky 9 pre-commit hooks</li>
-              <li>lint-staged integration</li>
-              <li>GitHub Actions workflows</li>
-              <li>TypeScript auto-detection</li>
-              <li>Merge-safe for existing projects</li>
-              <li>Community support via GitHub</li>
-            </ul>
-            <a href="#install" class="btn btn-primary">Get Started Free</a>
-          </div>
-
-          <!-- Premium Tier (Placeholder for future features) -->
-          <div class="pricing-card">
-            <h3>Premium</h3>
-            <div class="price">Coming Soon</div>
-            <p style="color: #666; margin-bottom: 20px">
-              Advanced features for teams and enterprises
-            </p>
-            <ul class="features-list">
-              <li>All Open Source features</li>
-              <li class="unavailable">Advanced security scanning</li>
-              <li class="unavailable">Custom rule sets</li>
-              <li class="unavailable">Team collaboration tools</li>
-              <li class="unavailable">Priority support</li>
-              <li class="unavailable">Advanced analytics</li>
-              <li class="unavailable">Multi-project management</li>
-            </ul>
-            <a
-              href="https://github.com/brettstark73/quality-automation-template/issues"
-              class="btn btn-secondary"
-              target="_blank"
-              >Request Features</a
-            >
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- GitHub CTA Section -->
-    <section class="github-cta">
-      <div class="container">
-        <h2>Open Source & Community Driven</h2>
-        <p>
-          Star us on GitHub, contribute, or report issues. We'd love your
-          feedback!
+        <h2>Simple, Transparent Pricing</h2>
+        <p style="font-size: 1.2rem; margin-bottom: 50px; color: #666">
+          Start with Pro. Upgrade to Enterprise when you need team features.
         </p>
-        <div class="cta-buttons">
-          <a
-            href="https://github.com/brettstark73/quality-automation-template"
-            class="btn btn-primary"
-            target="_blank"
-          >
-            ⭐ Star on GitHub
-          </a>
-          <a
-            href="https://github.com/brettstark73/quality-automation-template/issues"
-            class="btn btn-secondary"
-            target="_blank"
-          >
-            💬 Report an Issue
-          </a>
+
+        <div class="pricing-cards">
+          <div class="pricing-card popular">
+            <h3>Pro</h3>
+            <div class="price">$39<span class="period">/month</span></div>
+            <div class="founder-badge">
+              🎁 Founder: $19.50/month (50% off forever)
+            </div>
+
+            <ul class="pricing-features">
+              <li>Framework-aware dependency grouping</li>
+              <li>React, Vue, Angular, Svelte support</li>
+              <li>Multi-language monitoring</li>
+              <li>60%+ PR reduction</li>
+              <li>Priority email support (48h)</li>
+              <li>All quality automation features</li>
+            </ul>
+
+            <a
+              href="https://www.aibuilderlab.com/cqa-upgrade"
+              class="cta-button"
+            >
+              Start Pro - $19.50/month
+            </a>
+          </div>
+
+          <div class="pricing-card">
+            <h3>Enterprise</h3>
+            <div class="price">$197<span class="period">/month</span></div>
+            <div class="founder-badge">
+              🎁 Founder: $98.50/month (50% off forever)
+            </div>
+
+            <ul class="pricing-features">
+              <li>Everything in Pro</li>
+              <li>Priority support (24h response)</li>
+              <li>Custom integrations</li>
+              <li>Advanced analytics</li>
+              <li>Team management</li>
+              <li>SLA guarantees</li>
+            </ul>
+
+            <a
+              href="https://www.aibuilderlab.com/cqa-enterprise"
+              class="cta-button"
+            >
+              Start Enterprise - $98.50/month
+            </a>
+          </div>
         </div>
+      </div>
+    </section>
+
+    <!-- Final CTA -->
+    <section class="section final-cta">
+      <div class="container">
+        <h2>Ready to Reduce Your Dependency PRs by 60%?</h2>
+        <p style="font-size: 1.3rem; margin-bottom: 30px">
+          Join hundreds of developers who've already streamlined their
+          dependency management.
+        </p>
+
+        <div class="guarantee">
+          <h3>🛡️ 30-Day Money-Back Guarantee</h3>
+          <p>
+            Try Pro risk-free. If you're not satisfied, we'll refund your first
+            month - no questions asked.
+          </p>
+        </div>
+
+        <a
+          href="https://www.aibuilderlab.com/cqa-upgrade"
+          class="cta-button"
+          style="font-size: 1.5rem; padding: 25px 50px"
+        >
+          Start Pro Now - $19.50/month
+        </a>
+
+        <p style="margin-top: 20px; opacity: 0.8">
+          Setup takes 2 minutes • Works with existing projects • Cancel anytime
+        </p>
       </div>
     </section>
   </body>
