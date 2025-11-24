@@ -10,7 +10,39 @@ try {
 
 const configs = [
   {
-    ignores: ['**/node_modules/**', '**/dist/**', '**/build/**', '**/*.html'],
+    ignores: [
+      // Dependencies
+      '**/node_modules/**',
+      // Build outputs
+      '**/dist/**',
+      '**/build/**',
+      '**/out/**',
+      '**/.next/**',
+      // Test coverage
+      '**/coverage/**',
+      '**/.nyc_output/**',
+      // Cache directories
+      '**/.cache/**',
+      '**/.eslintcache',
+      '**/.stylelintcache',
+      // Package artifacts
+      '**/*.tgz',
+      '**/package/**',
+      // Logs
+      '**/*.log',
+      '**/npm-debug.log*',
+      // Environment files
+      '**/.env',
+      '**/.env.*',
+      // IDE
+      '**/.vscode/**',
+      '**/.idea/**',
+      // OS files
+      '**/.DS_Store',
+      '**/Thumbs.db',
+      // HTML files
+      '**/*.html',
+    ],
   },
   js.configs.recommended,
 ]
