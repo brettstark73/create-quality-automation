@@ -3,6 +3,17 @@
 const assert = require('assert')
 const fs = require('fs')
 const os = require('os')
+const path = require('path')
+console.log('\n🧪 Testing telemetry module...\n')
+
+// Store original env
+const originalEnv = process.env.CQA_TELEMETRY
+
+// Use temp directory to avoid permission issues
+const tempTelemetryDir = path.join(os.tmpdir(), 'cqa-telemetry-test')
+process.env.CQA_TELEMETRY_DIR = tempTelemetryDir
+
+// Import telemetry after env overrides
 const {
   isTelemetryEnabled,
   TelemetrySession,
@@ -11,17 +22,12 @@ const {
   TELEMETRY_FILE,
 } = require('../lib/telemetry')
 
-console.log('\n🧪 Testing telemetry module...\n')
-
-// Store original env
-const originalEnv = process.env.CQA_TELEMETRY
-
-// Helper to clean up telemetry file
+// Helper to clean up telemetry file/dir
 const cleanup = () => {
   try {
-    if (fs.existsSync(TELEMETRY_FILE)) {
-      fs.unlinkSync(TELEMETRY_FILE)
-    }
+    if (fs.existsSync(TELEMETRY_FILE)) fs.unlinkSync(TELEMETRY_FILE)
+    if (fs.existsSync(tempTelemetryDir))
+      fs.rmSync(tempTelemetryDir, { recursive: true, force: true })
   } catch {
     // Ignore cleanup errors
   }
@@ -163,9 +169,9 @@ console.log('  ✅ No personal information collected')
 
 // Test 12: Telemetry file location
 console.log('🔍 Test 12: Telemetry file location...')
-assert.ok(TELEMETRY_FILE.includes(os.homedir()))
-assert.ok(TELEMETRY_FILE.includes('.create-quality-automation'))
-console.log('  ✅ Telemetry stored in user home directory')
+assert.ok(TELEMETRY_FILE.includes(tempTelemetryDir))
+assert.ok(TELEMETRY_FILE.endsWith('telemetry.json'))
+console.log('  ✅ Telemetry stored in temp test directory')
 
 // Test 13: Silent failures
 console.log('🔍 Test 13: Silent failures (never throws)...')

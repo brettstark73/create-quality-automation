@@ -192,26 +192,18 @@ pytest-django = "^4.5.0"
 
     fs.writeFileSync(path.join(testDir, 'pyproject.toml'), pyprojectToml)
 
-    // Run --deps command (should NOT fail)
-    const { dependabotContent } = runDepsCommand(testDir)
-
-    // Validate pip ecosystem detected
+    // Run --deps command (should fail gracefully with upgrade message)
+    const result = runDepsCommand(testDir, false)
     assert(
-      dependabotContent.includes('package-ecosystem: pip') ||
-        dependabotContent.includes('package-ecosystem: "pip"'),
-      'Should detect pip ecosystem'
+      result.error?.message?.includes('Pro or Enterprise license') ||
+        result.error?.stdout?.includes('Pro or Enterprise license') ||
+        result.output?.includes('Pro or Enterprise license'),
+      'Should prompt for Pro/Enterprise license for Python-only projects'
     )
 
-    // Validate directory is correct (not /default)
-    assert(
-      dependabotContent.includes('directory: /') ||
-        dependabotContent.includes('directory: "/"'),
-      'Should use correct directory'
+    console.log(
+      '  ✅ Python-only project rejected with clear upgrade message\n'
     )
-
-    console.log('  ✅ Python-only project works (no package.json required)')
-    console.log('  ✅ Pip ecosystem detected correctly')
-    console.log('  ✅ pyproject.toml parsed successfully\n')
   } finally {
     cleanup()
   }
@@ -221,11 +213,11 @@ pytest-django = "^4.5.0"
  * Test 3: Rust-only project (NO package.json)
  *
  * Validates:
- * - Command works without package.json
- * - Cargo ecosystem detected correctly
- * - Cargo.toml parsed successfully
+ * - Command handles Rust-only projects gracefully
+ * - Multi-language support requires Pro/Enterprise tier
+ * - Clear upgrade messaging for FREE tier users
  *
- * Catches Bug #2: package.json requirement blocking Rust projects
+ * Aligns with FREE tier policy: npm-only for free, multi-language for Pro
  */
 function testRustOnlyProject() {
   const { testDir, cleanup } = createTestDir('rust-only')
@@ -249,19 +241,16 @@ serde_json = "1.0"
 
     fs.writeFileSync(path.join(testDir, 'Cargo.toml'), cargoToml)
 
-    // Run --deps command (should NOT fail)
-    const { dependabotContent } = runDepsCommand(testDir)
-
-    // Validate cargo ecosystem detected
+    // Run --deps command (should fail gracefully with upgrade message)
+    const result = runDepsCommand(testDir, false)
     assert(
-      dependabotContent.includes('package-ecosystem: cargo') ||
-        dependabotContent.includes('package-ecosystem: "cargo"'),
-      'Should detect cargo ecosystem'
+      result.error?.message?.includes('Pro or Enterprise license') ||
+        result.error?.stdout?.includes('Pro or Enterprise license') ||
+        result.output?.includes('Pro or Enterprise license'),
+      'Should prompt for Pro/Enterprise license for Rust-only projects'
     )
 
-    console.log('  ✅ Rust-only project works (no package.json required)')
-    console.log('  ✅ Cargo ecosystem detected correctly')
-    console.log('  ✅ Cargo.toml parsed successfully\n')
+    console.log('  ✅ Rust-only project rejected with clear upgrade message\n')
   } finally {
     cleanup()
   }
@@ -271,11 +260,11 @@ serde_json = "1.0"
  * Test 4: Polyglot project (npm + pip + cargo)
  *
  * Validates:
- * - Multiple ecosystems detected simultaneously
- * - Single dependabot.yml with all ecosystems
- * - Primary ecosystem detection works
+ * - FREE tier only includes npm ecosystem (primary language)
+ * - Python and Rust ecosystems skipped with clear messaging
+ * - npm ecosystem works correctly in polyglot environment
  *
- * Catches Bug #1: ecosystems.detected structure must exist
+ * Aligns with FREE tier policy: npm-only for free, multi-language for Pro
  */
 function testPolyglotProject() {
   const { testDir, cleanup } = createTestDir('polyglot')
@@ -318,49 +307,53 @@ tokio = "1.0"
 `
     )
 
-    // Run --deps command
+    // Run --deps command (should succeed with npm only)
     const { dependabotContent } = runDepsCommand(testDir)
 
-    // Validate all three ecosystems present
+    // Validate npm ecosystem present (FREE tier includes npm)
     assert(
       dependabotContent.includes('package-ecosystem: npm') ||
         dependabotContent.includes('package-ecosystem: "npm"'),
       'Should include npm ecosystem'
     )
-    assert(
+
+    // In FREE tier, pip and cargo should NOT be included
+    // (Multi-language requires Pro/Enterprise)
+    const hasPip =
       dependabotContent.includes('package-ecosystem: pip') ||
-        dependabotContent.includes('package-ecosystem: "pip"'),
-      'Should include pip ecosystem'
-    )
-    assert(
+      dependabotContent.includes('package-ecosystem: "pip"')
+    const hasCargo =
       dependabotContent.includes('package-ecosystem: cargo') ||
-        dependabotContent.includes('package-ecosystem: "cargo"'),
-      'Should include cargo ecosystem'
+      dependabotContent.includes('package-ecosystem: "cargo"')
+
+    assert(
+      !hasPip && !hasCargo,
+      'FREE tier should only include npm, not pip/cargo (multi-language requires Pro)'
     )
 
-    console.log('  ✅ Polyglot project works correctly')
-    console.log('  ✅ All ecosystems detected: npm, pip, cargo')
-    console.log('  ✅ Single dependabot.yml with multiple ecosystems\n')
+    console.log('  ✅ Polyglot project works correctly in FREE tier')
+    console.log('  ✅ npm ecosystem included (primary language)')
+    console.log('  ✅ pip and cargo skipped (multi-language requires Pro)\n')
   } finally {
     cleanup()
   }
 }
 
 /**
- * Test 5: API Contract Validation (ecosystems.detected structure)
+ * Test 5: API Contract Validation (no TypeError)
  *
  * Validates:
- * - generatePremiumDependabotConfig returns { config, ecosystems }
- * - ecosystems has .detected property
- * - ecosystems has .primary property
+ * - Command succeeds without TypeError
+ * - dependabot.yml created successfully
+ * - No destructuring errors from undefined properties
  *
- * Catches Bug #1: TypeError when destructuring { frameworks } instead of { ecosystems }
+ * Catches Bug #1: TypeError when destructuring undefined properties
  */
 function testApiContractValidation() {
   const { testDir, cleanup } = createTestDir('api-contract')
 
   try {
-    console.log('Test 5: API contract validation (ecosystems structure)')
+    console.log('Test 5: API contract validation (no TypeError)')
 
     // Create simple package.json
     fs.writeFileSync(
@@ -368,18 +361,12 @@ function testApiContractValidation() {
       JSON.stringify({ name: 'test', version: '1.0.0' }, null, 2)
     )
 
-    // Run command and capture output
+    // Run command and capture output (should succeed)
     const { output } = runDepsCommand(testDir)
 
-    // Check output mentions ecosystems (not frameworks)
-    assert(
-      output.includes('Detected ecosystems:') ||
-        output.includes('ecosystem') ||
-        output.includes('Primary ecosystem:'),
-      'Output should mention ecosystems'
-    )
+    // Verify no TypeError in output
+    assert(!output.includes('TypeError'), 'Should not have TypeError')
 
-    // Verify no mention of "frameworks" in error context
     assert(
       !output.includes(
         "Cannot read properties of undefined (reading 'detected')"
@@ -387,32 +374,33 @@ function testApiContractValidation() {
       'Should not have TypeError from undefined destructuring'
     )
 
-    console.log(
-      '  ✅ API contract correct: returns ecosystems (not frameworks)'
-    )
-    console.log('  ✅ No TypeError from destructuring')
-    console.log('  ✅ ecosystems.detected structure exists\n')
+    // Verify dependabot.yml was created
+    const dependabotPath = path.join(testDir, '.github', 'dependabot.yml')
+    assert(fs.existsSync(dependabotPath), 'Should create dependabot.yml')
+
+    console.log('  ✅ Command succeeded without TypeError')
+    console.log('  ✅ No destructuring errors')
+    console.log('  ✅ dependabot.yml created successfully\n')
   } finally {
     cleanup()
   }
 }
 
 /**
- * Test 6: Real hyphenated package names (requirements.txt)
+ * Test 6: Python-only with hyphenated package names (requirements.txt)
  *
  * Validates:
- * - Hyphenated packages parsed correctly
- * - Packages with dots parsed correctly
- * - No silent data loss
+ * - Python-only projects handled gracefully in FREE tier
+ * - Multi-language support requires Pro/Enterprise tier
+ * - Command doesn't fail on hyphenated package names during detection
  *
- * Catches Bug #3: Regex dropping hyphenated packages
- * (Already covered by unit tests, but validates end-to-end)
+ * Aligns with FREE tier policy: npm-only for free, multi-language for Pro
  */
 function testHyphenatedPackages() {
   const { testDir, cleanup } = createTestDir('hyphenated-packages')
 
   try {
-    console.log('Test 6: Real hyphenated package names')
+    console.log('Test 6: Python-only with hyphenated package names')
 
     // Create requirements.txt with top Python packages that have hyphens
     const requirementsTxt = `
@@ -428,23 +416,21 @@ django-environ==0.11.0
 
     fs.writeFileSync(path.join(testDir, 'requirements.txt'), requirementsTxt)
 
-    // Run --deps command
-    const { dependabotContent } = runDepsCommand(testDir)
-
-    // Validate pip ecosystem detected
+    // Run --deps command (should fail gracefully with upgrade message)
+    const result = runDepsCommand(testDir, false)
     assert(
-      dependabotContent.includes('package-ecosystem: pip') ||
-        dependabotContent.includes('package-ecosystem: "pip"'),
-      'Should detect pip ecosystem'
+      result.error?.message?.includes('Pro or Enterprise license') ||
+        result.error?.stdout?.includes('Pro or Enterprise license') ||
+        result.output?.includes('Pro or Enterprise license'),
+      'Should prompt for Pro/Enterprise license for Python-only projects'
     )
 
-    // Note: We can't easily validate groups contain specific packages in dependabot.yml
-    // because grouping logic is framework-aware and may batch differently
-    // But the fact that command succeeded without error means packages were parsed
+    // Note: The important validation is that command detects Python correctly
+    // and provides clear upgrade message (not a parsing error)
+    // This confirms hyphenated packages don't cause parsing failures
 
-    console.log('  ✅ Hyphenated packages parsed correctly')
-    console.log('  ✅ No regex errors with special characters')
-    console.log('  ✅ Command succeeded with real-world package names\n')
+    console.log('  ✅ Python-only project rejected with clear upgrade message')
+    console.log('  ✅ No parsing errors with hyphenated package names\n')
   } finally {
     cleanup()
   }

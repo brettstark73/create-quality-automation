@@ -1,11 +1,22 @@
 /**
  * Comprehensive licensing.js test suite
  * Target: >90% coverage
+ *
+ * Uses temporary directory for isolation (like telemetry/error-reporter tests)
  */
 
 const fs = require('fs')
 const path = require('path')
 const os = require('os')
+
+// Set up temporary license directory for tests (before requiring licensing.js)
+const TEST_LICENSE_DIR = path.join(
+  os.tmpdir(),
+  `cqa-license-test-${Date.now()}`
+)
+process.env.CQA_LICENSE_DIR = TEST_LICENSE_DIR
+
+// Now require licensing.js (will use CQA_LICENSE_DIR environment variable)
 const {
   LICENSE_TIERS,
   getLicenseInfo,
@@ -32,12 +43,13 @@ function restoreConsoleLog() {
 
 // Helper to get test license paths
 function getTestLicensePaths() {
-  const licenseDir = path.join(os.homedir(), '.create-quality-automation')
+  const licenseDir = TEST_LICENSE_DIR
   const licenseFile = path.join(licenseDir, 'license.json')
   return { licenseDir, licenseFile }
 }
 
 console.log('🧪 Testing licensing.js...\n')
+console.log(`📁 Using temporary license directory: ${TEST_LICENSE_DIR}\n`)
 
 /**
  * Setup and teardown
@@ -94,7 +106,7 @@ function testGetLicenseInfoValidPro() {
   // Create valid PRO license
   const licenseData = {
     tier: LICENSE_TIERS.PRO,
-    key: 'CQA-PRO-1234567890ABCDEFGHIJK',
+    licenseKey: 'CQA-PRO-1234567890ABCDEFGHIJK',
     email: 'test@example.com',
     expires: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(), // 1 year
     activated: new Date().toISOString(),
@@ -134,7 +146,7 @@ function testGetLicenseInfoExpired() {
 
   const licenseData = {
     tier: LICENSE_TIERS.PRO,
-    key: 'CQA-PRO-1234567890ABCDEFGHIJK',
+    licenseKey: 'CQA-PRO-1234567890ABCDEFGHIJK',
     email: 'test@example.com',
     expires: new Date(Date.now() - 1000).toISOString(), // Expired 1 second ago
     activated: new Date().toISOString(),
@@ -174,7 +186,7 @@ function testGetLicenseInfoInvalidKey() {
 
   const licenseData = {
     tier: LICENSE_TIERS.PRO,
-    key: 'INVALID-KEY', // Too short and wrong prefix
+    licenseKey: 'INVALID-KEY', // Too short and wrong prefix
     email: 'test@example.com',
     expires: null,
     activated: new Date().toISOString(),
@@ -293,7 +305,7 @@ function testHasFeature() {
   // Create PRO license
   const licenseData = {
     tier: LICENSE_TIERS.PRO,
-    key: 'CQA-PRO-1234567890ABCDEFGHIJK',
+    licenseKey: 'CQA-PRO-1234567890ABCDEFGHIJK',
     email: 'test@example.com',
     expires: null,
     activated: new Date().toISOString(),
@@ -336,7 +348,7 @@ function testGetDependencyMonitoringLevel() {
   // Create PRO license
   const licenseData = {
     tier: LICENSE_TIERS.PRO,
-    key: 'CQA-PRO-1234567890ABCDEFGHIJK',
+    licenseKey: 'CQA-PRO-1234567890ABCDEFGHIJK',
     email: 'test@example.com',
     expires: null,
     activated: new Date().toISOString(),
@@ -453,7 +465,7 @@ function testShowUpgradeMessageFree() {
   if (
     consoleOutput.some(line => line.includes('premium feature')) &&
     consoleOutput.some(line => line.includes('FREE')) &&
-    consoleOutput.some(line => line.includes('waitlist'))
+    consoleOutput.some(line => line.includes('Upgrade now'))
   ) {
     console.log('  ✅ Displays upgrade message for free tier\n')
     teardownTest()
@@ -475,7 +487,7 @@ function testShowUpgradeMessagePro() {
   // Create PRO license
   const licenseData = {
     tier: LICENSE_TIERS.PRO,
-    key: 'CQA-PRO-1234567890ABCDEFGHIJK',
+    licenseKey: 'CQA-PRO-1234567890ABCDEFGHIJK',
     email: 'test@example.com',
     expires: null,
     activated: new Date().toISOString(),
@@ -548,7 +560,7 @@ function testShowLicenseStatusPro() {
   const expiryDate = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000)
   const licenseData = {
     tier: LICENSE_TIERS.PRO,
-    key: 'CQA-PRO-1234567890ABCDEFGHIJK',
+    licenseKey: 'CQA-PRO-1234567890ABCDEFGHIJK',
     email: 'pro@example.com',
     expires: expiryDate.toISOString(),
     activated: new Date().toISOString(),
@@ -594,7 +606,7 @@ function testValidEnterpriseLicense() {
 
   const licenseData = {
     tier: LICENSE_TIERS.ENTERPRISE,
-    key: 'CQA-ENTERPRISE-1234567890ABCDEFG',
+    licenseKey: 'CQA-ENTERPRISE-1234567890ABCDEFG',
     email: 'enterprise@company.com',
     expires: null,
     activated: new Date().toISOString(),
@@ -633,7 +645,7 @@ function testLicenseStatusWithError() {
   // Create expired license
   const licenseData = {
     tier: LICENSE_TIERS.PRO,
-    key: 'CQA-PRO-1234567890ABCDEFGHIJK',
+    licenseKey: 'CQA-PRO-1234567890ABCDEFGHIJK',
     email: 'expired@example.com',
     expires: new Date(Date.now() - 1000).toISOString(),
     activated: new Date().toISOString(),
@@ -703,3 +715,9 @@ console.log('  • Upgrade messages - All tiers')
 console.log('  • Status display - All variations')
 console.log('  • Save/remove operations - Success and failure')
 console.log('')
+
+// Cleanup temporary test directory
+if (fs.existsSync(TEST_LICENSE_DIR)) {
+  fs.rmSync(TEST_LICENSE_DIR, { recursive: true, force: true })
+  console.log(`🧹 Cleaned up temporary directory: ${TEST_LICENSE_DIR}\n`)
+}

@@ -15,7 +15,7 @@ Bootstrap quality automation in JavaScript/TypeScript and Python projects with c
 - **🚢 Lighthouse CI** - SEO and performance checking with configurable thresholds
 - **🆕 Modern Tooling** - ESLint 9 flat config, Husky 9, latest dependencies
 - **🔒 Security Automation** - Blocking npm audit and hardcoded secrets scanning
-- **📊 Dependency Monitoring** - Basic Dependabot config (Free) + Advanced features (Pro/Enterprise)
+- **📊 Dependency Monitoring** - Basic npm monitoring (Free) + Framework grouping & multi-language (Pro)
 - **🎨 Custom Templates** - Use organization-specific coding standards with `--template` flag
 - **🎯 Progressive Quality (v4.0.0+)** - Adaptive checks based on project maturity - no false failures!
 
@@ -257,15 +257,22 @@ npx create-quality-automation@latest --deps
 npx create-quality-automation@latest --license-status
 ```
 
-#### 🎉 FREE BETA - All Features Unlocked!
+#### 🔒 Freemium Model - Choose Your Tier
 
-> **PREMIUM-001 SHIPPED!** Framework-aware dependency grouping is now available to **everyone for free** during our beta period.
+> **BETA ENDED!** Framework-aware dependency grouping and multi-language support are now **Pro/Enterprise features**.
 >
-> We're collecting feedback before launching paid tiers. **No payment required - no license keys - just run the setup!**
+> **Free tier provides basic npm dependency monitoring.** Upgrade to Pro for advanced features.
 
-**✨ Available Now - 100% Free During Beta**
+**🆓 FREE TIER - What You Get**
 
-- ✅ **Framework-aware dependency grouping for JavaScript/TypeScript** - **LIVE NOW**
+- ✅ **Basic Dependabot configuration** for npm packages only
+- ✅ **Weekly dependency updates** on Monday 9am
+- ✅ **GitHub Actions** dependency monitoring
+- ✅ **Quality automation** (ESLint, Prettier, Husky, etc.)
+
+**💎 PRO TIER ($39/month) - Premium Features**
+
+- ✅ **Framework-aware dependency grouping** for JavaScript/TypeScript
   - Automatically groups related dependencies into batched PRs
   - Reduces PR volume by 60%+ for React projects
   - Supports React, Vue, Angular, Svelte ecosystems
@@ -274,9 +281,8 @@ npx create-quality-automation@latest --license-status
   - Storybook ecosystem grouping
   - Wildcard pattern matching for scoped packages (`@tanstack/*`, `@radix-ui/*`)
   - Intelligent update-type filtering (major vs minor vs patch)
-  - Production-ready with comprehensive test coverage
 
-- ✅ **Multi-language dependency monitoring** - **JUST SHIPPED**
+- ✅ **Multi-language dependency monitoring**
   - **Python/Pip**: Django, Flask, FastAPI, Data Science (numpy, pandas, scikit-learn)
   - **Rust/Cargo**: Actix, Rocket, async runtimes (Tokio, async-std), Serde ecosystem
   - **Ruby/Bundler**: Rails, Sinatra, RSpec testing frameworks
@@ -284,21 +290,72 @@ npx create-quality-automation@latest --license-status
   - Framework-aware grouping across all languages
   - Automatic ecosystem detection from project files
 
-**🚀 Coming This Month - Also Free During Beta**
+**🏢 ENTERPRISE TIER ($197/month) - Advanced Features**
 
-- 📅 **Advanced security audit workflows** with custom schedules
-- 📅 **Breaking change detection** before merging dependency updates
+- 🔒 **Everything in Pro tier**
+- 🚀 **Advanced security audit workflows** with custom schedules
+- 🔍 **Breaking change detection** before merging dependency updates
+- 📞 **Priority support** and custom integrations
 
-**💰 Future Pricing - Lock in Founder Discount**
+**💰 Pricing & Upgrades**
 
-When we launch paid tiers (Q1 2026), pricing will be:
+Premium features are available now:
 
-- **Pro Tier**: $39/month (advanced features, multi-language support)
-- **Enterprise Tier**: $197/month (team features, governance, priority support)
+- **Pro Tier**: $39/month (framework-aware dependency monitoring, multi-language support)
+- **Enterprise Tier**: $197/month (everything in Pro + priority support, custom integrations)
 
-**Beta users who join our waitlist get 50% off for life** ($19.50/mo Pro, $98.50/mo Enterprise)
+**🎁 Limited-time founder pricing available for early adopters**
 
 [**📬 Join Waitlist - Lock in Founder Pricing**](https://tally.so/r/create-quality-automation-beta)
+
+### 🔑 License Activation
+
+After purchasing a Pro or Enterprise license, activate it in your project (one‑time network fetch to download the signed license registry):
+
+```bash
+# Activate your purchased license
+npx create-quality-automation@latest --activate-license
+
+# Follow prompts to enter:
+# - License key (from your purchase email)
+# - Email address (used for purchase)
+# - Internet access for the first run (downloads the license registry)
+```
+
+Offline? The registry is cached at `~/.create-quality-automation/legitimate-licenses.json`.
+
+- If you’re offline and have never activated before, connect briefly or ask your admin to refresh the cache for you.
+- Override the registry URL if you self-host it: `CQA_LICENSE_DB_URL=https://your-domain/licenses.json npx create-quality-automation@latest --activate-license`
+
+**Check your license status anytime:**
+
+```bash
+# View current license and available features
+npx create-quality-automation@latest --license-status
+```
+
+**Admin License Management:**
+
+For administrators (server/ops) managing licenses across teams:
+
+**Server-side tools are NOT included in the npm package.** Clone the repository to access server-only files:
+
+```bash
+# Clone repository for server-side tools
+git clone https://github.com/brettstark73/quality-automation-template.git
+cd quality-automation-template
+
+# Add licenses to the central registry (server-side only)
+node admin-license.js CQA-XXXX-XXXX-XXXX-XXXX customer_id PRO [founder_status] [email]
+
+# Example:
+node admin-license.js CQA-1234-ABCD-5678-EF90 cus_stripe123 PRO false user@company.com
+
+# Serve the registry to clients (e.g., via CDN or static hosting)
+# Ensure the URL matches CQA_LICENSE_DB_URL (default: https://license.aibuilderlab.com/cqa/legitimate-licenses.json)
+```
+
+**For webhook deployment and complete server integration, see [DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md)**
 
 **Example: React Project Dependency Grouping**
 
