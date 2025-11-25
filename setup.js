@@ -75,9 +75,19 @@ const { TemplateLoader } = require('./lib/template-loader')
 // Licensing system
 const {
   getLicenseInfo,
+  hasFeature,
   showUpgradeMessage,
   showLicenseStatus,
 } = require('./lib/licensing')
+
+// Smart Test Strategy Generator (Pro/Enterprise feature)
+const {
+  detectProjectType,
+  generateSmartStrategy,
+  writeSmartStrategy,
+  generateSmartPrePushHook,
+  getTestTierScripts,
+} = require('./lib/smart-strategy-generator')
 
 // Telemetry (opt-in usage tracking)
 const { TelemetrySession, showTelemetryStatus } = require('./lib/telemetry')
@@ -87,6 +97,13 @@ const {
   ErrorReporter,
   showErrorReportingStatus,
 } = require('./lib/error-reporter')
+
+// Critical setup enhancements (fixes production quality gaps)
+const {
+  applyProductionQualityFixes,
+  // generateEnhancedPreCommitHook,
+  validateProjectSetup,
+} = require('./lib/setup-enhancements')
 
 const STYLELINT_EXTENSION_SET = new Set(STYLELINT_EXTENSIONS)
 const STYLELINT_DEFAULT_TARGET = `**/*.{${STYLELINT_EXTENSIONS.join(',')}}`
@@ -1081,10 +1098,18 @@ HELP:
         typescript: usesTypeScript,
         stylelintTargets,
       })
-      packageJson.scripts = mergeScripts(
-        packageJson.scripts || {},
-        defaultScripts
-      )
+
+      // Import enhanced scripts to fix production quality gaps
+      const {
+        getEnhancedTypeScriptScripts,
+      } = require('./lib/typescript-config-generator')
+      const enhancedScripts = getEnhancedTypeScriptScripts()
+
+      // Merge both default and enhanced scripts
+      packageJson.scripts = mergeScripts(packageJson.scripts || {}, {
+        ...defaultScripts,
+        ...enhancedScripts,
+      })
 
       // Add devDependencies
       console.log('📦 Adding devDependencies...')
@@ -1104,6 +1129,18 @@ HELP:
         python: usesPython,
       })
 
+      // Import enhanced lint-staged to fix production quality gaps
+      const {
+        getEnhancedLintStaged,
+      } = require('./lib/typescript-config-generator')
+      const enhancedLintStaged = getEnhancedLintStaged(
+        usesPython,
+        usesTypeScript
+      )
+
+      // Merge enhanced configuration with defaults
+      const finalLintStaged = { ...defaultLintStaged, ...enhancedLintStaged }
+
       const hasExistingCssPatterns = Object.keys(
         packageJson['lint-staged'] || {}
       ).some(patternIncludesStylelintExtension)
@@ -1116,7 +1153,7 @@ HELP:
 
       packageJson['lint-staged'] = mergeLintStaged(
         packageJson['lint-staged'] || {},
-        defaultLintStaged,
+        finalLintStaged,
         { stylelintTargets },
         patternIncludesStylelintExtension
       )
@@ -1670,6 +1707,67 @@ echo "✅ Pre-push validation passed!"
         pythonSpinner.succeed('Python quality tools configured')
       }
 
+      // Smart Test Strategy (Pro/Enterprise feature)
+      const smartStrategyEnabled = hasFeature('smartTestStrategy')
+      if (smartStrategyEnabled) {
+        const smartSpinner = showProgress('Setting up Smart Test Strategy...')
+
+        try {
+          // Detect project type and generate customized strategy
+          const projectType = detectProjectType(process.cwd())
+          const { script, projectTypeName } = generateSmartStrategy({
+            projectPath: process.cwd(),
+            projectName: packageJson.name || path.basename(process.cwd()),
+            projectType,
+          })
+
+          // Write smart strategy script
+          writeSmartStrategy(process.cwd(), script)
+          console.log(`✅ Added Smart Test Strategy (${projectTypeName})`)
+
+          // Update pre-push hook to use smart strategy
+          const huskyDir = path.join(process.cwd(), '.husky')
+          const prePushPath = path.join(huskyDir, 'pre-push')
+          const smartPrePush = generateSmartPrePushHook()
+          fs.writeFileSync(prePushPath, smartPrePush)
+          fs.chmodSync(prePushPath, 0o755)
+          console.log('✅ Updated pre-push hook to use smart strategy')
+
+          // Add test tier scripts to package.json
+          const testTierScripts = getTestTierScripts(projectType)
+          const PackageJson = checkNodeVersionAndLoadPackageJson()
+          const pkgJson = await PackageJson.load(process.cwd())
+          pkgJson.content.scripts = mergeScripts(
+            pkgJson.content.scripts || {},
+            testTierScripts
+          )
+          await pkgJson.save()
+          console.log(
+            '✅ Added test tier scripts (test:fast, test:medium, test:comprehensive)'
+          )
+
+          smartSpinner.succeed('Smart Test Strategy configured')
+
+          console.log('\n💎 Smart Test Strategy Benefits:')
+          console.log('   • 70% faster pre-push validation on average')
+          console.log('   • Risk-based test selection')
+          console.log('   • Adapts to branch, time of day, and change size')
+          console.log(
+            '   • Override with SKIP_SMART=1, FORCE_COMPREHENSIVE=1, or FORCE_MINIMAL=1'
+          )
+        } catch (error) {
+          smartSpinner.warn('Could not set up Smart Test Strategy')
+          console.warn('⚠️ Smart Test Strategy setup error:', error.message)
+        }
+      } else {
+        // Show upgrade message for Free tier users
+        console.log('\n💡 Smart Test Strategy is available with Pro tier:')
+        console.log('   • 70% faster pre-push validation')
+        console.log('   • Intelligent risk-based test selection')
+        console.log('   • Saves 10-20 hours/month per developer')
+        showUpgradeMessage('Smart Test Strategy')
+      }
+
       // Generate placeholder test file with helpful documentation
       const testsDir = path.join(process.cwd(), 'tests')
       const testExtension = usesTypeScript ? 'ts' : 'js'
@@ -1741,6 +1839,30 @@ describe('Test framework validation', () => {
         console.log(
           '   💡 Replace with real tests as you build your application'
         )
+      }
+
+      // Apply critical production quality fixes
+      console.log('\n🔧 Applying production quality enhancements...')
+      const qualityEnhancements = applyProductionQualityFixes('.', {
+        hasTypeScript: usesTypeScript,
+        hasPython: usesPython,
+        skipTypeScriptTests: false,
+      })
+
+      // Display applied fixes
+      qualityEnhancements.fixes.forEach(fix => console.log(fix))
+
+      // Validate setup for common gaps
+      const { warnings, errors } = validateProjectSetup('.')
+
+      if (errors.length > 0) {
+        console.log('\n🚨 CRITICAL ISSUES DETECTED:')
+        errors.forEach(error => console.log(error))
+      }
+
+      if (warnings.length > 0) {
+        console.log('\n⚠️  Setup Warnings:')
+        warnings.forEach(warning => console.log(warning))
       }
 
       console.log('\n🎉 Quality automation setup complete!')

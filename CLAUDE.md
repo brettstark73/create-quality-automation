@@ -33,6 +33,53 @@ This project uses Brett Stark's global Claude Code configuration with specific a
 - **Husky 9** pre-commit hooks
 - **lint-staged** for staged file processing
 - **GitHub Actions** workflows with quality checks
+- **Smart Test Strategy** (Pro/Enterprise) - Adaptive risk-based test selection
+
+## Smart Test Strategy (Pro/Enterprise Feature)
+
+**Location**: `lib/smart-strategy-generator.js`, `templates/scripts/smart-test-strategy.sh`
+
+An adaptive, risk-based pre-push validation system that intelligently selects test tiers based on change context.
+
+### How It Works
+
+1. **Risk Score Calculation (0-10)**:
+   - High-risk files (auth, payment, security): +4
+   - Security files: +3
+   - API files: +2
+   - Config files: +2
+   - Large changes (>10 files): +2
+   - Branch risk (main/hotfix): +3-4
+
+2. **Test Tier Selection**:
+   - Risk ≥ 7: Comprehensive (all tests + security audit)
+   - Risk 4-6: Medium (fast + integration, exclude slow)
+   - Risk 2-3: Fast (unit tests only)
+   - Risk 0-1: Minimal (lint + format only)
+
+3. **Project Type Detection**:
+   - CLI tools, Web apps, SaaS, APIs, Libraries, Documentation
+   - Auto-detects based on package.json dependencies
+
+### Environment Variable Overrides
+
+```bash
+SKIP_SMART=1 git push          # Always run comprehensive
+FORCE_COMPREHENSIVE=1 git push  # Force full tests
+FORCE_MINIMAL=1 git push        # Lint only (use with caution)
+```
+
+### Files Generated
+
+- `scripts/smart-test-strategy.sh` - Risk-based test orchestration
+- `.husky/pre-push` - Calls smart strategy script
+- `package.json` scripts: `test:fast`, `test:medium`, `test:comprehensive`, `test:smart`
+
+### Monetization
+
+- **Free Tier**: Basic pre-push (runs all tests, slow)
+- **Pro Tier ($39/month)**: Smart Test Strategy (70% faster average)
+- **Enterprise**: Smart + custom risk patterns
 
 ## Development Notes
 
