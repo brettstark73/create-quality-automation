@@ -15,6 +15,15 @@ const {
   STYLELINT_EXTENSIONS,
 } = require('../config/defaults')
 
+// Import enhanced scripts for testing
+const {
+  getEnhancedTypeScriptScripts,
+} = require('../lib/typescript-config-generator')
+// const {
+//   getSecurityScripts
+// } = require('../lib/security-enhancements')
+const { getTestTierScripts } = require('../lib/smart-strategy-generator')
+
 const createTempProject = initialPackageJson => {
   const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'qa-template-'))
   execSync('git init', { cwd: tempDir, stdio: 'ignore' })
@@ -195,10 +204,18 @@ try {
   runSetup(jsProjectDir)
 
   const pkg = readJson(path.join(jsProjectDir, 'package.json'))
-  const expectedScripts = mergeScripts(
-    jsInitial.scripts,
-    getDefaultScripts({ typescript: false })
-  )
+
+  // Include enhanced scripts in expected results (matching setup.js behavior)
+  const defaultScripts = getDefaultScripts({ typescript: false })
+  const enhancedScripts = getEnhancedTypeScriptScripts()
+  const smartStrategyScripts = getTestTierScripts()
+
+  // Include all scripts that setup.js actually adds
+  const expectedScripts = mergeScripts(jsInitial.scripts, {
+    ...defaultScripts,
+    ...enhancedScripts,
+    ...smartStrategyScripts,
+  })
   const expectedDevDependencies = mergeDevDependencies(
     jsInitial.devDependencies,
     getDefaultDevDependencies({ typescript: false })
