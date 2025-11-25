@@ -41,7 +41,7 @@ async function runTest() {
     }
 
     // Use production checksums (no injection!)
-    const scanner = new ConfigSecurityScanner()
+    const scanner = new ConfigSecurityScanner({ quiet: true })
 
     // Test 1: Invalid checksum rejection with production logic
     console.log('🧪 Test 1: Invalid checksum rejection with production logic')
@@ -133,6 +133,7 @@ async function runTest() {
 
     const successScanner = new ConfigSecurityScanner({
       checksumMap: { [platformKey]: testSuccessChecksum },
+      quiet: true,
     })
 
     successScanner.downloadFile = async function (url, targetPath) {

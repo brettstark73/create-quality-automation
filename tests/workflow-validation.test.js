@@ -47,7 +47,10 @@ async function testMissingWorkflowDirectory() {
     'Test 1: Missing .github/workflows directory (catches real misconfiguration)'
   )
 
-  const validator = new WorkflowValidator({ disableActionlint: true })
+  const validator = new WorkflowValidator({
+    disableActionlint: true,
+    quiet: true,
+  })
 
   try {
     await validator.validateAll()
@@ -82,7 +85,10 @@ async function testEmptyWorkflowDirectory() {
     'Test 2: Empty .github/workflows directory (catches missing workflow files)'
   )
 
-  const validator = new WorkflowValidator({ disableActionlint: true })
+  const validator = new WorkflowValidator({
+    disableActionlint: true,
+    quiet: true,
+  })
 
   try {
     await validator.validateAll()
@@ -127,7 +133,10 @@ jobs:
 `
   fs.writeFileSync(path.join(WORKFLOW_DIR, 'invalid.yml'), invalidWorkflow)
 
-  const validator = new WorkflowValidator({ disableActionlint: true })
+  const validator = new WorkflowValidator({
+    disableActionlint: true,
+    quiet: true,
+  })
 
   try {
     await validator.validateAll()
@@ -166,7 +175,10 @@ on: push
 `
   fs.writeFileSync(path.join(WORKFLOW_DIR, 'nojobs.yml'), invalidWorkflow)
 
-  const validator = new WorkflowValidator({ disableActionlint: true })
+  const validator = new WorkflowValidator({
+    disableActionlint: true,
+    quiet: true,
+  })
 
   try {
     await validator.validateAll()
@@ -214,7 +226,10 @@ jobs:
 `
   fs.writeFileSync(path.join(WORKFLOW_DIR, 'buggy-node.yml'), buggyWorkflow)
 
-  const validator = new WorkflowValidator({ disableActionlint: true })
+  const validator = new WorkflowValidator({
+    disableActionlint: true,
+    quiet: true,
+  })
 
   try {
     await validator.validateAll()
@@ -263,7 +278,10 @@ jobs:
 `
   fs.writeFileSync(path.join(WORKFLOW_DIR, 'dangerous.yml'), dangerousWorkflow)
 
-  const validator = new WorkflowValidator({ disableActionlint: true })
+  const validator = new WorkflowValidator({
+    disableActionlint: true,
+    quiet: true,
+  })
 
   try {
     await validator.validateAll()
@@ -316,7 +334,10 @@ jobs:
 `
   fs.writeFileSync(path.join(WORKFLOW_DIR, 'valid.yml'), validWorkflow)
 
-  const validator = new WorkflowValidator({ disableActionlint: true })
+  const validator = new WorkflowValidator({
+    disableActionlint: true,
+    quiet: true,
+  })
 
   try {
     const result = await validator.validateAll()
@@ -361,7 +382,10 @@ async function testFileReadError() {
     return true
   }
 
-  const validator = new WorkflowValidator({ disableActionlint: true })
+  const validator = new WorkflowValidator({
+    disableActionlint: true,
+    quiet: true,
+  })
 
   try {
     await validator.validateAll()
@@ -429,7 +453,10 @@ jobs:
   fs.writeFileSync(path.join(WORKFLOW_DIR, 'missing-jobs.yml'), workflow2)
   fs.writeFileSync(path.join(WORKFLOW_DIR, 'security.yml'), workflow3)
 
-  const validator = new WorkflowValidator({ disableActionlint: true })
+  const validator = new WorkflowValidator({
+    disableActionlint: true,
+    quiet: true,
+  })
 
   try {
     await validator.validateAll()
@@ -476,7 +503,10 @@ on: push
 
   fs.writeFileSync(path.join(WORKFLOW_DIR, 'test.yaml'), workflow)
 
-  const validator = new WorkflowValidator({ disableActionlint: true })
+  const validator = new WorkflowValidator({
+    disableActionlint: true,
+    quiet: true,
+  })
 
   try {
     await validator.validateAll()
@@ -522,7 +552,10 @@ jobs:
   fs.writeFileSync(path.join(WORKFLOW_DIR, 'test.yml'), validWorkflow)
 
   // With disableActionlint: true, actionlint should not run
-  const validator = new WorkflowValidator({ disableActionlint: true })
+  const validator = new WorkflowValidator({
+    disableActionlint: true,
+    quiet: true,
+  })
 
   try {
     const result = await validator.validateAll()

@@ -50,7 +50,7 @@ async function runAsyncTest(testName, testFn) {
 
   // Test 1: Environment GITLEAKS_PATH takes highest precedence
   await runAsyncTest('Environment GITLEAKS_PATH precedence', async () => {
-    const scanner = new ConfigSecurityScanner()
+    const scanner = new ConfigSecurityScanner({ quiet: true })
     const mockPath = '/custom/path/to/gitleaks'
     process.env.GITLEAKS_PATH = mockPath
 
@@ -67,7 +67,7 @@ async function runAsyncTest(testName, testFn) {
 
   // Test 2: Global binary is second priority (acceptance test - uses cached binary in environment)
   await runAsyncTest('Global binary fallback acceptance test', async () => {
-    const scanner = new ConfigSecurityScanner()
+    const scanner = new ConfigSecurityScanner({ quiet: true })
     delete process.env.GITLEAKS_PATH
 
     // In a test environment with cached binary, verify the binary resolution works correctly
@@ -104,7 +104,10 @@ async function runAsyncTest(testName, testFn) {
     const testChecksumMap = {
       [`${process.platform}-${process.arch}`]: testContentHash,
     }
-    const scanner = new ConfigSecurityScanner({ checksumMap: testChecksumMap })
+    const scanner = new ConfigSecurityScanner({
+      checksumMap: testChecksumMap,
+      quiet: true,
+    })
     delete process.env.GITLEAKS_PATH
 
     // Mock that global binary doesn't exist
@@ -145,7 +148,7 @@ async function runAsyncTest(testName, testFn) {
 
   // Test 4: Hard fail instead of npx fallback (security-first behavior)
   await runAsyncTest('Hard fail without allowLatestGitleaks flag', async () => {
-    const scanner = new ConfigSecurityScanner() // No allowLatestGitleaks option
+    const scanner = new ConfigSecurityScanner({ quiet: true }) // No allowLatestGitleaks option
     delete process.env.GITLEAKS_PATH
 
     // Mock that nothing exists
@@ -179,7 +182,10 @@ async function runAsyncTest(testName, testFn) {
   await runAsyncTest(
     'npx fallback with explicit allowLatestGitleaks flag',
     async () => {
-      const scanner = new ConfigSecurityScanner({ allowLatestGitleaks: true })
+      const scanner = new ConfigSecurityScanner({
+        allowLatestGitleaks: true,
+        quiet: true,
+      })
       delete process.env.GITLEAKS_PATH
 
       let warningCaptured = false
@@ -221,7 +227,7 @@ async function runAsyncTest(testName, testFn) {
 
   // Test 6: Platform detection
   console.log('🧪 Testing platform detection')
-  const scanner2 = new ConfigSecurityScanner()
+  const scanner2 = new ConfigSecurityScanner({ quiet: true })
   const originalPlatform = process.platform
   const originalArch = process.arch
 
