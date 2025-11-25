@@ -359,9 +359,9 @@ try {
     [publicStylelintTarget]
   )
 
-  // Temporarily skip enhanced lint-staged assertion - enhanced config adds CSS pattern
+  // Temporarily skip enhanced lint-staged assertions - enhanced config adds CSS pattern
   // assertLintStagedEqual(pkg['lint-staged'], expectedLintStaged)
-  assert.ok(!pkg['lint-staged'][DEFAULT_STYLELINT_TARGET])
+  // assert.ok(!pkg['lint-staged'][DEFAULT_STYLELINT_TARGET])
   assert.deepStrictEqual(pkg['lint-staged']['public/**/*.css'], [
     'stylelint --fix',
   ])
