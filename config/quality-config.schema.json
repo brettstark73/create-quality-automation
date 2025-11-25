@@ -81,6 +81,12 @@
             "type": "boolean",
             "default": false,
             "description": "Whether this check is required to pass for CI/CD success"
+          },
+          "threshold": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Threshold percentage (e.g., coverage percentage for coverage checks)"
           }
         },
         "additionalProperties": false
