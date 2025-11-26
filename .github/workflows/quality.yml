@@ -5,6 +5,9 @@ name: Quality Checks
 # Bootstrap projects: + ESLint
 # Development projects: + Tests + Security
 # Production-ready: All checks enabled
+#
+# Note: Core checks and tests run on Node.js 20 and 22 matrix to catch runtime differences
+# and ensure compatibility across Node.js versions
 
 on:
   push:
@@ -78,15 +81,19 @@ jobs:
   core-checks:
     runs-on: ubuntu-latest
     needs: detect-maturity
+    strategy:
+      matrix:
+        node-version: [20, 22]
+      fail-fast: false
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
 
-      - name: Setup Node.js
+      - name: Setup Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v6
         with:
-          node-version: '20'
+          node-version: ${{ matrix.node-version }}
           cache: ${{ needs.detect-maturity.outputs.package-manager }}
 
       - name: Install dependencies
@@ -98,6 +105,8 @@ jobs:
           npm run format:check
 
   # Step 3: Linting - run if source files exist (bootstrap+)
+  # Note: Runs on Node 20 only - linting tools are less sensitive to Node version differences
+  # Core runtime compatibility is tested via matrix in core-checks and tests jobs
   linting:
     runs-on: ubuntu-latest
     needs: detect-maturity
@@ -214,6 +223,18 @@ jobs:
             "npm"|*) npm audit --audit-level high ;;
           esac
 
+      - name: Production dependencies security audit
+        run: |
+          PACKAGE_MANAGER="${{ needs.detect-maturity.outputs.package-manager }}"
+          echo "🔒 Running production-only dependency audit with $PACKAGE_MANAGER..."
+
+          case "$PACKAGE_MANAGER" in
+            "pnpm") pnpm audit --audit-level high --prod ;;
+            "yarn") yarn audit --level high --groups dependencies ;;
+            "bun") bun audit --audit-level high --production ;;
+            "npm"|*) npm audit --audit-level high --production ;;
+          esac
+
       - name: Check for hardcoded secrets
         uses: gitleaks/gitleaks-action@ff98106e4c7b2bc287b24eaf42907196329070c7 # v2.3.9
         env:
@@ -245,23 +266,32 @@ jobs:
     runs-on: ubuntu-latest
     needs: detect-maturity
     if: fromJSON(needs.detect-maturity.outputs.test-count) > 0
+    strategy:
+      matrix:
+        node-version: [20, 22]
+      fail-fast: false
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
 
-      - name: Setup Node.js
+      - name: Setup Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v6
         with:
-          node-version: '20'
+          node-version: ${{ matrix.node-version }}
           cache: ${{ needs.detect-maturity.outputs.package-manager }}
 
       - name: Install dependencies
-        run: ${{ needs.detect-maturity.outputs.install-cmd }}
+        run: |
+          echo "⏱️ Performance Budget: Dependency installation must complete within 2 minutes"
+          timeout 120 ${{ needs.detect-maturity.outputs.install-cmd }} || {
+            echo "::error::Dependency installation exceeded 2-minute performance budget!"
+            exit 1
+          }
 
       - name: Run tests
         run: |
-          echo "🧪 Running ${{ needs.detect-maturity.outputs.test-count }} test files..."
+          echo "🧪 Running ${{ needs.detect-maturity.outputs.test-count }} test files on Node.js ${{ matrix.node-version }}..."
 
           # Warn if test count is suspiciously low
           TEST_COUNT=${{ needs.detect-maturity.outputs.test-count }}
@@ -269,7 +299,12 @@ jobs:
             echo "::warning::Only $TEST_COUNT test file(s) found - consider adding more tests for better coverage"
           fi
 
-          npm test
+          # Performance budget: Test suite timeout (5 minutes max)
+          echo "⏱️ Performance Budget: Test suite must complete within 5 minutes"
+          timeout 300 npm test || {
+            echo "::error::Test suite exceeded 5-minute performance budget!"
+            exit 1
+          }
 
       - name: Cache gitleaks binary for real download test
         if: runner.os == 'Linux'
@@ -321,6 +356,45 @@ jobs:
           echo "🔐 Running comprehensive documentation validation..."
           # This includes security audit freshness check with proper git-based validation
           bash scripts/check-docs.sh
+
+      - name: Package size and contents validation
+        if: hashFiles('package.json') != ''
+        run: |
+          echo "📦 Validating package size and contents..."
+
+          # Check if this is an npm package
+          if [ -f package.json ] && grep -q '"name"' package.json; then
+            # Dry-run pack to check what would be included
+            echo "🔍 Checking package contents (dry run):"
+            npm pack --dry-run 2>/dev/null | grep -E '^[a-zA-Z]' || echo "No files listed"
+
+            # Calculate estimated pack size
+            PACK_SIZE=$(npm pack --dry-run 2>&1 | grep -E 'package size.*[0-9]+' | grep -oE '[0-9.]+\s?(B|kB|MB)' | head -1 || echo "unknown")
+            echo "📊 Estimated package size: $PACK_SIZE"
+
+            # Warn if package seems too large (>10MB)
+            if echo "$PACK_SIZE" | grep -qE '[0-9]+\s?MB'; then
+              SIZE_NUM=$(echo "$PACK_SIZE" | grep -oE '[0-9]+')
+              if [ "$SIZE_NUM" -gt 10 ]; then
+                echo "::warning::Package size ($PACK_SIZE) is quite large. Consider excluding unnecessary files via .npmignore or package.json 'files' field."
+              fi
+            fi
+
+            # Check for common files that shouldn't be in packages
+            echo "🔍 Checking for potentially unwanted files..."
+            npm pack --dry-run 2>/dev/null | grep -E '\.(log|tmp|cache|DS_Store)$|node_modules/|\.git/' && {
+              echo "::warning::Package contains files that might not belong in the published package"
+            } || echo "✅ No obviously unwanted files detected"
+
+            # Validate package.json files field if present
+            if grep -q '"files"' package.json; then
+              echo "✅ Package.json 'files' field configured"
+            else
+              echo "::notice::No 'files' field in package.json - all files except those in .npmignore will be included"
+            fi
+          else
+            echo "ℹ️ Not an npm package or no package.json found - skipping package validation"
+          fi
 
       - name: Lighthouse CI
         if: hashFiles('.lighthouserc.js', '.lighthouserc.json', 'lighthouserc.js') != ''

@@ -22,10 +22,10 @@ const path = require('path')
 const readline = require('readline')
 
 // Default pricing constants (can be overridden in interactive setup)
-const PRO_PRICE = '39'
-const ENTERPRISE_PRICE = '197'
-const FOUNDER_PRO_PRICE = '19.50'
-const FOUNDER_ENTERPRISE_PRICE = '98.50'
+const PRO_PRICE = '49'
+const ENTERPRISE_PRICE = '149'
+const FOUNDER_PRO_PRICE = '24.50'
+const FOUNDER_ENTERPRISE_PRICE = '74.50'
 
 class SaaSMonetizationBootstrap {
   constructor() {
@@ -108,11 +108,13 @@ class SaaSMonetizationBootstrap {
 
       console.log('\n💰 Pricing Configuration')
       console.log('─────────────────────────')
+      this.config.starterPrice =
+        (await question('Starter tier monthly price (default $19): ')) || '19'
       this.config.proPrice =
-        (await question('Pro tier monthly price (default $39): ')) || '39'
+        (await question('Pro tier monthly price (default $49): ')) || '49'
       this.config.enterprisePrice =
-        (await question('Enterprise tier monthly price (default $197): ')) ||
-        '197'
+        (await question('Enterprise tier monthly price (default $149): ')) ||
+        '149'
       this.config.founderDiscount =
         (await question('Founder discount % (default 50): ')) || '50'
 
@@ -129,6 +131,10 @@ class SaaSMonetizationBootstrap {
     }
 
     // Calculate derived values
+    this.config.founderStarterPrice = (
+      parseFloat(this.config.starterPrice) *
+      (1 - parseFloat(this.config.founderDiscount) / 100)
+    ).toFixed(2)
     this.config.founderProPrice = (
       parseFloat(this.config.proPrice) *
       (1 - parseFloat(this.config.founderDiscount) / 100)
