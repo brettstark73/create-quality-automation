@@ -16,11 +16,20 @@
  * Target: 100% bug detection rate (vs 33% with unit tests only)
  */
 
-const assert = require('node:assert')
 const { execSync } = require('node:child_process')
 const fs = require('node:fs')
 const path = require('node:path')
 const os = require('node:os')
+
+/**
+ * Helper: Better test assertion with prefixed error output
+ */
+function testAssert(condition, message) {
+  if (!condition) {
+    console.error(`📋 TEST SCENARIO: ${message}`)
+    throw new Error(`Test assertion failed: ${message}`)
+  }
+}
 
 console.log('🧪 Testing CLI --deps Integration...\n')
 
@@ -66,26 +75,29 @@ function runDepsCommand(testDir, expectSuccess = true) {
 
     if (expectSuccess) {
       // Validate no errors in output
-      assert(
+      testAssert(
         !output.includes('Error'),
         'Output should not contain error messages'
       )
-      assert(
+      testAssert(
         !output.includes('TypeError'),
         'Output should not contain TypeError'
       )
 
       // Validate dependabot.yml was created
       const dependabotPath = path.join(testDir, '.github', 'dependabot.yml')
-      assert(
+      testAssert(
         fs.existsSync(dependabotPath),
         'Should create .github/dependabot.yml'
       )
 
       // Read and validate YAML structure
       const dependabotContent = fs.readFileSync(dependabotPath, 'utf8')
-      assert(dependabotContent.includes('version: 2'), 'Should have version: 2')
-      assert(
+      testAssert(
+        dependabotContent.includes('version: 2'),
+        'Should have version: 2'
+      )
+      testAssert(
         dependabotContent.includes('updates:'),
         'Should have updates section'
       )
@@ -142,7 +154,7 @@ function testNpmOnlyProject() {
     const { dependabotContent } = runDepsCommand(testDir)
 
     // Validate npm ecosystem detected (basic or premium tier)
-    assert(
+    testAssert(
       dependabotContent.includes('package-ecosystem: npm') ||
         dependabotContent.includes('package-ecosystem: "npm"'),
       'Should detect npm ecosystem'
@@ -194,7 +206,7 @@ pytest-django = "^4.5.0"
 
     // Run --deps command (should fail gracefully with upgrade message)
     const result = runDepsCommand(testDir, false)
-    assert(
+    testAssert(
       result.error?.message?.includes('Pro or Enterprise license') ||
         result.error?.stdout?.includes('Pro or Enterprise license') ||
         result.output?.includes('Pro or Enterprise license'),
@@ -243,7 +255,7 @@ serde_json = "1.0"
 
     // Run --deps command (should fail gracefully with upgrade message)
     const result = runDepsCommand(testDir, false)
-    assert(
+    testAssert(
       result.error?.message?.includes('Pro or Enterprise license') ||
         result.error?.stdout?.includes('Pro or Enterprise license') ||
         result.output?.includes('Pro or Enterprise license'),
@@ -311,7 +323,7 @@ tokio = "1.0"
     const { dependabotContent } = runDepsCommand(testDir)
 
     // Validate npm ecosystem present (FREE tier includes npm)
-    assert(
+    testAssert(
       dependabotContent.includes('package-ecosystem: npm') ||
         dependabotContent.includes('package-ecosystem: "npm"'),
       'Should include npm ecosystem'
@@ -326,7 +338,7 @@ tokio = "1.0"
       dependabotContent.includes('package-ecosystem: cargo') ||
       dependabotContent.includes('package-ecosystem: "cargo"')
 
-    assert(
+    testAssert(
       !hasPip && !hasCargo,
       'FREE tier should only include npm, not pip/cargo (multi-language requires Pro)'
     )
@@ -365,9 +377,9 @@ function testApiContractValidation() {
     const { output } = runDepsCommand(testDir)
 
     // Verify no TypeError in output
-    assert(!output.includes('TypeError'), 'Should not have TypeError')
+    testAssert(!output.includes('TypeError'), 'Should not have TypeError')
 
-    assert(
+    testAssert(
       !output.includes(
         "Cannot read properties of undefined (reading 'detected')"
       ),
@@ -376,7 +388,7 @@ function testApiContractValidation() {
 
     // Verify dependabot.yml was created
     const dependabotPath = path.join(testDir, '.github', 'dependabot.yml')
-    assert(fs.existsSync(dependabotPath), 'Should create dependabot.yml')
+    testAssert(fs.existsSync(dependabotPath), 'Should create dependabot.yml')
 
     console.log('  ✅ Command succeeded without TypeError')
     console.log('  ✅ No destructuring errors')
@@ -418,7 +430,7 @@ django-environ==0.11.0
 
     // Run --deps command (should fail gracefully with upgrade message)
     const result = runDepsCommand(testDir, false)
-    assert(
+    testAssert(
       result.error?.message?.includes('Pro or Enterprise license') ||
         result.error?.stdout?.includes('Pro or Enterprise license') ||
         result.output?.includes('Pro or Enterprise license'),

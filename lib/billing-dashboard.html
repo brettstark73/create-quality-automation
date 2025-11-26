@@ -311,12 +311,12 @@
             onclick="selectTier('pro')"
           >
             <div class="tier-name">Pro</div>
-            <div class="tier-price">$39<span class="period">/month</span></div>
+            <div class="tier-price">$49<span class="period">/month</span></div>
 
             <div class="founder-discount">
               <h3>🎁 Limited Founder Pricing</h3>
-              <div class="original-price">$39/month</div>
-              <div class="founder-price">$19.50/month</div>
+              <div class="original-price">$49/month</div>
+              <div class="founder-price">$24.50/month</div>
               <div>Save 50% forever!</div>
             </div>
 
@@ -337,12 +337,12 @@
             onclick="selectTier('enterprise')"
           >
             <div class="tier-name">Enterprise</div>
-            <div class="tier-price">$197<span class="period">/month</span></div>
+            <div class="tier-price">$149<span class="period">/month</span></div>
 
             <div class="founder-discount">
               <h3>🎁 Limited Founder Pricing</h3>
-              <div class="original-price">$197/month</div>
-              <div class="founder-price">$98.50/month</div>
+              <div class="original-price">$149/month</div>
+              <div class="founder-price">$74.50/month</div>
               <div>Save 50% forever!</div>
             </div>
 
@@ -454,12 +454,12 @@
 
         if (tier === 'pro') {
           checkoutBtn.textContent = isFounder
-            ? 'Start Pro Subscription - $19.50/month (Founder Price)'
-            : 'Start Pro Subscription - $39/month'
+            ? 'Start Pro Subscription - $24.50/month (Founder Price)'
+            : 'Start Pro Subscription - $49/month'
         } else if (tier === 'enterprise') {
           checkoutBtn.textContent = isFounder
-            ? 'Start Enterprise Subscription - $98.50/month (Founder Price)'
-            : 'Start Enterprise Subscription - $197/month'
+            ? 'Start Enterprise Subscription - $74.50/month (Founder Price)'
+            : 'Start Enterprise Subscription - $149/month'
         }
       }
 
@@ -511,12 +511,12 @@
           checkoutBtn.disabled = false
           if (selectedTier === 'pro') {
             checkoutBtn.textContent = isFounder
-              ? 'Start Pro Subscription - $19.50/month (Founder Price)'
-              : 'Start Pro Subscription - $39/month'
+              ? 'Start Pro Subscription - $24.50/month (Founder Price)'
+              : 'Start Pro Subscription - $49/month'
           } else {
             checkoutBtn.textContent = isFounder
-              ? 'Start Enterprise Subscription - $98.50/month (Founder Price)'
-              : 'Start Enterprise Subscription - $197/month'
+              ? 'Start Enterprise Subscription - $74.50/month (Founder Price)'
+              : 'Start Enterprise Subscription - $149/month'
           }
         }
       }
