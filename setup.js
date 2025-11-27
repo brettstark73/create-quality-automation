@@ -78,6 +78,8 @@ const {
   hasFeature,
   showUpgradeMessage,
   showLicenseStatus,
+  checkUsageCaps,
+  incrementUsage,
 } = require('./lib/licensing')
 
 // Smart Test Strategy Generator (Pro/Team/Enterprise feature)
@@ -688,6 +690,27 @@ HELP:
     if (hasRust) console.log('🦀 Detected: Rust project')
     if (hasRuby) console.log('💎 Detected: Ruby project')
     console.log(`📋 License tier: ${license.tier.toUpperCase()}`)
+
+    // Enforce Free tier caps for dependency monitoring (counted as dependency PRs)
+    if (license.tier === 'FREE') {
+      const capCheck = checkUsageCaps('dependency-pr')
+      if (!capCheck.allowed) {
+        console.error(`❌ ${capCheck.reason}`)
+        console.error(
+          '   Upgrade to Pro, Team, or Enterprise for unlimited runs: https://vibebuildlab.com/cqa'
+        )
+        process.exit(1)
+      }
+
+      const increment = incrementUsage('dependency-pr')
+      const usage = increment.usage || capCheck.usage
+      const caps = capCheck.caps
+      if (usage && caps && caps.maxDependencyPRsPerMonth !== undefined) {
+        console.log(
+          `🧮 Usage: ${usage.dependencyPRs}/${caps.maxDependencyPRsPerMonth} dependency monitoring runs used this month`
+        )
+      }
+    }
 
     const dependabotPath = path.join(projectPath, '.github', 'dependabot.yml')
 
@@ -1496,6 +1519,61 @@ coverage/
 . "$(dirname "$0")/_/husky.sh"
 
 echo "🔍 Running pre-push validation..."
+
+# Enforce Free tier pre-push cap (50/month)
+node - <<'EOF'
+const fs = require('fs')
+const path = require('path')
+const os = require('os')
+
+const licenseDir =
+  process.env.CQA_LICENSE_DIR || path.join(os.homedir(), '.create-quality-automation')
+const licenseFile = path.join(licenseDir, 'license.json')
+const usageFile = path.join(licenseDir, 'usage.json')
+const now = new Date()
+const currentMonth = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0')
+
+let usage = {
+  month: currentMonth,
+  prePushRuns: 0,
+  dependencyPRs: 0,
+  repos: [],
+  totalLinesOfCode: 0,
+}
+
+let tier = 'FREE'
+try {
+  const data = JSON.parse(fs.readFileSync(licenseFile, 'utf8'))
+  tier = (data && data.tier) || 'FREE'
+} catch (_error) {
+  tier = 'FREE'
+}
+
+if (tier !== 'FREE') {
+  process.exit(0)
+}
+
+try {
+  const data = JSON.parse(fs.readFileSync(usageFile, 'utf8'))
+  if (data.month === currentMonth) {
+    usage = { ...usage, ...data }
+  }
+} catch (_error) {
+  // First run or corrupt file – start fresh
+}
+
+const CAP = 50
+if (usage.prePushRuns >= CAP) {
+console.error('❌ Free tier limit reached: ' + usage.prePushRuns + '/' + CAP + ' pre-push runs this month')
+  console.error('   Upgrade to Pro, Team, or Enterprise: https://vibebuildlab.com/cqa')
+  process.exit(1)
+}
+
+usage.prePushRuns += 1
+fs.mkdirSync(licenseDir, { recursive: true })
+fs.writeFileSync(usageFile, JSON.stringify(usage, null, 2))
+console.log('🧮 Usage: ' + usage.prePushRuns + '/' + CAP + ' pre-push runs used this month')
+EOF
 
 # Validate command patterns (fast - catches deprecated patterns)
 if node -e "const pkg=require('./package.json');process.exit(pkg.scripts['test:patterns']?0:1)" 2>/dev/null; then

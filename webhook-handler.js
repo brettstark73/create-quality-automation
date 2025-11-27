@@ -111,12 +111,13 @@ function generateLicenseKey(customerId, tier, isFounder = false) {
  * Map Stripe price ID to tier and founder status
  */
 function mapPriceToTier(priceId) {
-  // Configure these based on your Stripe price IDs
+  // Configure these based on your Stripe price IDs (founder pricing retired)
   const priceMapping = {
     price_pro_monthly: { tier: 'PRO', isFounder: false },
-    price_pro_founder: { tier: 'PRO', isFounder: true },
-    price_enterprise_monthly: { tier: 'ENTERPRISE', isFounder: false },
-    price_enterprise_founder: { tier: 'ENTERPRISE', isFounder: true },
+    price_pro_annual: { tier: 'PRO', isFounder: false },
+    price_team_monthly: { tier: 'TEAM', isFounder: false },
+    price_team_annual: { tier: 'TEAM', isFounder: false },
+    price_enterprise_annual: { tier: 'ENTERPRISE', isFounder: false },
   }
 
   return priceMapping[priceId] || { tier: 'PRO', isFounder: false }
