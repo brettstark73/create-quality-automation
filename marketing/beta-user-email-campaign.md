@@ -1,10 +1,10 @@
 # Beta User Email Campaign - Founder Pricing
 
-Email sequence for existing beta users announcing the end of free beta and offering founder pricing.
+Email sequence for existing beta users announcing the end of free beta and inviting them to the new pricing (founder pricing retired as of Jan 15, 2026). Offer 14-day Pro trial and standard pricing: Pro $59/mo or $590/yr, Team $15/user/mo (5-seat min), Enterprise $249/mo annual.
 
 ## Email 1: Thank You + Founder Pricing Announcement (Send Immediately)
 
-**Subject:** 🎉 Thanks for beta testing - Your founder discount awaits!
+**Subject:** 🎉 Thanks for beta testing - Enjoy a 14-day Pro trial!
 
 **From:** Brett Stark <hello@aibuilderlab.com>
 
@@ -40,7 +40,7 @@ But because you were part of our journey from the beginning...
 
 ## ⏰ Limited Time: 30 Days to Claim
 
-Your founder pricing expires on December 22, 2025. After that, standard pricing applies.
+Your 14-day Pro trial starts today. After the trial, standard pricing applies ($59/mo or $590/yr).
 
 [**🎯 Claim Founder Pricing ($19.50/month)**](https://www.aibuilderlab.com/cqa-upgrade?utm_source=beta_email&utm_campaign=founder_pricing&code=FOUNDER50)
 
@@ -77,7 +77,7 @@ P.S. Free tier users still get all the quality automation features (ESLint, Pret
 ```
 Hi [Name],
 
-Quick follow-up on your founder pricing opportunity...
+Quick follow-up on your Pro trial...
 
 I wanted to share what other beta users are saying about the framework-aware dependency monitoring:
 
@@ -197,18 +197,18 @@ Brett
 
 Hi [Name],
 
-This is your final reminder - founder pricing expires in just 3 days (December 22).
+This is your final reminder - your 14-day Pro trial ends soon.
 
 After that, Pro tier goes to full price ($39/month).
 
 ## 🎁 What You're Missing Out On
 
-Without founder pricing:
+Without upgrading after trial:
 ❌ Pay $39/month instead of $19.50
 ❌ No lifetime price lock
 ❌ Join the waiting list for next discount (6+ months)
 
-With founder pricing:
+With Pro/Team/Enterprise:
 ✅ $19.50/month forever
 ✅ All Pro features included
 ✅ Priority support
@@ -221,7 +221,7 @@ With founder pricing:
 • 15+ individual PRs per week
 • Time spent reviewing: ~3 hours/week
 
-**Pro tier with founder pricing:**
+**Pro tier (standard pricing):**
 • Framework-aware grouping
 • 3-5 grouped PRs per week
 • Time spent reviewing: ~45 minutes/week
@@ -238,7 +238,7 @@ Thanks for being an amazing beta user!
 Best,
 Brett Stark
 
-P.S. This is the last email about founder pricing. After December 22, next opportunity won't be until mid-2026.
+P.S. This is the last email about the trial. After it ends, standard pricing applies.
 
 ```
 
@@ -256,7 +256,7 @@ Hi [Name],
 
 Welcome to Create Quality Automation Pro! 🎉
 
-Your founder pricing is locked in at $19.50/month forever. Here's how to get started:
+Your Pro trial is live today. Here's how to get started:
 
 ## 🔑 Step 1: Activate Your License
 
@@ -301,7 +301,7 @@ Have questions? Reply to this email for priority support (48h response time).
 
 ## 🎁 Bonus: Share with Your Team
 
-Your founder pricing is personal, but you can share the tool:
+Your trial is personal, but you can share the tool:
 
 ```bash
 npx create-quality-automation@latest
