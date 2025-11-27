@@ -259,58 +259,58 @@ npx create-quality-automation@latest --license-status
 
 #### 🔒 Freemium Model - Choose Your Tier
 
-> **BETA ENDED!** Framework-aware dependency grouping and multi-language support are now **Pro/Enterprise features**.
->
-> **Free tier provides basic npm dependency monitoring.** Upgrade to Pro for advanced features.
+> Premium features require Pro, Team, or Enterprise licenses.
+> **Free tier** has caps: 1 private repo, 2k LOC, 10 dependency PRs/month, 50 pre-push runs/month.
 
-**🆓 FREE TIER - What You Get**
+**🆓 FREE TIER - Hobby/OSS**
 
 - ✅ **Basic Dependabot configuration** for npm packages only
 - ✅ **Weekly dependency updates** on Monday 9am
-- ✅ **GitHub Actions** dependency monitoring
-- ✅ **Quality automation** (ESLint, Prettier, Husky, etc.)
+- ✅ **GitHub Actions** quality checks
+- ✅ **Quality automation** (ESLint, Prettier, Husky)
+- ⚠️ **Caps**: 1 private repo, 2k LOC, 10 dep PRs/month, 50 pre-push runs/month
 
-**💎 PRO TIER ($39/month) - Premium Features**
+**💎 PRO TIER ($59/month or $590/year) - Solo Devs/Small Teams**
 
-- ✅ **Framework-aware dependency grouping** for JavaScript/TypeScript
-  - Automatically groups related dependencies into batched PRs
-  - Reduces PR volume by 60%+ for React projects
-  - Supports React, Vue, Angular, Svelte ecosystems
-  - Testing frameworks (Jest, Vitest, Playwright, Testing Library)
-  - Build tools (Vite, Webpack, Turbo, Nx, Rollup, esbuild)
-  - Storybook ecosystem grouping
-  - Wildcard pattern matching for scoped packages (`@tanstack/*`, `@radix-ui/*`)
-  - Intelligent update-type filtering (major vs minor vs patch)
+- ✅ **Unlimited** repos, LOC, and runs
+- ✅ **Smart Test Strategy** (70% faster pre-push validation)
+- ✅ **Security scanning** (Gitleaks + ESLint security rules)
+- ✅ **TypeScript production protection**
+- ✅ **Multi-language** (Python, Rust, Ruby)
+- ✅ **Framework-aware dependency grouping** (React, Vue, Angular, Svelte)
+- ✅ **Email support** (24-48h response)
 
-- ✅ **Multi-language dependency monitoring**
-  - **Python/Pip**: Django, Flask, FastAPI, Data Science (numpy, pandas, scikit-learn)
-  - **Rust/Cargo**: Actix, Rocket, async runtimes (Tokio, async-std), Serde ecosystem
-  - **Ruby/Bundler**: Rails, Sinatra, RSpec testing frameworks
-  - **Polyglot support**: Single Dependabot config for npm + pip + cargo + bundler
-  - Framework-aware grouping across all languages
-  - Automatic ecosystem detection from project files
+**👥 TEAM TIER ($15/user/month, 5-seat minimum)**
 
-**🏢 ENTERPRISE TIER ($197/month) - Advanced Features**
+- ✅ **All PRO features** included
+- ✅ **Per-seat licensing** for your organization
+- ✅ **Shared quota** & usage reporting
+- ✅ **Team-wide config policies**
+- ✅ **Slack/email alerts** for failures
+- ✅ **Priority support** (business hours)
 
-- 🔒 **Everything in Pro tier**
-- 🚀 **Advanced security audit workflows** with custom schedules
-- 🔍 **Breaking change detection** before merging dependency updates
-- 📞 **Priority support** and custom integrations
+**🏢 ENTERPRISE TIER ($249/month annual + $499 onboarding)**
 
-**💰 Pricing & Upgrades**
+- ✅ **All TEAM features** included
+- ✅ **SSO/SAML integration**
+- ✅ **Custom risk patterns** & dependency policies
+- ✅ **Audit logs export** & compliance pack (SOC2, GDPR)
+- ✅ **Dedicated TAM** + 24×5 support with SLA
 
-Premium features are available now:
+**💰 Pricing**
 
-- **Pro Tier**: $39/month (framework-aware dependency monitoring, multi-language support)
-- **Enterprise Tier**: $197/month (everything in Pro + priority support, custom integrations)
+| Tier           | Monthly | Annual (save 17%) |
+| -------------- | ------- | ----------------- |
+| FREE           | $0      | -                 |
+| PRO            | $59     | $590 (save $118)  |
+| TEAM (5 seats) | $75     | $750 (save $150)  |
+| ENTERPRISE     | -       | $2,988            |
 
-**🎁 Limited-time founder pricing available for early adopters**
-
-[**📬 Join Waitlist - Lock in Founder Pricing**](https://tally.so/r/create-quality-automation-beta)
+[**🚀 Get Started**](https://vibebuildlab.com/cqa)
 
 ### 🔑 License Activation
 
-After purchasing a Pro or Enterprise license, activate it in your project (one‑time network fetch to download the signed license registry):
+After purchasing a Pro, Team, or Enterprise license, activate it in your project (one‑time network fetch to download the signed license registry):
 
 ```bash
 # Activate your purchased license

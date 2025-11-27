@@ -311,22 +311,38 @@
             onclick="selectTier('pro')"
           >
             <div class="tier-name">Pro</div>
-            <div class="tier-price">$49<span class="period">/month</span></div>
-
-            <div class="founder-discount">
-              <h3>🎁 Limited Founder Pricing</h3>
-              <div class="original-price">$49/month</div>
-              <div class="founder-price">$24.50/month</div>
-              <div>Save 50% forever!</div>
+            <div class="tier-price">$59<span class="period">/month</span></div>
+            <div style="color: #22c55e; font-size: 0.9rem">
+              or $590/year (save $118)
             </div>
 
             <ul class="tier-features">
+              <li>Unlimited repos, LOC, runs</li>
+              <li>Smart Test Strategy (70% faster)</li>
+              <li>Security scanning (Gitleaks + ESLint)</li>
+              <li>Multi-language (Python, Rust, Ruby)</li>
               <li>Framework-aware dependency grouping</li>
-              <li>React, Vue, Angular ecosystem support</li>
-              <li>60%+ reduction in dependency PRs</li>
-              <li>Multi-language support (Python, Rust, Ruby)</li>
-              <li>Priority email support</li>
-              <li>Advanced security workflows</li>
+              <li>Email support (24-48h response)</li>
+            </ul>
+          </div>
+
+          <!-- Team Tier -->
+          <div class="tier-card" data-tier="team" onclick="selectTier('team')">
+            <div class="tier-name">Team</div>
+            <div class="tier-price">
+              $15<span class="period">/user/month</span>
+            </div>
+            <div style="color: #666; font-size: 0.9rem">
+              5-seat minimum ($75/mo)
+            </div>
+
+            <ul class="tier-features">
+              <li>All PRO features included</li>
+              <li>Per-seat licensing for orgs</li>
+              <li>Shared quota & usage reporting</li>
+              <li>Team-wide config policies</li>
+              <li>Slack/email alerts for failures</li>
+              <li>Priority support (business hours)</li>
             </ul>
           </div>
 
@@ -337,59 +353,79 @@
             onclick="selectTier('enterprise')"
           >
             <div class="tier-name">Enterprise</div>
-            <div class="tier-price">$149<span class="period">/month</span></div>
-
-            <div class="founder-discount">
-              <h3>🎁 Limited Founder Pricing</h3>
-              <div class="original-price">$149/month</div>
-              <div class="founder-price">$74.50/month</div>
-              <div>Save 50% forever!</div>
+            <div class="tier-price">$249<span class="period">/month</span></div>
+            <div style="color: #666; font-size: 0.9rem">
+              annual + $499 onboarding
             </div>
 
             <ul class="tier-features">
-              <li>Everything in Pro</li>
-              <li>Priority support (24h response)</li>
-              <li>Custom integrations</li>
-              <li>Advanced analytics</li>
-              <li>Team management features</li>
-              <li>SLA guarantees</li>
+              <li>All TEAM features included</li>
+              <li>SSO/SAML integration</li>
+              <li>Custom risk patterns & policies</li>
+              <li>Audit logs export & compliance</li>
+              <li>Dedicated TAM + 24×5 SLA</li>
+              <li>Optional on-prem license server</li>
             </ul>
           </div>
         </div>
 
-        <div class="features-comparison">
+        <div
+          class="features-comparison"
+          style="grid-template-columns: 2fr 1fr 1fr 1fr"
+        >
           <div class="header-row">Features</div>
           <div class="header-row">Pro</div>
+          <div class="header-row">Team</div>
           <div class="header-row">Enterprise</div>
 
-          <div class="feature-row">
-            <div class="feature-name">Framework Grouping</div>
+          <div
+            class="feature-row"
+            style="grid-template-columns: 2fr 1fr 1fr 1fr"
+          >
+            <div class="feature-name">Smart Test Strategy</div>
             <div class="feature-value">✅</div>
-            <div class="feature-value">✅</div>
-          </div>
-
-          <div class="feature-row">
-            <div class="feature-name">Multi-language Support</div>
             <div class="feature-value">✅</div>
             <div class="feature-value">✅</div>
           </div>
 
-          <div class="feature-row">
-            <div class="feature-name">Priority Support</div>
+          <div
+            class="feature-row"
+            style="grid-template-columns: 2fr 1fr 1fr 1fr"
+          >
+            <div class="feature-name">Multi-language</div>
+            <div class="feature-value">✅</div>
+            <div class="feature-value">✅</div>
+            <div class="feature-value">✅</div>
+          </div>
+
+          <div
+            class="feature-row"
+            style="grid-template-columns: 2fr 1fr 1fr 1fr"
+          >
+            <div class="feature-name">Team Policies</div>
+            <div class="feature-value">❌</div>
+            <div class="feature-value">✅</div>
+            <div class="feature-value">✅</div>
+          </div>
+
+          <div
+            class="feature-row"
+            style="grid-template-columns: 2fr 1fr 1fr 1fr"
+          >
+            <div class="feature-name">SSO/SAML</div>
+            <div class="feature-value">❌</div>
+            <div class="feature-value">❌</div>
+            <div class="feature-value">✅</div>
+          </div>
+
+          <div
+            class="feature-row"
+            style="grid-template-columns: 2fr 1fr 1fr 1fr"
+          >
+            <div class="feature-name">Support SLA</div>
             <div class="feature-value">48h</div>
             <div class="feature-value">24h</div>
-          </div>
-
-          <div class="feature-row">
-            <div class="feature-name">Custom Integrations</div>
-            <div class="feature-value">❌</div>
-            <div class="feature-value">✅</div>
-          </div>
-
-          <div class="feature-row">
-            <div class="feature-name">Team Analytics</div>
-            <div class="feature-value">❌</div>
-            <div class="feature-value">✅</div>
+            <div class="feature-value">4h</div>
           </div>
         </div>
 
