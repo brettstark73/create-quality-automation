@@ -183,10 +183,17 @@ function testWriteBasicConfig() {
 
   if (fs.existsSync(outputPath)) {
     const content = fs.readFileSync(outputPath, 'utf8')
+    // Support both quoted and unquoted YAML key formats
+    const hasNpmEcosystem =
+      content.includes('package-ecosystem: npm') ||
+      content.includes('package-ecosystem: "npm"') ||
+      content.includes('"package-ecosystem": npm') ||
+      content.includes('"package-ecosystem": "npm"')
+
     if (
       content.includes('Basic Dependabot configuration') &&
       content.includes('version: 2') &&
-      content.includes('package-ecosystem: npm')
+      hasNpmEcosystem
     ) {
       console.log('  ✅ Config file created correctly\n')
       teardownTest()
@@ -376,13 +383,18 @@ function testFullConfigGeneration() {
 
   const content = fs.readFileSync(outputPath, 'utf8')
 
+  // Support both quoted and unquoted YAML key formats
+  const hasCommitMessage =
+    content.includes('commit-message:') || content.includes('"commit-message":')
+  const hasLabels = content.includes('labels:') || content.includes('"labels":')
+
   if (
     content.includes('Free Tier') &&
     content.includes('monthly') &&
     content.includes('npm') &&
     content.includes('github-actions') &&
-    content.includes('labels:') &&
-    content.includes('commit-message:')
+    hasLabels &&
+    hasCommitMessage
   ) {
     console.log('  ✅ Full configuration generated correctly\n')
     teardownTest()

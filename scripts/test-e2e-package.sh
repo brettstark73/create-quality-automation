@@ -205,7 +205,8 @@ npm install --silent > /dev/null 2>&1 || {
 }
 
 # Create test files for commands to process
-echo "const x = 1;" > test.js
+# Use valid code that won't trigger linting errors
+echo "module.exports = { name: 'test' };" > test.js
 echo "body { color: red; }" > test.css
 
 # Test format:check - should work (even if files need formatting)

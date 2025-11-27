@@ -1,0 +1,723 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Create Quality Automation - Ship Faster with Confidence</title>
+    <meta
+      name="description"
+      content="Automated quality gates for modern development. ESLint, Prettier, security scanning, smart test strategy. 70% faster pre-push validation."
+    />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Create Quality Automation" />
+    <meta
+      property="og:description"
+      content="Ship faster with confidence. Automated quality gates, security scanning, and 70% faster pre-push validation."
+    />
+    <meta property="og:url" content="https://vibebuildlab.com/cqa" />
+    <meta property="og:type" content="website" />
+
+    <!-- Stripe -->
+    <script src="https://js.stripe.com/v3/"></script>
+
+    <style>
+      :root {
+        --primary: #6366f1;
+        --primary-dark: #4f46e5;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --bg: #0f172a;
+        --bg-card: #1e293b;
+        --text: #f8fafc;
+        --text-muted: #94a3b8;
+        --border: #334155;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.6;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 24px;
+      }
+
+      /* Hero */
+      .hero {
+        padding: 80px 0;
+        text-align: center;
+        background: linear-gradient(135deg, var(--bg) 0%, #1e1b4b 100%);
+      }
+
+      .hero h1 {
+        font-size: 3.5rem;
+        font-weight: 800;
+        margin-bottom: 24px;
+        background: linear-gradient(135deg, #fff 0%, #a5b4fc 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      .hero p {
+        font-size: 1.25rem;
+        color: var(--text-muted);
+        max-width: 600px;
+        margin: 0 auto 32px;
+      }
+
+      .hero-cta {
+        display: flex;
+        gap: 16px;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+
+      .btn {
+        padding: 16px 32px;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.2s;
+        cursor: pointer;
+        border: none;
+      }
+
+      .btn-primary {
+        background: var(--primary);
+        color: white;
+      }
+
+      .btn-primary:hover {
+        background: var(--primary-dark);
+        transform: translateY(-2px);
+      }
+
+      .btn-outline {
+        background: transparent;
+        color: var(--text);
+        border: 2px solid var(--border);
+      }
+
+      .btn-outline:hover {
+        border-color: var(--primary);
+      }
+
+      .quick-start {
+        margin-top: 40px;
+        padding: 16px 24px;
+        background: var(--bg-card);
+        border-radius: 8px;
+        display: inline-block;
+        font-family: monospace;
+        font-size: 1.1rem;
+      }
+
+      .quick-start code {
+        color: var(--success);
+      }
+
+      /* Stats */
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 24px;
+        padding: 60px 0;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .stat {
+        text-align: center;
+      }
+
+      .stat-value {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--primary);
+      }
+
+      .stat-label {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+      }
+
+      /* Features */
+      .features {
+        padding: 80px 0;
+      }
+
+      .section-title {
+        text-align: center;
+        font-size: 2rem;
+        margin-bottom: 48px;
+      }
+
+      .features-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 24px;
+      }
+
+      .feature-card {
+        background: var(--bg-card);
+        border-radius: 12px;
+        padding: 32px;
+        border: 1px solid var(--border);
+      }
+
+      .feature-icon {
+        font-size: 2rem;
+        margin-bottom: 16px;
+      }
+
+      .feature-card h3 {
+        font-size: 1.25rem;
+        margin-bottom: 12px;
+      }
+
+      .feature-card p {
+        color: var(--text-muted);
+        font-size: 0.95rem;
+      }
+
+      /* Pricing */
+      .pricing {
+        padding: 80px 0;
+        background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg) 100%);
+      }
+
+      .pricing-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 24px;
+      }
+
+      .pricing-card {
+        background: var(--bg);
+        border-radius: 16px;
+        padding: 32px;
+        border: 1px solid var(--border);
+        position: relative;
+      }
+
+      .pricing-card.popular {
+        border-color: var(--primary);
+        transform: scale(1.05);
+      }
+
+      .popular-badge {
+        position: absolute;
+        top: -12px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: var(--primary);
+        color: white;
+        padding: 4px 16px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+      }
+
+      .pricing-tier {
+        font-size: 1.1rem;
+        color: var(--text-muted);
+        margin-bottom: 8px;
+      }
+
+      .pricing-price {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 8px;
+      }
+
+      .pricing-price span {
+        font-size: 1rem;
+        color: var(--text-muted);
+        font-weight: 400;
+      }
+
+      .pricing-desc {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        margin-bottom: 24px;
+        min-height: 40px;
+      }
+
+      .pricing-features {
+        list-style: none;
+        margin-bottom: 32px;
+      }
+
+      .pricing-features li {
+        padding: 8px 0;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+      }
+
+      .pricing-features li::before {
+        content: '✓';
+        color: var(--success);
+        font-weight: bold;
+      }
+
+      .pricing-features li.limited::before {
+        content: '⚠';
+        color: var(--warning);
+      }
+
+      .pricing-features li.no::before {
+        content: '✗';
+        color: #ef4444;
+      }
+
+      .pricing-card .btn {
+        width: 100%;
+        text-align: center;
+      }
+
+      /* Comparison */
+      .comparison {
+        padding: 80px 0;
+      }
+
+      .comparison-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: var(--bg-card);
+        border-radius: 12px;
+        overflow: hidden;
+      }
+
+      .comparison-table th,
+      .comparison-table td {
+        padding: 16px;
+        text-align: left;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .comparison-table th {
+        background: var(--bg);
+        font-weight: 600;
+      }
+
+      .comparison-table td:not(:first-child) {
+        text-align: center;
+      }
+
+      /* CTA */
+      .cta {
+        padding: 80px 0;
+        text-align: center;
+        background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+      }
+
+      .cta h2 {
+        font-size: 2.5rem;
+        margin-bottom: 16px;
+      }
+
+      .cta p {
+        font-size: 1.1rem;
+        opacity: 0.9;
+        margin-bottom: 32px;
+      }
+
+      /* Footer */
+      footer {
+        padding: 40px 0;
+        text-align: center;
+        color: var(--text-muted);
+        font-size: 0.9rem;
+      }
+
+      footer a {
+        color: var(--text-muted);
+        text-decoration: none;
+      }
+
+      footer a:hover {
+        color: var(--primary);
+      }
+
+      /* Responsive */
+      @media (max-width: 1024px) {
+        .pricing-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .features-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .stats {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+
+      @media (max-width: 640px) {
+        .hero h1 {
+          font-size: 2rem;
+        }
+        .pricing-grid {
+          grid-template-columns: 1fr;
+        }
+        .pricing-card.popular {
+          transform: none;
+        }
+        .features-grid {
+          grid-template-columns: 1fr;
+        }
+        .stats {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Hero -->
+    <section class="hero">
+      <div class="container">
+        <h1>Ship Faster with Confidence</h1>
+        <p>
+          Automated quality gates for modern development. One command sets up
+          ESLint, Prettier, security scanning, and smart test strategy.
+        </p>
+        <div class="hero-cta">
+          <a href="#pricing" class="btn btn-primary">Start 14-Day Free Trial</a>
+          <a
+            href="https://github.com/brettstark73/create-quality-automation"
+            class="btn btn-outline"
+            >View on GitHub</a
+          >
+        </div>
+        <div class="quick-start">
+          <code>npx create-quality-automation@latest</code>
+        </div>
+      </div>
+    </section>
+
+    <!-- Stats -->
+    <section class="container">
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-value">70%</div>
+          <div class="stat-label">Faster pre-push validation</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value">142</div>
+          <div class="stat-label">Tests passing</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value">1.9k+</div>
+          <div class="stat-label">npm downloads/month</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value">0</div>
+          <div class="stat-label">Security vulnerabilities</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features -->
+    <section class="features">
+      <div class="container">
+        <h2 class="section-title">Everything You Need for Quality Code</h2>
+        <div class="features-grid">
+          <div class="feature-card">
+            <div class="feature-icon">⚡</div>
+            <h3>Smart Test Strategy</h3>
+            <p>
+              Risk-based pre-push validation. Only runs tests that matter based
+              on what you changed. 70% faster on average.
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">🔒</div>
+            <h3>Security Scanning</h3>
+            <p>
+              Gitleaks catches secrets before they hit your repo. ESLint
+              security rules prevent common vulnerabilities.
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">📦</div>
+            <h3>Dependency Management</h3>
+            <p>
+              Framework-aware grouping reduces Dependabot PR noise by 60%+.
+              React, Vue, Angular auto-detected.
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">🎯</div>
+            <h3>TypeScript Protection</h3>
+            <p>
+              Prevents production TypeScript errors with strict test configs.
+              Catch type issues before deploy.
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">🌐</div>
+            <h3>Multi-Language</h3>
+            <p>
+              JavaScript, TypeScript, Python, Rust, Ruby. One tool for your
+              entire polyglot stack.
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">🏢</div>
+            <h3>Team & Enterprise</h3>
+            <p>
+              Per-seat licensing, shared policies, SSO, audit logs. Built for
+              organizations of any size.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Pricing -->
+    <section class="pricing" id="pricing">
+      <div class="container">
+        <h2 class="section-title">Simple, Transparent Pricing</h2>
+        <div class="pricing-grid">
+          <!-- Free -->
+          <div class="pricing-card">
+            <div class="pricing-tier">FREE</div>
+            <div class="pricing-price">$0</div>
+            <div class="pricing-desc">For hobby projects and OSS</div>
+            <ul class="pricing-features">
+              <li>ESLint, Prettier, Stylelint</li>
+              <li>Basic Husky pre-commit hooks</li>
+              <li class="limited">1 private repo, 2k LOC</li>
+              <li class="limited">10 dependency PRs/month</li>
+              <li class="no">No security scanning</li>
+              <li class="no">No Smart Test Strategy</li>
+            </ul>
+            <a
+              href="https://github.com/brettstark73/create-quality-automation"
+              class="btn btn-outline"
+              >Get Started Free</a
+            >
+          </div>
+
+          <!-- Pro -->
+          <div class="pricing-card popular">
+            <div class="popular-badge">MOST POPULAR</div>
+            <div class="pricing-tier">PRO</div>
+            <div class="pricing-price">$59<span>/month</span></div>
+            <div class="pricing-desc">Or $590/year (save $118)</div>
+            <ul class="pricing-features">
+              <li>Unlimited repos, LOC, runs</li>
+              <li><strong>Smart Test Strategy</strong> (70% faster)</li>
+              <li><strong>Security scanning</strong> (Gitleaks)</li>
+              <li>TypeScript protection</li>
+              <li>Multi-language support</li>
+              <li>Framework-aware grouping</li>
+              <li>Email support (24-48h)</li>
+            </ul>
+            <button class="btn btn-primary" onclick="checkout('pro_monthly')">
+              Start Monthly ($59)
+            </button>
+            <button
+              class="btn btn-outline"
+              onclick="checkout('pro_annual')"
+              style="margin-top: 8px; width: 100%"
+            >
+              Annual ($590 - Save 17%)
+            </button>
+          </div>
+
+          <!-- Team -->
+          <div class="pricing-card">
+            <div class="pricing-tier">TEAM</div>
+            <div class="pricing-price">$15<span>/user/mo</span></div>
+            <div class="pricing-desc">
+              5-seat min · $150/user/year (save 17%)
+            </div>
+            <ul class="pricing-features">
+              <li>All PRO features</li>
+              <li>Per-seat licensing</li>
+              <li>Shared org quota & reporting</li>
+              <li>Team-wide config policies</li>
+              <li>Slack/email alerts</li>
+              <li>Team audit log</li>
+              <li>Priority support</li>
+            </ul>
+            <a
+              href="mailto:sales@vibebuildlab.com?subject=CQA Team Plan Inquiry"
+              class="btn btn-primary"
+              >Contact Sales</a
+            >
+          </div>
+
+          <!-- Enterprise -->
+          <div class="pricing-card">
+            <div class="pricing-tier">ENTERPRISE</div>
+            <div class="pricing-price">$249<span>/month</span></div>
+            <div class="pricing-desc">Annual + $499 onboarding</div>
+            <ul class="pricing-features">
+              <li>All TEAM features</li>
+              <li>SSO/SAML integration</li>
+              <li>Custom risk patterns</li>
+              <li>Custom dependency policies</li>
+              <li>Audit logs export</li>
+              <li>Compliance pack (SOC2)</li>
+              <li>Dedicated TAM + SLA</li>
+            </ul>
+            <a href="mailto:enterprise@vibebuildlab.com" class="btn btn-outline"
+              >Contact Enterprise</a
+            >
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Comparison -->
+    <section class="comparison">
+      <div class="container">
+        <h2 class="section-title">How We Compare</h2>
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Feature</th>
+              <th>CQA Pro ($59/mo)</th>
+              <th>Snyk ($25-98/dev)</th>
+              <th>SonarCloud (~$30/mo)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Secret scanning</td>
+              <td>✅</td>
+              <td>✅</td>
+              <td>❌</td>
+            </tr>
+            <tr>
+              <td>Pre-commit hooks</td>
+              <td>✅</td>
+              <td>❌</td>
+              <td>❌</td>
+            </tr>
+            <tr>
+              <td>Smart test strategy</td>
+              <td>✅</td>
+              <td>❌</td>
+              <td>❌</td>
+            </tr>
+            <tr>
+              <td>Framework grouping</td>
+              <td>✅</td>
+              <td>❌</td>
+              <td>❌</td>
+            </tr>
+            <tr>
+              <td>Multi-language</td>
+              <td>✅</td>
+              <td>✅</td>
+              <td>✅</td>
+            </tr>
+            <tr>
+              <td>Team-wide license</td>
+              <td>✅ ($59 flat)</td>
+              <td>❌ (per seat)</td>
+              <td>❌ (by LOC)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta">
+      <div class="container">
+        <h2>Ready to Ship Faster?</h2>
+        <p>Start your 14-day free trial. No credit card required.</p>
+        <button
+          class="btn btn-primary"
+          onclick="checkout('pro')"
+          style="background: white; color: var(--primary)"
+        >
+          Start Free Trial
+        </button>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+      <div class="container">
+        <p>
+          <a href="https://github.com/brettstark73/create-quality-automation"
+            >GitHub</a
+          >
+          ·
+          <a href="https://www.npmjs.com/package/create-quality-automation"
+            >npm</a
+          >
+          · <a href="mailto:support@vibebuildlab.com">Support</a> ·
+          <a href="/privacy">Privacy</a> ·
+          <a href="/terms">Terms</a>
+        </p>
+        <p style="margin-top: 16px">
+          © 2025 VibeBuildLab. All rights reserved.
+        </p>
+      </div>
+    </footer>
+
+    <script>
+      // Stripe integration
+      // TODO: Replace with your Stripe publishable key
+      const stripe = Stripe('pk_live_YOUR_PUBLISHABLE_KEY')
+
+      async function checkout(plan) {
+        // TODO: Replace with your actual price IDs from Stripe
+        const priceIds = {
+          pro_monthly: 'price_PRO_MONTHLY_ID', // $59/mo
+          pro_annual: 'price_PRO_ANNUAL_ID', // $590/yr (save $118)
+          team_monthly: 'price_TEAM_MONTHLY_ID', // $75/mo (5 seats)
+          team_annual: 'price_TEAM_ANNUAL_ID', // $750/yr (5 seats)
+          enterprise: 'price_ENTERPRISE_ANNUAL_ID', // $2988/yr + $499 onboarding
+        }
+
+        // Team/Enterprise go to contact form
+        if (plan.startsWith('team') || plan === 'enterprise') {
+          window.location.href =
+            'mailto:sales@vibebuildlab.com?subject=CQA ' +
+            plan.replace('_', ' ').toUpperCase() +
+            ' Inquiry'
+          return
+        }
+
+        try {
+          const response = await fetch('/api/create-checkout-session', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              priceId: priceIds[plan],
+              trial: plan.includes('monthly'), // 14-day trial for monthly only
+            }),
+          })
+
+          const session = await response.json()
+          await stripe.redirectToCheckout({ sessionId: session.id })
+        } catch (error) {
+          console.error('Checkout error:', error)
+          alert(
+            'Unable to start checkout. Please try again or contact support.'
+          )
+        }
+      }
+    </script>
+  </body>
+</html>
