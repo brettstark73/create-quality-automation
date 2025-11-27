@@ -63,7 +63,7 @@ const {
   writeBasicDependabotConfig,
 } = require('./lib/dependency-monitoring-basic')
 
-// Premium dependency monitoring (Pro/Enterprise Tiers)
+// Premium dependency monitoring (Pro/Team/Enterprise Tiers)
 const {
   generatePremiumDependabotConfig,
   writePremiumDependabotConfig,
@@ -80,7 +80,7 @@ const {
   showLicenseStatus,
 } = require('./lib/licensing')
 
-// Smart Test Strategy Generator (Pro/Enterprise feature)
+// Smart Test Strategy Generator (Pro/Team/Enterprise feature)
 const {
   detectProjectType,
   generateSmartStrategy,
@@ -492,7 +492,7 @@ VALIDATION OPTIONS:
 
 LICENSE, TELEMETRY & ERROR REPORTING:
   --license-status          Show current license tier and available features
-  --activate-license        Activate Pro/Enterprise license key from Stripe purchase
+  --activate-license        Activate Pro/Team/Enterprise license key from Stripe purchase
   --telemetry-status        Show telemetry status and opt-in instructions
   --error-reporting-status  Show error reporting status and privacy information
 
@@ -515,7 +515,7 @@ EXAMPLES:
     → Show current license tier and upgrade options
 
   npx create-quality-automation@latest --activate-license
-    → Activate Pro/Enterprise license after Stripe purchase
+    → Activate Pro/Team/Enterprise license after Stripe purchase
 
   npx create-quality-automation@latest --telemetry-status
     → Show telemetry status and privacy information
@@ -664,7 +664,7 @@ HELP:
     return fs.existsSync(path.join(projectPath, 'Gemfile'))
   }
 
-  // Handle dependency monitoring (Free/Pro/Enterprise)
+  // Handle dependency monitoring (Free/Pro/Team/Enterprise)
   async function handleDependencyMonitoring() {
     const projectPath = process.cwd()
     const license = getLicenseInfo()
@@ -703,7 +703,7 @@ HELP:
     // Free tier only supports npm projects. Fail fast with a clear message.
     if (!shouldUsePremium && !hasNpm && (hasPython || hasRust || hasRuby)) {
       console.error(
-        '❌ Dependency monitoring for this project requires a Pro or Enterprise license.'
+        '❌ Dependency monitoring for this project requires a Pro, Team, or Enterprise license.'
       )
       console.error(
         '   Free tier supports npm projects only. Detected non-npm ecosystems.'
@@ -1709,7 +1709,7 @@ echo "✅ Pre-push validation passed!"
         pythonSpinner.succeed('Python quality tools configured')
       }
 
-      // Smart Test Strategy (Pro/Enterprise feature)
+      // Smart Test Strategy (Pro/Team/Enterprise feature)
       const smartStrategyEnabled = hasFeature('smartTestStrategy')
       if (smartStrategyEnabled) {
         const smartSpinner = showProgress('Setting up Smart Test Strategy...')
