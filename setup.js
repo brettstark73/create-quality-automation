@@ -692,11 +692,13 @@ HELP:
     const dependabotPath = path.join(projectPath, '.github', 'dependabot.yml')
 
     // Use premium or basic config based on license tier
-    // Free beta ended with v4.1.1 - Premium features now require Pro/Enterprise tier
-    // Pro/Enterprise: Framework-aware dependency monitoring with grouping
+    // Free beta ended with v4.1.1 - Premium features now require Pro/Team/Enterprise tier
+    // Pro/Team/Enterprise: Framework-aware dependency monitoring with grouping
     // Free: Basic npm-only dependency monitoring
     const shouldUsePremium =
-      license.tier === 'PRO' || license.tier === 'ENTERPRISE'
+      license.tier === 'PRO' ||
+      license.tier === 'TEAM' ||
+      license.tier === 'ENTERPRISE'
 
     // Free tier only supports npm projects. Fail fast with a clear message.
     if (!shouldUsePremium && !hasNpm && (hasPython || hasRust || hasRuby)) {

@@ -66,11 +66,19 @@ function createTestDir(name) {
 function runDepsCommand(testDir, expectSuccess = true) {
   const setupPath = path.resolve(__dirname, '..', 'setup.js')
 
+  // Disable developer mode to test real license behavior
+  const env = {
+    ...process.env,
+    CQA_DEVELOPER: 'false',
+    CQA_LICENSE_DIR: path.join(testDir, '.cqa-license'), // Use temp dir for license
+  }
+
   try {
     const output = execSync(`node "${setupPath}" --deps`, {
       cwd: testDir,
       encoding: 'utf8',
       stdio: 'pipe',
+      env,
     })
 
     if (expectSuccess) {
@@ -156,7 +164,9 @@ function testNpmOnlyProject() {
     // Validate npm ecosystem detected (basic or premium tier)
     testAssert(
       dependabotContent.includes('package-ecosystem: npm') ||
-        dependabotContent.includes('package-ecosystem: "npm"'),
+        dependabotContent.includes('package-ecosystem: "npm"') ||
+        dependabotContent.includes('"package-ecosystem": npm') ||
+        dependabotContent.includes('"package-ecosystem": "npm"'),
       'Should detect npm ecosystem'
     )
 
@@ -325,7 +335,9 @@ tokio = "1.0"
     // Validate npm ecosystem present (FREE tier includes npm)
     testAssert(
       dependabotContent.includes('package-ecosystem: npm') ||
-        dependabotContent.includes('package-ecosystem: "npm"'),
+        dependabotContent.includes('package-ecosystem: "npm"') ||
+        dependabotContent.includes('"package-ecosystem": npm') ||
+        dependabotContent.includes('"package-ecosystem": "npm"'),
       'Should include npm ecosystem'
     )
 
@@ -333,10 +345,14 @@ tokio = "1.0"
     // (Multi-language requires Pro/Enterprise)
     const hasPip =
       dependabotContent.includes('package-ecosystem: pip') ||
-      dependabotContent.includes('package-ecosystem: "pip"')
+      dependabotContent.includes('package-ecosystem: "pip"') ||
+      dependabotContent.includes('"package-ecosystem": pip') ||
+      dependabotContent.includes('"package-ecosystem": "pip"')
     const hasCargo =
       dependabotContent.includes('package-ecosystem: cargo') ||
-      dependabotContent.includes('package-ecosystem: "cargo"')
+      dependabotContent.includes('package-ecosystem: "cargo"') ||
+      dependabotContent.includes('"package-ecosystem": cargo') ||
+      dependabotContent.includes('"package-ecosystem": "cargo"')
 
     testAssert(
       !hasPip && !hasCargo,
