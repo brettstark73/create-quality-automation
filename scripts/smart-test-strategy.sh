@@ -56,14 +56,20 @@ echo "   ⚡ Speed Bonus: $SPEED_BONUS"
 echo ""
 
 # Decision logic
+# NOTE: test:commands and test:e2e are ALWAYS excluded from pre-push (run in CI only)
+# - test:commands: Takes 60+ seconds, verifies npm scripts work in isolated env
+# - test:e2e: Requires browser/package build, CI has better infrastructure
+# These run in GitHub Actions on every PR and push to main
+
 if [[ $RISK_SCORE -ge 7 ]]; then
-  echo "🔴 HIGH RISK - Comprehensive validation"
-  echo "   • All tests + security audit"
-  npm run test:comprehensive
+  echo "🔴 HIGH RISK - Comprehensive validation (pre-push)"
+  echo "   • Patterns + unit tests + security audit"
+  echo "   • (command + e2e tests run in CI only)"
+  npm run test:patterns && npm test && npm run security:audit
 elif [[ $RISK_SCORE -ge 4 ]]; then
   echo "🟡 MEDIUM RISK - Standard validation"
-  echo "   • Fast tests + patterns + command execution"
-  npm run test:medium
+  echo "   • Fast tests + patterns"
+  npm run test:patterns && npm run test:fast
 elif [[ $RISK_SCORE -ge 2 || "$SPEED_BONUS" == "false" ]]; then
   echo "🟢 LOW RISK - Fast validation"
   echo "   • Unit tests only"
