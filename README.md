@@ -1,4 +1,4 @@
-# Create Quality Automation
+# QA Architect
 
 Bootstrap quality automation in JavaScript/TypeScript and Python projects with comprehensive tooling. One command adds ESLint, Prettier, Husky, lint-staged, security scanning, and GitHub Actions to any project.
 
@@ -39,20 +39,21 @@ npx create-qa-architect@latest
 
 ## Pricing & Licensing
 
-### Freemium Model
+### Hybrid Model
 
-| Tier           | Price       | Features                                                |
-| -------------- | ----------- | ------------------------------------------------------- |
-| **Free**       | $0          | Basic quality automation, 1 private repo, 2k LOC        |
-| **Pro**        | $59/mo      | Unlimited repos, Smart Test Strategy, security scanning |
-| **Team**       | $15/user/mo | All Pro features + shared quota, team policies          |
-| **Enterprise** | $249/mo     | SSO/SAML, custom patterns, compliance pack              |
+| Tier       | Price                    | Features                                          |
+| ---------- | ------------------------ | ------------------------------------------------- |
+| **Free**   | $0                       | CLI tool, basic quality automation                |
+| **Pro**    | $29/mo or $199/yr        | Dashboard, Smart Test Strategy, security scanning |
+| **Bundle** | Included in Vibe Lab Pro | Full Pro access                                   |
+
+**Pro access**: Available standalone or through [Vibe Lab Pro](https://vibebuildlab.com/pro) membership ($49/mo or $399/yr)
 
 ### License
 
 **Open Source (MIT)** - Free for personal and commercial use.
 
-[Get Started with Pro](https://vibebuildlab.com/cqa)
+[Get Started](https://vibebuildlab.com/qa-architect)
 
 ## Tech Stack
 
