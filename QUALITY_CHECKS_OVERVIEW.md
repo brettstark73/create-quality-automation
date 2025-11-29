@@ -43,12 +43,12 @@
      - WARNING ONLY (does not fail)
 
 5. **Configuration Security Check**
-   - `npx create-quality-automation@latest --security-config`
+   - `npx create-qa-architect@latest --security-config`
    - Runs comprehensive configuration validation
    - Fails if security issues detected
 
 6. **Documentation Validation**
-   - `npx create-quality-automation@latest --validate-docs`
+   - `npx create-qa-architect@latest --validate-docs`
    - Checks documentation consistency
    - Fails on doc issues
 
@@ -144,9 +144,9 @@
      "format": "prettier --write .",
      "format:check": "prettier --check .",
      "security:audit": "npm audit --audit-level high",
-     "security:config": "npx create-quality-automation@latest --security-config",
-     "validate:docs": "npx create-quality-automation@latest --validate-docs",
-     "validate:comprehensive": "npx create-quality-automation@latest --comprehensive",
+     "security:config": "npx create-qa-architect@latest --security-config",
+     "validate:docs": "npx create-qa-architect@latest --validate-docs",
+     "validate:comprehensive": "npx create-qa-architect@latest --comprehensive",
      "validate:all": "npm run validate:comprehensive && npm run security:audit"
    }
    ```

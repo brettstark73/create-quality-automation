@@ -1,4 +1,4 @@
-# Test Coverage Analysis - create-quality-automation
+# Test Coverage Analysis - create-qa-architect
 
 **Generated**: 2025-11-18
 **Overall Coverage**: 80.1% statements | 77.57% branches | 79.19% functions
@@ -328,13 +328,13 @@ Coverage Report: coverage/index.html
 
 ## Comparison with Similar Projects
 
-| Project                       | Coverage  | Notes               |
-| ----------------------------- | --------- | ------------------- |
-| `eslint`                      | ~90%      | Linting tool        |
-| `prettier`                    | ~95%      | Code formatter      |
-| `husky`                       | ~85%      | Git hooks           |
-| `create-react-app`            | ~80%      | CLI scaffold        |
-| **create-quality-automation** | **80.1%** | **On par with CRA** |
+| Project                 | Coverage  | Notes               |
+| ----------------------- | --------- | ------------------- |
+| `eslint`                | ~90%      | Linting tool        |
+| `prettier`              | ~95%      | Code formatter      |
+| `husky`                 | ~85%      | Git hooks           |
+| `create-react-app`      | ~80%      | CLI scaffold        |
+| **create-qa-architect** | **80.1%** | **On par with CRA** |
 
 **Verdict**: Coverage is acceptable for a CLI tool, but critical security/licensing code needs improvement.
 

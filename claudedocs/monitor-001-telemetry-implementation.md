@@ -16,7 +16,7 @@ Implemented opt-in telemetry system for usage tracking. Critical for data-driven
 1. **lib/telemetry.js** (304 lines)
    - TelemetrySession class for lifecycle tracking
    - Event recording (start, complete, failure, validation)
-   - Local JSON storage (~/.create-quality-automation/telemetry.json)
+   - Local JSON storage (~/.create-qa-architect/telemetry.json)
    - Automatic event rotation (max 100 events)
    - Statistics aggregation
    - Privacy-first design
@@ -45,7 +45,7 @@ Implemented opt-in telemetry system for usage tracking. Critical for data-driven
 ✅ **Opt-in only** - Disabled by default
 ✅ **Local storage** - No network calls
 ✅ **No personal information** - No paths, usernames, IP addresses
-✅ **Easy to inspect** - Plain JSON file in ~/.create-quality-automation/
+✅ **Easy to inspect** - Plain JSON file in ~/.create-qa-architect/
 ✅ **Easy to delete** - Single file removal
 ✅ **Transparent** - --telemetry-status shows everything
 
@@ -90,7 +90,7 @@ Implemented opt-in telemetry system for usage tracking. Critical for data-driven
 ❌ IP addresses
 ❌ Directory structures
 ❌ Code content
-❌ Environment variables (except CQA_TELEMETRY)
+❌ Environment variables (except QAA_TELEMETRY)
 
 ## Usage
 
@@ -98,28 +98,28 @@ Implemented opt-in telemetry system for usage tracking. Critical for data-driven
 
 ```bash
 # Temporary (current session)
-export CQA_TELEMETRY=true
+export QAA_TELEMETRY=true
 
 # Persistent (add to ~/.bashrc or ~/.zshrc)
-echo 'export CQA_TELEMETRY=true' >> ~/.bashrc
+echo 'export QAA_TELEMETRY=true' >> ~/.bashrc
 ```
 
 ### Check Status
 
 ```bash
-npx create-quality-automation@latest --telemetry-status
+npx create-qa-architect@latest --telemetry-status
 ```
 
 ### Inspect Data
 
 ```bash
-cat ~/.create-quality-automation/telemetry.json
+cat ~/.create-qa-architect/telemetry.json
 ```
 
 ### Clear Data
 
 ```bash
-rm ~/.create-quality-automation/telemetry.json
+rm ~/.create-qa-architect/telemetry.json
 ```
 
 ## Testing
@@ -156,8 +156,8 @@ LICENSE & TELEMETRY:
 
 PRIVACY & TELEMETRY:
   Telemetry is OPT-IN only (disabled by default). To enable:
-    export CQA_TELEMETRY=true
-  All data stays local (~/.create-quality-automation/telemetry.json)
+    export QAA_TELEMETRY=true
+  All data stays local (~/.create-qa-architect/telemetry.json)
   No personal information collected. Run --telemetry-status for details.
 ```
 

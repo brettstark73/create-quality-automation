@@ -25,7 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Prevents license database tampering
   - License validator rejects databases without valid checksums
   - Webhook handlers automatically calculate and embed checksums
-  - Security bulletin CQA-2024-001 addressing validation bypass vulnerabilities
+  - Security bulletin QAA-2024-001 addressing validation bypass vulnerabilities
 
 - **License Management Tools** (`admin-license.js`)
   - Command-line tool for license database management
@@ -155,7 +155,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Environment Variables** (`README.md`)
   - Added documentation for `NO_EMOJI` and `SCREEN_READER` variables
-  - Added documentation for existing `CQA_TELEMETRY` and `CQA_ERROR_REPORTING`
+  - Added documentation for existing `QAA_TELEMETRY` and `QAA_ERROR_REPORTING`
   - Usage examples for accessibility features
 
 - **Configuration Schema** (`.qualityrc.json.example`)
@@ -192,7 +192,7 @@ No breaking changes. All new features are opt-in or automatic enhancements:
 
 2. **Optional features**:
    - Set `NO_EMOJI=true` for accessibility mode
-   - Run `npx create-quality-automation@latest --validate-config` to validate `.qualityrc.json`
+   - Run `npx create-qa-architect@latest --validate-config` to validate `.qualityrc.json`
    - Dependabot will automatically create PRs for dependency updates
 
 3. **For contributors**:
@@ -213,7 +213,7 @@ No breaking changes. All new features are opt-in or automatic enhancements:
   - Auto-detects 4 maturity levels: minimal, bootstrap, development, production-ready
   - Counts source files, test files, CSS files
   - Detects documentation presence and dependencies
-  - CLI command: `npx create-quality-automation@latest --check-maturity`
+  - CLI command: `npx create-qa-architect@latest --check-maturity`
   - GitHub Actions compatible output format (`--github-actions`)
   - 84%+ code coverage with 23 comprehensive tests
 
@@ -280,10 +280,10 @@ No breaking changes. All new features are opt-in or automatic enhancements:
 
 ```bash
 # Option 1: Update your configuration (recommended)
-npx create-quality-automation@latest --update
+npx create-qa-architect@latest --update
 
 # Option 2: Check your maturity level
-npx create-quality-automation@latest --check-maturity
+npx create-qa-architect@latest --check-maturity
 
 # Option 3: Force strict mode (disable progressive)
 # Edit .qualityrc.json: set "maturity": "production-ready"
@@ -328,7 +328,7 @@ npx create-quality-automation@latest --check-maturity
 ### Notes
 
 - **Monorepo subdirectory detection** (Bug #3) deferred to v3.2.0 - requires architectural changes
-- Workaround: Run CLI in each service directory manually (`cd services/api && npx create-quality-automation --deps`)
+- Workaround: Run CLI in each service directory manually (`cd services/api && npx create-qa-architect --deps`)
 - All 22+ test suites passing with new parser fixes
 
 ## [3.1.0] - 2025-11-15
@@ -508,8 +508,8 @@ None - All changes are backward compatible
 ### Fixed
 
 - **🚨 CRITICAL**: Workflow validation steps using conditional setup.js checks that always fall back to weaker validation
-  - Configuration security check now uses `npx create-quality-automation@latest --security-config`
-  - Documentation validation now uses `npx create-quality-automation@latest --validate-docs`
+  - Configuration security check now uses `npx create-qa-architect@latest --security-config`
+  - Documentation validation now uses `npx create-qa-architect@latest --validate-docs`
   - Previously: `if [ -f "setup.js" ]` was always false in consumer repos, silently falling back to basic grep checks
   - Impact: Consumer repos now get comprehensive validation instead of weak fallback checks
 - **📖 README accuracy**: Removed "Auto-merge for security patches only" claim from Dependabot feature list
@@ -532,7 +532,7 @@ None - All changes are backward compatible
 ### Fixed
 
 - **🚨 CRITICAL**: Workflow references to non-existent setup.js in consumer repos - Removed problematic step
-- **🚨 CRITICAL**: npm scripts using `node setup.js` instead of `npx create-quality-automation@latest`
+- **🚨 CRITICAL**: npm scripts using `node setup.js` instead of `npx create-qa-architect@latest`
 - **.eslintignore missing from npm package** - Added to files array
 - **Invalid Dependabot config schema** - Removed unsupported `update-type` keys
 - Removed .npmrc from files array (npm excludes it automatically)
@@ -540,7 +540,7 @@ None - All changes are backward compatible
 ### Changed
 
 - Enhanced prerelease checks to include E2E package validation
-- npm scripts now use `npx create-quality-automation@latest` for CLI operations
+- npm scripts now use `npx create-qa-architect@latest` for CLI operations
 - Improved workflow to avoid consumer-facing failures
 
 ### Developer Experience
@@ -663,9 +663,9 @@ None - All changes are backward compatible
 
 ### New CLI Commands
 
-- `npx create-quality-automation@latest --security-config` - Run configuration security scan
-- `npx create-quality-automation@latest --validate-docs` - Validate documentation accuracy
-- `npx create-quality-automation@latest --comprehensive` - Run all validation checks
+- `npx create-qa-architect@latest --security-config` - Run configuration security scan
+- `npx create-qa-architect@latest --validate-docs` - Validate documentation accuracy
+- `npx create-qa-architect@latest --comprehensive` - Run all validation checks
 
 ### Enhanced GitHub Actions
 
@@ -816,7 +816,7 @@ None - All changes are backward compatible
 
 ### Added
 
-- 🎉 Initial release as npm package `create-quality-automation`
+- 🎉 Initial release as npm package `create-qa-architect`
 - ESLint 9 flat config support (`eslint.config.cjs`)
 - Automatic TypeScript detection and configuration
 - Husky v9 pre-commit hooks with lint-staged
@@ -834,7 +834,7 @@ None - All changes are backward compatible
 - **Smart TypeScript Support**: Automatically detects TypeScript projects and configures `@typescript-eslint`
 - **Modern Tooling**: ESLint 9 flat config, Husky 9, latest Prettier/Stylelint
 - **Graceful Merging**: Preserves existing scripts, dependencies, and lint-staged configs
-- **CLI Interface**: Run with `npx create-quality-automation@latest`
+- **CLI Interface**: Run with `npx create-qa-architect@latest`
 - **Update Support**: Re-run with `--update` flag for configuration updates
 
 ### Technical
@@ -884,7 +884,7 @@ If you were using the template repository directly:
    node /path/to/template/setup.js
 
    # New way
-   npx create-quality-automation@latest
+   npx create-qa-architect@latest
    ```
 
 2. **Configuration Changes**:
@@ -894,5 +894,5 @@ If you were using the template repository directly:
 
 3. **Update Existing Projects**:
    ```bash
-   npx create-quality-automation@latest --update
+   npx create-qa-architect@latest --update
    ```

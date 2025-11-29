@@ -473,7 +473,7 @@ function parseArguments(rawArgs) {
     console.log(`
 🚀 Create Quality Automation Setup
 
-Usage: npx create-quality-automation@latest [options]
+Usage: npx create-qa-architect@latest [options]
 
 SETUP OPTIONS:
   (no args)         Run complete quality automation setup
@@ -507,47 +507,47 @@ GRANULAR TOOL CONTROL:
   --no-eslint-security   Disable ESLint security rule checking
 
 EXAMPLES:
-  npx create-quality-automation@latest
+  npx create-qa-architect@latest
     → Set up quality automation with all tools
 
-  npx create-quality-automation@latest --deps
+  npx create-qa-architect@latest --deps
     → Add basic dependency monitoring (Dependabot config + weekly updates + GitHub Actions)
 
-  npx create-quality-automation@latest --license-status
+  npx create-qa-architect@latest --license-status
     → Show current license tier and upgrade options
 
-  npx create-quality-automation@latest --activate-license
+  npx create-qa-architect@latest --activate-license
     → Activate Pro/Team/Enterprise license after Stripe purchase
 
-  npx create-quality-automation@latest --telemetry-status
+  npx create-qa-architect@latest --telemetry-status
     → Show telemetry status and privacy information
 
-  npx create-quality-automation@latest --error-reporting-status
+  npx create-qa-architect@latest --error-reporting-status
     → Show error reporting status and crash analytics information
 
-  npx create-quality-automation@latest --check-maturity
+  npx create-qa-architect@latest --check-maturity
     → Detect project maturity level (minimal, bootstrap, development, production-ready)
 
-  npx create-quality-automation@latest --validate-config
+  npx create-qa-architect@latest --validate-config
     → Validate .qualityrc.json configuration file against JSON Schema
 
-  npx create-quality-automation@latest --comprehensive --no-gitleaks
+  npx create-qa-architect@latest --comprehensive --no-gitleaks
     → Run validation but skip gitleaks secret scanning
 
-  npx create-quality-automation@latest --security-config --allow-latest-gitleaks
+  npx create-qa-architect@latest --security-config --allow-latest-gitleaks
     → Run security checks with unpinned gitleaks (NOT RECOMMENDED - supply chain risk)
 
-  npx create-quality-automation@latest --security-config --no-npm-audit
+  npx create-qa-architect@latest --security-config --no-npm-audit
     → Run security checks but skip npm audit
 
-  npx create-quality-automation@latest --dry-run
+  npx create-qa-architect@latest --dry-run
     → Preview what files and configurations would be created/modified
 
 PRIVACY & TELEMETRY:
   Telemetry and error reporting are OPT-IN only (disabled by default). To enable:
-    export CQA_TELEMETRY=true           # Usage tracking (local only)
-    export CQA_ERROR_REPORTING=true     # Crash analytics (local only)
-  All data stays local (~/.create-quality-automation/)
+    export QAA_TELEMETRY=true           # Usage tracking (local only)
+    export QAA_ERROR_REPORTING=true     # Crash analytics (local only)
+  All data stays local (~/.create-qa-architect/)
   No personal information collected. Run --telemetry-status or
   --error-reporting-status for details.
 
@@ -596,7 +596,7 @@ HELP:
     console.log('✅ Dry run complete - no files were modified')
     console.log('')
     console.log('To apply these changes, run without --dry-run flag:')
-    console.log('  npx create-quality-automation@latest')
+    console.log('  npx create-qa-architect@latest')
     process.exit(0)
   }
 
@@ -732,7 +732,7 @@ HELP:
         '   Free tier supports npm projects only. Detected non-npm ecosystems.'
       )
       console.error(
-        '   Options: add npm/package.json, or upgrade and re-run: npx create-quality-automation@latest --deps after activation.'
+        '   Options: add npm/package.json, or upgrade and re-run: npx create-qa-architect@latest --deps after activation.'
       )
       process.exit(1)
     }
@@ -849,12 +849,12 @@ HELP:
       if (result.success) {
         console.log('\n🎉 Success! Premium features are now available.')
         console.log('\nNext steps:')
-        console.log('• Run: npx create-quality-automation@latest --deps')
+        console.log('• Run: npx create-qa-architect@latest --deps')
         console.log('• Enable framework-aware dependency grouping')
         console.log('• Enjoy 60%+ reduction in dependency PRs!')
       } else {
         console.log('\n❌ License activation failed.')
-        console.log('• Check your license key format (CQA-XXXX-XXXX-XXXX-XXXX)')
+        console.log('• Check your license key format (QAA-XXXX-XXXX-XXXX-XXXX)')
         console.log('• Verify your email address')
         console.log('• Contact support: hello@aibuilderlab.com')
       }
@@ -934,6 +934,44 @@ HELP:
         console.error('❌ This must be run in a git repository')
         console.log('Run "git init" first, then try again.')
         process.exit(1)
+      }
+
+      // Enforce FREE tier repo limit (1 private repo)
+      // Must happen before any file modifications
+      const license = getLicenseInfo()
+      if (license.tier === 'FREE') {
+        // Generate unique repo ID from git remote or directory name
+        let repoId
+        try {
+          const remoteUrl = execSync('git remote get-url origin', {
+            encoding: 'utf8',
+            stdio: ['pipe', 'pipe', 'ignore'],
+          }).trim()
+          repoId = remoteUrl
+        } catch {
+          // No remote - use absolute path as fallback
+          repoId = process.cwd()
+        }
+
+        const repoCheck = checkUsageCaps('repo')
+        const currentRepos = repoCheck.usage?.repos || []
+
+        // Only enforce if this is a NEW repo (not already tracked)
+        if (!currentRepos.includes(repoId)) {
+          if (!repoCheck.allowed) {
+            console.error(`\n❌ ${repoCheck.reason}`)
+            console.error(
+              '   Upgrade to Pro for unlimited repos: https://vibebuildlab.com/cqa'
+            )
+            process.exit(1)
+          }
+
+          // Register this repo
+          incrementUsage('repo', 1, repoId)
+          console.log(
+            `✅ Registered repo (FREE tier: ${currentRepos.length + 1}/1 repos used)`
+          )
+        }
       }
 
       // Validate custom template path BEFORE any mutations
@@ -1527,7 +1565,7 @@ const path = require('path')
 const os = require('os')
 
 const licenseDir =
-  process.env.CQA_LICENSE_DIR || path.join(os.homedir(), '.create-quality-automation')
+  process.env.QAA_LICENSE_DIR || path.join(os.homedir(), '.create-qa-architect')
 const licenseFile = path.join(licenseDir, 'license.json')
 const usageFile = path.join(licenseDir, 'usage.json')
 const now = new Date()
@@ -1538,7 +1576,6 @@ let usage = {
   prePushRuns: 0,
   dependencyPRs: 0,
   repos: [],
-  totalLinesOfCode: 0,
 }
 
 let tier = 'FREE'
@@ -2016,7 +2053,7 @@ describe('Test framework validation', () => {
     // If report was captured, show location
     if (reportId) {
       console.log(`\n📊 Error report saved: ${reportId}`)
-      console.log(`View at: ~/.create-quality-automation/error-reports.json`)
+      console.log(`View at: ~/.create-qa-architect/error-reports.json`)
     }
   } catch (reportingError) {
     // Error in error reporting - fallback to basic error display

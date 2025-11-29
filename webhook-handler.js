@@ -102,9 +102,9 @@ function generateLicenseKey(customerId, tier, isFounder = false) {
     .update(`${customerId}:${tier}:${isFounder}:cqa-license-v1`)
     .digest('hex')
 
-  // Format as license key: CQA-XXXX-XXXX-XXXX-XXXX
+  // Format as license key: QAA-XXXX-XXXX-XXXX-XXXX
   const keyParts = hash.slice(0, 16).match(/.{4}/g)
-  return `CQA-${keyParts.join('-').toUpperCase()}`
+  return `QAA-${keyParts.join('-').toUpperCase()}`
 }
 
 /**

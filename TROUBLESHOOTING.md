@@ -1,6 +1,6 @@
 # Troubleshooting Guide
 
-Common issues and solutions when using create-quality-automation.
+Common issues and solutions when using create-qa-architect.
 
 ## Table of Contents
 
@@ -44,7 +44,7 @@ This tool requires Node.js 20+ with modern module support.
 
 - Ensure you're using Node.js 20 or higher
 - Try clearing npm cache: `npm cache clean --force`
-- Reinstall the package: `npx clear-npx-cache && npx create-quality-automation@latest`
+- Reinstall the package: `npx clear-npx-cache && npx create-qa-architect@latest`
 
 ## Setup Errors
 
@@ -64,7 +64,7 @@ This tool requires Node.js 20+ with modern module support.
    ```
 2. Then run the quality automation setup:
    ```bash
-   npx create-quality-automation@latest
+   npx create-qa-architect@latest
    ```
 
 ### Error: Malformed package.json
@@ -124,7 +124,7 @@ EPERM: operation not permitted
    ```
 2. Then run setup:
    ```bash
-   npx create-quality-automation@latest
+   npx create-qa-architect@latest
    ```
 3. Or skip Husky if not using git:
    - Edit package.json to remove `"prepare": "husky"` script
@@ -143,7 +143,7 @@ EPERM: operation not permitted
 
 1. Check which specific config is insecure:
    ```bash
-   npx create-quality-automation@latest --security-config
+   npx create-qa-architect@latest --security-config
    ```
 2. Common issues:
    - `dangerouslySetInnerHTML` in Next.js/Vite config
@@ -152,7 +152,7 @@ EPERM: operation not permitted
 3. Review the flagged configuration file and remove unsafe patterns
 4. Or skip security checks (not recommended):
    ```bash
-   npx create-quality-automation@latest --no-eslint-security
+   npx create-qa-architect@latest --no-eslint-security
    ```
 
 ### Error: Documentation validation failed
@@ -173,7 +173,7 @@ README.md references non-existent file: some-file.txt
    - Use placeholder markers like `[file-to-be-created]`
 3. Skip documentation validation if needed:
    ```bash
-   npx create-quality-automation@latest --comprehensive --no-markdownlint
+   npx create-qa-architect@latest --comprehensive --no-markdownlint
    ```
 
 ### Error: ESLint not installed
@@ -192,7 +192,7 @@ ESLint is not installed or not found in PATH
    ```
 2. Or skip ESLint security checks:
    ```bash
-   npx create-quality-automation@latest --security-config --no-eslint-security
+   npx create-qa-architect@latest --security-config --no-eslint-security
    ```
 3. After setup completes, run:
    ```bash
@@ -287,7 +287,7 @@ ESLint is not installed or not found in PATH
 - This is fixed in recent versions (v2.1+)
 - Update to latest version:
   ```bash
-  npx create-quality-automation@latest
+  npx create-qa-architect@latest
   ```
 - The tool now uses Node.js APIs instead of shell commands
 
@@ -342,7 +342,7 @@ ESLint is not installed or not found in PATH
 
 1. Use `--dry-run` to preview changes first:
    ```bash
-   npx create-quality-automation@latest --dry-run
+   npx create-qa-architect@latest --dry-run
    ```
 2. Check network connection (npm registry access)
 3. Clear npm cache:
@@ -364,12 +364,12 @@ ESLint is not installed or not found in PATH
 
 1. Run individual validation checks:
    ```bash
-   npx create-quality-automation@latest --security-config
-   npx create-quality-automation@latest --validate-docs
+   npx create-qa-architect@latest --security-config
+   npx create-qa-architect@latest --validate-docs
    ```
 2. Disable slow tools:
    ```bash
-   npx create-quality-automation@latest --comprehensive --no-gitleaks --no-actionlint
+   npx create-qa-architect@latest --comprehensive --no-gitleaks --no-actionlint
    ```
 3. Check for large files in project that tools are scanning
 
@@ -380,7 +380,7 @@ ESLint is not installed or not found in PATH
 1. **Check the version:**
 
    ```bash
-   npx create-quality-automation@latest --help
+   npx create-qa-architect@latest --help
    ```
 
    Ensure you're using the latest version.
@@ -394,7 +394,7 @@ ESLint is not installed or not found in PATH
    Run with Node.js debug flags:
 
    ```bash
-   NODE_DEBUG=* npx create-quality-automation@latest
+   NODE_DEBUG=* npx create-qa-architect@latest
    ```
 
 4. **Report an issue:**
@@ -419,10 +419,10 @@ ESLint is not installed or not found in PATH
    # 2. Try in a clean test directory
    mkdir test-qa && cd test-qa
    npm init -y
-   npx create-quality-automation@latest
+   npx create-qa-architect@latest
 
    # 3. Use dry-run to preview
-   npx create-quality-automation@latest --dry-run
+   npx create-qa-architect@latest --dry-run
 
    # 4. Check for conflicting tools
    npm ls eslint prettier stylelint
@@ -435,7 +435,7 @@ ESLint is not installed or not found in PATH
 Yes! The tool is merge-safe and won't overwrite existing configurations. Use `--update` mode:
 
 ```bash
-npx create-quality-automation@latest --update
+npx create-qa-architect@latest --update
 ```
 
 ### Can I customize the configurations?
@@ -465,7 +465,7 @@ Yes! Use the validation modes:
 
 ```bash
 # In your CI workflow
-npx create-quality-automation@latest --comprehensive
+npx create-qa-architect@latest --comprehensive
 ```
 
 Or run individual tools:

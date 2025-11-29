@@ -76,7 +76,7 @@ This meant that if a user selected "Validate" or "Dependency monitoring" in inte
 Re-parsing with interactive flags REPLACED all original command-line arguments. For example:
 
 ```bash
-npx create-quality-automation --interactive --template ./custom --no-gitleaks
+npx create-qa-architect --interactive --template ./custom --no-gitleaks
 ```
 
 After interactive mode selected `--deps`, the re-parse would only see:
@@ -114,7 +114,7 @@ parsedConfig = parseArguments(mergedFlags)
 
 ```bash
 # Original command
-npx create-quality-automation --interactive --template ./custom --no-gitleaks
+npx create-qa-architect --interactive --template ./custom --no-gitleaks
 
 # Interactive selections
 # - operationMode: setup

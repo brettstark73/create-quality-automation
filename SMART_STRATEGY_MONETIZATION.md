@@ -159,7 +159,7 @@ The time you save pays for itself 25x over.
 
 3. **templates/scripts/smart-test-strategy.sh**
    - Generated for PRO/ENTERPRISE users only
-   - Customized for project type (create-quality-automation defaults)
+   - Customized for project type (create-qa-architect defaults)
 
 ### License Gating Logic
 

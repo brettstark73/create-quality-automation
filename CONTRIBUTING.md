@@ -1,4 +1,4 @@
-# Contributing to create-quality-automation
+# Contributing to create-qa-architect
 
 ## Error Prevention & Quality Standards
 
@@ -117,7 +117,7 @@ npm run test:watch  # Re-run tests on file changes
 - CLI commands and flags (--deps, --template, --comprehensive)
 - Multi-file operations (template copying, config generation)
 - Cross-language features (npm + Python + Rust detection)
-- User-facing workflows (npx create-quality-automation)
+- User-facing workflows (npx create-qa-architect)
 
 **Pattern**:
 

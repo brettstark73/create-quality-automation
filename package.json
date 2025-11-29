@@ -1,10 +1,10 @@
 {
-  "name": "create-quality-automation",
-  "version": "4.3.3",
-  "description": "Bootstrap quality automation for JavaScript/TypeScript and Python projects with GitHub Actions, pre-commit hooks, linting, formatting, and freemium dependency monitoring",
+  "name": "create-qa-architect",
+  "version": "5.0.0",
+  "description": "QA Architect - Bootstrap quality automation for JavaScript/TypeScript and Python projects with GitHub Actions, pre-commit hooks, linting, formatting, and smart test strategy",
   "main": "setup.js",
   "bin": {
-    "create-quality-automation": "./setup.js",
+    "create-qa-architect": "./setup.js",
     "create-saas-monetization": "./create-saas-monetization.js"
   },
   "scripts": {
@@ -43,6 +43,8 @@
     "release:major": "npm version major && git push --follow-tags"
   },
   "keywords": [
+    "qa-architect",
+    "quality-automation",
     "quality",
     "automation",
     "prettier",
@@ -55,13 +57,9 @@
     "python",
     "javascript",
     "typescript",
-    "black",
-    "ruff",
-    "mypy",
+    "smart-test-strategy",
     "pre-commit",
-    "freemium",
     "dependency-monitoring",
-    "dependabot",
     "security-audit"
   ],
   "author": "Brett Stark",
@@ -84,12 +82,12 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/brettstark73/quality-automation-template.git"
+    "url": "git+https://github.com/brettstark73/qa-architect.git"
   },
   "bugs": {
-    "url": "https://github.com/brettstark73/quality-automation-template/issues"
+    "url": "https://github.com/brettstark73/qa-architect/issues"
   },
-  "homepage": "https://github.com/brettstark73/quality-automation-template#readme",
+  "homepage": "https://github.com/brettstark73/qa-architect#readme",
   "engines": {
     "node": ">=20"
   },

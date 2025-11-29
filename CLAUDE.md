@@ -4,8 +4,8 @@ This project uses Brett Stark's global Claude Code configuration with specific a
 
 ## Project Information
 
-- **Package:** `create-quality-automation`
-- **CLI Command:** `npx create-quality-automation@latest`
+- **Package:** `create-qa-architect`
+- **CLI Command:** `npx create-qa-architect@latest`
 - **Purpose:** Bootstrap quality automation in any project via CLI
 
 ## Project-Specific Commands
@@ -87,7 +87,7 @@ FORCE_MINIMAL=1 git push        # Lint only (use with caution)
 - This is an npm package with CLI functionality - test with `npm run test`
 - Setup script is conservative and merge-safe for existing projects
 - Supports Node.js ≥20 with Volta configuration
-- Package is published to npm as an unscoped CLI (`create-quality-automation`)
+- Package is published to npm as an unscoped CLI (`create-qa-architect`)
 
 ## CLAUDE.md Maintenance Automation
 

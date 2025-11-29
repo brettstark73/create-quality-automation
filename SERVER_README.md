@@ -36,7 +36,7 @@ npm install express stripe
 # Set environment variables
 export STRIPE_SECRET_KEY=sk_live_...
 export STRIPE_WEBHOOK_SECRET=whsec_...
-export LICENSE_DATABASE_PATH=/var/lib/cqa/legitimate-licenses.json
+export LICENSE_DATABASE_PATH=/var/lib/qaa/legitimate-licenses.json
 export PORT=3000
 
 # Run webhook handler
@@ -53,10 +53,10 @@ Manually add licenses to the database (useful for testing or special cases).
 
 ```bash
 # Add a license manually
-node admin-license.js CQA-1234-ABCD-5678-EF90 cus_customer123 PRO false user@example.com
+node admin-license.js QAA-1234-ABCD-5678-EF90 cus_customer123 PRO false user@example.com
 
 # Arguments:
-# 1. License key (CQA-XXXX-XXXX-XXXX-XXXX format)
+# 1. License key (QAA-XXXX-XXXX-XXXX-XXXX format)
 # 2. Stripe customer ID
 # 3. Tier (PRO or ENTERPRISE)
 # 4. Founder status (true/false)
@@ -76,17 +76,17 @@ See [DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md) for complete deployment instruc
 
 ### Serving the License Database
 
-The CLI fetches licenses from `CQA_LICENSE_DB_URL` (default: `https://license.aibuilderlab.com/cqa/legitimate-licenses.json`).
+The CLI fetches licenses from `QAA_LICENSE_DB_URL` (default: `https://license.aibuilderlab.com/qaa/legitimate-licenses.json`).
 
 **Option 1: Direct from webhook handler**
 
 - Webhook handler already serves `/legitimate-licenses.json` endpoint
-- Point `CQA_LICENSE_DB_URL` to your webhook handler URL
+- Point `QAA_LICENSE_DB_URL` to your webhook handler URL
 
 **Option 2: CDN/Static hosting**
 
 - Upload `legitimate-licenses.json` to CDN/S3
-- Point `CQA_LICENSE_DB_URL` to CDN URL
+- Point `QAA_LICENSE_DB_URL` to CDN URL
 - More scalable, faster for global users
 
 ## Security
@@ -123,10 +123,10 @@ npm install express stripe
 
 ```bash
 # Test admin tool
-node admin-license.js CQA-TEST-1234-5678-ABCD cus_test PRO false test@example.com
+node admin-license.js QAA-TEST-1234-5678-ABCD cus_test PRO false test@example.com
 
 # Verify database created
-cat ~/.create-quality-automation/legitimate-licenses.json
+cat ~/.create-qa-architect/legitimate-licenses.json
 
 # Test webhook handler
 # (Requires Stripe webhook secret and test event)

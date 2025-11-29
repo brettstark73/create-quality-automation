@@ -7,11 +7,11 @@ const path = require('path')
 console.log('\n🧪 Testing telemetry module...\n')
 
 // Store original env
-const originalEnv = process.env.CQA_TELEMETRY
+const originalEnv = process.env.QAA_TELEMETRY
 
 // Use temp directory to avoid permission issues
 const tempTelemetryDir = path.join(os.tmpdir(), 'cqa-telemetry-test')
-process.env.CQA_TELEMETRY_DIR = tempTelemetryDir
+process.env.QAA_TELEMETRY_DIR = tempTelemetryDir
 
 // Import telemetry after env overrides
 const {
@@ -35,19 +35,19 @@ const cleanup = () => {
 
 // Test 1: Telemetry disabled by default
 console.log('🔍 Test 1: Telemetry disabled by default...')
-delete process.env.CQA_TELEMETRY
+delete process.env.QAA_TELEMETRY
 assert.strictEqual(isTelemetryEnabled(), false)
 console.log('  ✅ Telemetry correctly disabled by default')
 
 // Test 2: Telemetry enabled with env var
 console.log('🔍 Test 2: Telemetry enabled with env var...')
-process.env.CQA_TELEMETRY = 'true'
+process.env.QAA_TELEMETRY = 'true'
 assert.strictEqual(isTelemetryEnabled(), true)
-process.env.CQA_TELEMETRY = '1'
+process.env.QAA_TELEMETRY = '1'
 assert.strictEqual(isTelemetryEnabled(), true)
-process.env.CQA_TELEMETRY = 'false'
+process.env.QAA_TELEMETRY = 'false'
 assert.strictEqual(isTelemetryEnabled(), false)
-process.env.CQA_TELEMETRY = '0'
+process.env.QAA_TELEMETRY = '0'
 assert.strictEqual(isTelemetryEnabled(), false)
 console.log('  ✅ Telemetry opt-in via env var works correctly')
 
@@ -61,7 +61,7 @@ console.log('  ✅ Session creation works correctly')
 
 // Test 4: No events recorded when disabled
 console.log('🔍 Test 4: No events recorded when disabled...')
-delete process.env.CQA_TELEMETRY
+delete process.env.QAA_TELEMETRY
 cleanup()
 const disabledSession = new TelemetrySession()
 disabledSession.recordStart({ test: 'data' })
@@ -71,7 +71,7 @@ console.log('  ✅ No events recorded when telemetry disabled')
 
 // Test 5: Events recorded when enabled
 console.log('🔍 Test 5: Events recorded when enabled...')
-process.env.CQA_TELEMETRY = 'true'
+process.env.QAA_TELEMETRY = 'true'
 cleanup()
 const enabledSession = new TelemetrySession()
 enabledSession.recordStart({ mode: 'test' })
@@ -175,7 +175,7 @@ console.log('  ✅ Telemetry stored in temp test directory')
 
 // Test 13: Silent failures
 console.log('🔍 Test 13: Silent failures (never throws)...')
-delete process.env.CQA_TELEMETRY
+delete process.env.QAA_TELEMETRY
 assert.doesNotThrow(() => {
   const safeSession = new TelemetrySession()
   safeSession.recordStart()
@@ -189,9 +189,9 @@ cleanup()
 
 // Restore original env
 if (originalEnv) {
-  process.env.CQA_TELEMETRY = originalEnv
+  process.env.QAA_TELEMETRY = originalEnv
 } else {
-  delete process.env.CQA_TELEMETRY
+  delete process.env.QAA_TELEMETRY
 }
 
 console.log('\n✅ All telemetry tests passed!\n')

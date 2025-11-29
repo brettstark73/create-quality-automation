@@ -2,7 +2,7 @@
 
 **Date:** 2025-11-25
 **Status:** Planning Phase - Implementation Pending
-**Scope:** create-quality-automation, letterflow, keyflash, saas-starter-template, project-starter-guide
+**Scope:** create-qa-architect, letterflow, keyflash, saas-starter-template, project-starter-guide
 
 ---
 
@@ -16,7 +16,7 @@
 
 ## Project Classification & Testing Needs
 
-### 1. **create-quality-automation** (CLI Tool Generator)
+### 1. **create-qa-architect** (CLI Tool Generator)
 
 **Type:** Developer tooling / npm package
 **Special Characteristics:**
@@ -273,7 +273,7 @@ CI/CD:
 ### Phase 1: Analysis (Current)
 
 - ✅ Analyze letterflow (complete)
-- ✅ Analyze create-quality-automation (complete)
+- ✅ Analyze create-qa-architect (complete)
 - ⏳ Analyze keyflash (pending)
 - ⏳ Analyze saas-starter-template (pending)
 - ⏳ Analyze project-starter-guide (pending)
@@ -297,7 +297,7 @@ CI/CD:
 
 **Order:**
 
-1. create-quality-automation (highest pain)
+1. create-qa-architect (highest pain)
 2. letterflow (activate smart strategy if desired)
 3. keyflash (after analysis)
 4. saas-starter-template (if needed)
@@ -360,7 +360,7 @@ CI/CD:
 
 1. **Analyze remaining projects** (keyflash, saas-starter-template, project-starter-guide)
 2. **Get approval on strategy** from user
-3. **Implement create-quality-automation** first (highest pain point)
+3. **Implement create-qa-architect** first (highest pain point)
 4. **Test and validate** new flow
 5. **Roll out to other projects** based on learnings
 
@@ -369,7 +369,7 @@ CI/CD:
 ## Questions for User
 
 1. **keyflash:** What type of project is this? What tests does it have?
-2. **Priority:** Which project should we fix first besides create-quality-automation?
+2. **Priority:** Which project should we fix first besides create-qa-architect?
 3. **Smart Strategy:** Should letterflow activate the smart strategy or keep fixed medium?
 4. **Templates:** Do saas-starter-template and project-starter-guide need test optimization?
 

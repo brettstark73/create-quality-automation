@@ -1,6 +1,6 @@
 # Webhook Handler Deployment Guide
 
-This guide explains how to deploy the license webhook handler for production use with create-quality-automation.
+This guide explains how to deploy the license webhook handler for production use with create-qa-architect.
 
 ## Architecture Overview
 
@@ -27,7 +27,7 @@ This guide explains how to deploy the license webhook handler for production use
 ```bash
 # On your server
 git clone your-repo
-cd create-quality-automation
+cd create-qa-architect
 npm install express stripe
 
 # Or copy just the webhook handler
@@ -111,7 +111,7 @@ const endpoints = [
 curl https://your-domain.com/legitimate-licenses.json
 
 # Test full activation flow
-npx create-quality-automation@latest --activate-license
+npx create-qa-architect@latest --activate-license
 ```
 
 ## 4. Production Considerations
