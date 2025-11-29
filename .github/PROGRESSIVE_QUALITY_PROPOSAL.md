@@ -295,7 +295,7 @@ jobs:
       - run: npm ci || npm install
 
       - name: Documentation validation
-        run: npx create-quality-automation@latest --validate-docs
+        run: npx create-qa-architect@latest --validate-docs
 
       - name: Lighthouse CI
         if: hashFiles('.lighthouserc.js', '.lighthouserc.json', 'lighthouserc.js') != ''
@@ -320,7 +320,7 @@ jobs:
 
 3. **Add CLI command for maturity check**
    ```bash
-   npx create-quality-automation@latest --check-maturity
+   npx create-qa-architect@latest --check-maturity
    ```
 
 ### Phase 2: Workflow Updates (Week 2)
@@ -336,8 +336,8 @@ jobs:
 
 3. **Add setup.js option for maturity level**
    ```bash
-   npx create-quality-automation@latest --maturity=minimal
-   npx create-quality-automation@latest --maturity=auto  # default
+   npx create-qa-architect@latest --maturity=minimal
+   npx create-qa-architect@latest --maturity=auto  # default
    ```
 
 ### Phase 3: Documentation & Testing (Week 3)

@@ -69,8 +69,8 @@ function runDepsCommand(testDir, expectSuccess = true) {
   // Disable developer mode to test real license behavior
   const env = {
     ...process.env,
-    CQA_DEVELOPER: 'false',
-    CQA_LICENSE_DIR: path.join(testDir, '.cqa-license'), // Use temp dir for license
+    QAA_DEVELOPER: 'false',
+    QAA_LICENSE_DIR: path.join(testDir, '.cqa-license'), // Use temp dir for license
   }
 
   try {

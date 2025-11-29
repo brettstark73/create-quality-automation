@@ -49,7 +49,7 @@ Your 14-day Pro trial starts today. After the trial, standard pricing applies ($
 If you've already upgraded, activate with:
 ```
 
-npx create-quality-automation@latest --activate-license
+npx create-qa-architect@latest --activate-license
 
 ```
 
@@ -169,7 +169,7 @@ react-build:
 Try it on your React project:
 
 ```bash
-npx create-quality-automation@latest --deps
+npx create-qa-architect@latest --deps
 ```
 
 Then check your generated `.github/dependabot.yml` - you'll see the intelligent grouping in action.
@@ -263,7 +263,7 @@ Your Pro trial is live today. Here's how to get started:
 You'll receive your license key in a separate email from Stripe. Then run:
 
 ```bash
-npx create-quality-automation@latest --activate-license
+npx create-qa-architect@latest --activate-license
 ```
 
 Enter your license key and email when prompted.
@@ -274,13 +274,13 @@ For existing projects:
 
 ```bash
 cd your-react-project
-npx create-quality-automation@latest --deps
+npx create-qa-architect@latest --deps
 ```
 
 For new projects:
 
 ```bash
-npx create-quality-automation@latest
+npx create-qa-architect@latest
 ```
 
 ## 📊 Step 3: See the Magic
@@ -304,7 +304,7 @@ Have questions? Reply to this email for priority support (48h response time).
 Your trial is personal, but you can share the tool:
 
 ```bash
-npx create-quality-automation@latest
+npx create-qa-architect@latest
 ```
 
 Team members can upgrade separately or use the free tier.

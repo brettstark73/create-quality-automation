@@ -4,7 +4,7 @@ This document captures common pitfalls, anti-patterns, and best practices for se
 
 ## Reference Templates
 
-create-quality-automation includes reference workflow templates that implement these patterns:
+create-qa-architect includes reference workflow templates that implement these patterns:
 
 - **`.github/workflows/pnpm-ci.yml.example`** - Modern pnpm workflow with correct action order, caching, and monorepo support
 - **`.github/workflows/python-ci.yml.example`** - Python CI with Ruff, Black, mypy, pytest, and matrix testing
@@ -14,12 +14,12 @@ These templates are included in the npm package and can be copied from:
 
 ```bash
 # Copy and rename to use
-cp node_modules/create-quality-automation/.github/workflows/pnpm-ci.yml.example .github/workflows/ci.yml
-cp node_modules/create-quality-automation/.github/workflows/python-ci.yml.example .github/workflows/ci.yml
-cp node_modules/create-quality-automation/config/.pre-commit-config.yaml .pre-commit-config.yaml
+cp node_modules/create-qa-architect/.github/workflows/pnpm-ci.yml.example .github/workflows/ci.yml
+cp node_modules/create-qa-architect/.github/workflows/python-ci.yml.example .github/workflows/ci.yml
+cp node_modules/create-qa-architect/config/.pre-commit-config.yaml .pre-commit-config.yaml
 ```
 
-Or view them on [GitHub](https://github.com/brettstark73/create-quality-automation/tree/main/.github/workflows).
+Or view them on [GitHub](https://github.com/brettstark73/create-qa-architect/tree/main/.github/workflows).
 
 ## Table of Contents
 

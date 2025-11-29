@@ -7,7 +7,7 @@ const path = require('path')
 
 // Use temp directory to avoid permission issues and keep tests isolated
 const tempErrorDir = path.join(os.tmpdir(), 'cqa-error-reporter-test')
-process.env.CQA_ERROR_DIR = tempErrorDir
+process.env.QAA_ERROR_DIR = tempErrorDir
 
 const {
   ErrorReporter,
@@ -23,11 +23,11 @@ const {
 } = require('../lib/error-reporter')
 
 describe('Error Reporter', () => {
-  const originalEnv = process.env.CQA_ERROR_REPORTING
+  const originalEnv = process.env.QAA_ERROR_REPORTING
 
   beforeEach(() => {
     // Clear environment
-    delete process.env.CQA_ERROR_REPORTING
+    delete process.env.QAA_ERROR_REPORTING
 
     // Clear error reports file
     if (fs.existsSync(ERROR_REPORTS_FILE)) {
@@ -38,9 +38,9 @@ describe('Error Reporter', () => {
   afterEach(() => {
     // Restore environment
     if (originalEnv) {
-      process.env.CQA_ERROR_REPORTING = originalEnv
+      process.env.QAA_ERROR_REPORTING = originalEnv
     } else {
-      delete process.env.CQA_ERROR_REPORTING
+      delete process.env.QAA_ERROR_REPORTING
     }
 
     // Cleanup
@@ -55,17 +55,17 @@ describe('Error Reporter', () => {
     })
 
     it('should be enabled when ENV var is "true"', () => {
-      process.env.CQA_ERROR_REPORTING = 'true'
+      process.env.QAA_ERROR_REPORTING = 'true'
       assert.strictEqual(isErrorReportingEnabled(), true)
     })
 
     it('should be enabled when ENV var is "1"', () => {
-      process.env.CQA_ERROR_REPORTING = '1'
+      process.env.QAA_ERROR_REPORTING = '1'
       assert.strictEqual(isErrorReportingEnabled(), true)
     })
 
     it('should be disabled for other ENV var values', () => {
-      process.env.CQA_ERROR_REPORTING = 'false'
+      process.env.QAA_ERROR_REPORTING = 'false'
       assert.strictEqual(isErrorReportingEnabled(), false)
     })
   })
@@ -236,7 +236,7 @@ describe('Error Reporter', () => {
     })
 
     it('should capture errors when enabled', () => {
-      process.env.CQA_ERROR_REPORTING = 'true'
+      process.env.QAA_ERROR_REPORTING = 'true'
 
       const reporter = new ErrorReporter('test-operation')
       const error = new Error('Test error message')
@@ -258,7 +258,7 @@ describe('Error Reporter', () => {
     })
 
     it('should include operation context in report', () => {
-      process.env.CQA_ERROR_REPORTING = 'true'
+      process.env.QAA_ERROR_REPORTING = 'true'
 
       const reporter = new ErrorReporter('setup')
       const error = new Error('Test error')
@@ -271,7 +271,7 @@ describe('Error Reporter', () => {
     })
 
     it('should include additional context in report', () => {
-      process.env.CQA_ERROR_REPORTING = 'true'
+      process.env.QAA_ERROR_REPORTING = 'true'
 
       const reporter = new ErrorReporter('validate')
       const error = new Error('Validation failed')
@@ -288,7 +288,7 @@ describe('Error Reporter', () => {
     })
 
     it('should include user comment in report', () => {
-      process.env.CQA_ERROR_REPORTING = 'true'
+      process.env.QAA_ERROR_REPORTING = 'true'
 
       const reporter = new ErrorReporter('setup')
       const error = new Error('Setup failed')
@@ -301,7 +301,7 @@ describe('Error Reporter', () => {
     })
 
     it('should sanitize error message and stack trace', () => {
-      process.env.CQA_ERROR_REPORTING = 'true'
+      process.env.QAA_ERROR_REPORTING = 'true'
 
       const reporter = new ErrorReporter('test')
       const error = new Error('Error in /Users/johndoe/project/file.js')
@@ -316,7 +316,7 @@ describe('Error Reporter', () => {
     })
 
     it('should categorize errors correctly', () => {
-      process.env.CQA_ERROR_REPORTING = 'true'
+      process.env.QAA_ERROR_REPORTING = 'true'
 
       const reporter = new ErrorReporter('test')
       const error = new Error('EACCES: permission denied')
@@ -354,7 +354,7 @@ describe('Error Reporter', () => {
     })
 
     it('should calculate statistics correctly', () => {
-      process.env.CQA_ERROR_REPORTING = 'true'
+      process.env.QAA_ERROR_REPORTING = 'true'
 
       const reporter = new ErrorReporter('test')
 
@@ -380,7 +380,7 @@ describe('Error Reporter', () => {
 
   describe('clearErrorReports', () => {
     it('should delete error reports file', () => {
-      process.env.CQA_ERROR_REPORTING = 'true'
+      process.env.QAA_ERROR_REPORTING = 'true'
 
       const reporter = new ErrorReporter('test')
       reporter.captureError(new Error('Test'))
@@ -400,7 +400,7 @@ describe('Error Reporter', () => {
 
   describe('Error report rotation', () => {
     it('should keep only last 50 reports', () => {
-      process.env.CQA_ERROR_REPORTING = 'true'
+      process.env.QAA_ERROR_REPORTING = 'true'
 
       const reporter = new ErrorReporter('test')
 
@@ -419,7 +419,7 @@ describe('Error Reporter', () => {
 
   describe('Error reporting file permissions', () => {
     it('should create error reports file with 0600 permissions', () => {
-      process.env.CQA_ERROR_REPORTING = 'true'
+      process.env.QAA_ERROR_REPORTING = 'true'
 
       const reporter = new ErrorReporter('test')
       reporter.captureError(new Error('Test'))
@@ -434,7 +434,7 @@ describe('Error Reporter', () => {
 
   describe('Silent failure behavior', () => {
     it('should not throw if error reporting save fails', () => {
-      process.env.CQA_ERROR_REPORTING = 'true'
+      process.env.QAA_ERROR_REPORTING = 'true'
 
       // Make directory read-only to cause write failure
       const reporter = new ErrorReporter('test')

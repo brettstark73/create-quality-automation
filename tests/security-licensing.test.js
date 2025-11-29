@@ -14,9 +14,9 @@ const TEST_LICENSE_DIR = path.join(
   os.tmpdir(),
   `cqa-security-test-${Date.now()}`
 )
-process.env.CQA_LICENSE_DIR = TEST_LICENSE_DIR
+process.env.QAA_LICENSE_DIR = TEST_LICENSE_DIR
 
-// Now require licensing.js (will use CQA_LICENSE_DIR environment variable)
+// Now require licensing.js (will use QAA_LICENSE_DIR environment variable)
 const {
   getLicenseInfo,
   activateLicense,
@@ -66,9 +66,9 @@ async function testLicenseValidationBypass() {
   // Attempt to activate arbitrary license keys that should fail
   // These should be rejected as they are not in the legitimate license database
   const testKeys = [
-    'CQA-1234-5678-9ABC-DEF0',
-    'CQA-ABCD-EF12-3456-7890',
-    'CQA-FFFF-AAAA-1111-2222',
+    'QAA-1234-5678-9ABC-DEF0',
+    'QAA-ABCD-EF12-3456-7890',
+    'QAA-FFFF-AAAA-1111-2222',
   ]
 
   for (const testKey of testKeys) {
@@ -130,7 +130,7 @@ async function testStripeInitializationSecurity() {
   delete process.env.STRIPE_SECRET_KEY
 
   // Attempt to activate with valid-format key but no Stripe config
-  const testKey = 'CQA-1234-ABCD-5678-EF12'
+  const testKey = 'QAA-1234-ABCD-5678-EF12'
 
   try {
     const result = await activateLicense(testKey, 'test@example.com')
@@ -273,7 +273,7 @@ function testLocalLicenseFileTamperingDetection() {
   // Test 1: Valid license file
   const validLicenseData = {
     tier: 'PRO',
-    licenseKey: 'CQA-1234-ABCD-5678-EF12',
+    licenseKey: 'QAA-1234-ABCD-5678-EF12',
     email: 'test@example.com',
     activated: new Date().toISOString(),
     payload: validPayload,

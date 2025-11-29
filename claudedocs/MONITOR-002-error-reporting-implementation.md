@@ -16,7 +16,7 @@ Implemented comprehensive error reporting and crash analytics system to track fa
 **Features**:
 
 - **Privacy-First Design**: Opt-in only, no PII collected
-- **Local Storage**: All data stored in `~/.create-quality-automation/error-reports.json`
+- **Local Storage**: All data stored in `~/.create-qa-architect/error-reports.json`
 - **Smart Categorization**: 6 error categories (dependency, permission, config, validation, network, unknown)
 - **Path Sanitization**: Removes usernames and personal information
 - **Silent Failures**: Never breaks the tool
@@ -47,7 +47,7 @@ UNKNOWN_ERROR // Uncategorized
 
 1. Global error handler (catch block)
 2. `--error-reporting-status` flag for status display
-3. Optional capture with `CQA_ERROR_REPORTING=true`
+3. Optional capture with `QAA_ERROR_REPORTING=true`
 
 **Error Flow**:
 
@@ -62,7 +62,7 @@ Categorize error (dependency, permission, etc.)
   ↓
 Sanitize message and stack trace
   ↓
-Save to ~/.create-quality-automation/error-reports.json
+Save to ~/.create-qa-architect/error-reports.json
   ↓
 Show friendly error message with category
   ↓
@@ -82,8 +82,8 @@ Error: Cannot find module 'eslint'
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 📊 Help improve this tool by reporting errors
-Enable error reporting: export CQA_ERROR_REPORTING=true
-Report will be saved locally at: ~/.create-quality-automation/error-reports.json
+Enable error reporting: export QAA_ERROR_REPORTING=true
+Report will be saved locally at: ~/.create-qa-architect/error-reports.json
 ```
 
 ### 3. Comprehensive Tests (`tests/error-reporter.test.js`)
@@ -120,9 +120,9 @@ LICENSE, TELEMETRY & ERROR REPORTING:
 
 PRIVACY & TELEMETRY:
   Telemetry and error reporting are OPT-IN only (disabled by default). To enable:
-    export CQA_TELEMETRY=true           # Usage tracking (local only)
-    export CQA_ERROR_REPORTING=true     # Crash analytics (local only)
-  All data stays local (~/.create-quality-automation/)
+    export QAA_TELEMETRY=true           # Usage tracking (local only)
+    export QAA_ERROR_REPORTING=true     # Crash analytics (local only)
+  All data stays local (~/.create-qa-architect/)
   No personal information collected.
 ```
 
@@ -157,7 +157,7 @@ package.json                       # Updated - Added error-reporter.test.js to t
 
 **Storage**:
 
-- Location: `~/.create-quality-automation/error-reports.json`
+- Location: `~/.create-qa-architect/error-reports.json`
 - Permissions: 0600 (owner only)
 - Rotation: Max 50 reports (auto-cleanup)
 - Format: JSON (easy to inspect and delete)
@@ -168,30 +168,30 @@ package.json                       # Updated - Added error-reporter.test.js to t
 
 ```bash
 # Temporary (current session)
-export CQA_ERROR_REPORTING=true
-npx create-quality-automation@latest
+export QAA_ERROR_REPORTING=true
+npx create-qa-architect@latest
 
 # Persistent (add to ~/.bashrc or ~/.zshrc)
-echo 'export CQA_ERROR_REPORTING=true' >> ~/.zshrc
+echo 'export QAA_ERROR_REPORTING=true' >> ~/.zshrc
 source ~/.zshrc
 ```
 
 ### View Error Reporting Status
 
 ```bash
-npx create-quality-automation@latest --error-reporting-status
+npx create-qa-architect@latest --error-reporting-status
 ```
 
 ### Inspect Error Reports
 
 ```bash
-cat ~/.create-quality-automation/error-reports.json
+cat ~/.create-qa-architect/error-reports.json
 ```
 
 ### Clear Error Reports
 
 ```bash
-rm ~/.create-quality-automation/error-reports.json
+rm ~/.create-qa-architect/error-reports.json
 ```
 
 ## Benefits
@@ -258,7 +258,7 @@ and improve quality before premium launch.
 
 Features:
 - Privacy-first design (opt-in only, no PII)
-- Local storage (~/.create-quality-automation/error-reports.json)
+- Local storage (~/.create-qa-architect/error-reports.json)
 - Smart error categorization (6 categories)
 - Path/credential sanitization
 - Friendly error messages with suggestions
@@ -274,7 +274,7 @@ Error categories:
 - UNKNOWN_ERROR (uncategorized)
 
 Privacy guarantees:
-- Opt-in via CQA_ERROR_REPORTING env var
+- Opt-in via QAA_ERROR_REPORTING env var
 - All data local (no network calls)
 - Sanitizes usernames, paths, tokens, emails
 - 0600 file permissions (owner only)

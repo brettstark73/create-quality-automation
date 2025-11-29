@@ -14,9 +14,9 @@ const TEST_LICENSE_DIR = path.join(
   os.tmpdir(),
   `cqa-license-test-${Date.now()}`
 )
-process.env.CQA_LICENSE_DIR = TEST_LICENSE_DIR
+process.env.QAA_LICENSE_DIR = TEST_LICENSE_DIR
 
-// Now require licensing.js (will use CQA_LICENSE_DIR environment variable)
+// Now require licensing.js (will use QAA_LICENSE_DIR environment variable)
 const {
   LICENSE_TIERS,
   getLicenseInfo,
@@ -106,7 +106,7 @@ function testGetLicenseInfoValidPro() {
   // Create valid PRO license
   const licenseData = {
     tier: LICENSE_TIERS.PRO,
-    licenseKey: 'CQA-PRO-1234567890ABCDEFGHIJK',
+    licenseKey: 'QAA-PRO-1234567890ABCDEFGHIJK',
     email: 'test@example.com',
     expires: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(), // 1 year
     activated: new Date().toISOString(),
@@ -146,7 +146,7 @@ function testGetLicenseInfoExpired() {
 
   const licenseData = {
     tier: LICENSE_TIERS.PRO,
-    licenseKey: 'CQA-PRO-1234567890ABCDEFGHIJK',
+    licenseKey: 'QAA-PRO-1234567890ABCDEFGHIJK',
     email: 'test@example.com',
     expires: new Date(Date.now() - 1000).toISOString(), // Expired 1 second ago
     activated: new Date().toISOString(),
@@ -305,7 +305,7 @@ function testHasFeature() {
   // Create PRO license
   const licenseData = {
     tier: LICENSE_TIERS.PRO,
-    licenseKey: 'CQA-PRO-1234567890ABCDEFGHIJK',
+    licenseKey: 'QAA-PRO-1234567890ABCDEFGHIJK',
     email: 'test@example.com',
     expires: null,
     activated: new Date().toISOString(),
@@ -348,7 +348,7 @@ function testGetDependencyMonitoringLevel() {
   // Create PRO license
   const licenseData = {
     tier: LICENSE_TIERS.PRO,
-    licenseKey: 'CQA-PRO-1234567890ABCDEFGHIJK',
+    licenseKey: 'QAA-PRO-1234567890ABCDEFGHIJK',
     email: 'test@example.com',
     expires: null,
     activated: new Date().toISOString(),
@@ -406,7 +406,7 @@ function testSaveAndRemoveLicense() {
   // Save license
   const saveResult = saveLicense(
     LICENSE_TIERS.PRO,
-    'CQA-PRO-TEST123456789ABCD',
+    'QAA-PRO-TEST123456789ABCD',
     'save-test@example.com',
     new Date(Date.now() + 1000000).toISOString()
   )
@@ -487,7 +487,7 @@ function testShowUpgradeMessagePro() {
   // Create PRO license
   const licenseData = {
     tier: LICENSE_TIERS.PRO,
-    licenseKey: 'CQA-PRO-1234567890ABCDEFGHIJK',
+    licenseKey: 'QAA-PRO-1234567890ABCDEFGHIJK',
     email: 'test@example.com',
     expires: null,
     activated: new Date().toISOString(),
@@ -560,7 +560,7 @@ function testShowLicenseStatusPro() {
   const expiryDate = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000)
   const licenseData = {
     tier: LICENSE_TIERS.PRO,
-    licenseKey: 'CQA-PRO-1234567890ABCDEFGHIJK',
+    licenseKey: 'QAA-PRO-1234567890ABCDEFGHIJK',
     email: 'pro@example.com',
     expires: expiryDate.toISOString(),
     activated: new Date().toISOString(),
@@ -606,7 +606,7 @@ function testValidEnterpriseLicense() {
 
   const licenseData = {
     tier: LICENSE_TIERS.ENTERPRISE,
-    licenseKey: 'CQA-ENTERPRISE-1234567890ABCDEFG',
+    licenseKey: 'QAA-ENTERPRISE-1234567890ABCDEFG',
     email: 'enterprise@company.com',
     expires: null,
     activated: new Date().toISOString(),
@@ -645,7 +645,7 @@ function testLicenseStatusWithError() {
   // Create expired license
   const licenseData = {
     tier: LICENSE_TIERS.PRO,
-    licenseKey: 'CQA-PRO-1234567890ABCDEFGHIJK',
+    licenseKey: 'QAA-PRO-1234567890ABCDEFGHIJK',
     email: 'expired@example.com',
     expires: new Date(Date.now() - 1000).toISOString(),
     activated: new Date().toISOString(),

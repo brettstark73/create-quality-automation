@@ -15,8 +15,8 @@ const os = require('os')
 const TEST_LICENSE_DIR = path.join(os.tmpdir(), `cqa-tier-test-${Date.now()}`)
 
 // Set environment before requiring licensing module
-process.env.CQA_LICENSE_DIR = TEST_LICENSE_DIR
-process.env.CQA_DEVELOPER = 'false'
+process.env.QAA_LICENSE_DIR = TEST_LICENSE_DIR
+process.env.QAA_DEVELOPER = 'false'
 
 // Now require the module
 const {
@@ -48,7 +48,7 @@ function setTier(tier) {
   if (tier === 'FREE') {
     removeLicense()
   } else {
-    saveLicense(tier, `CQA-${tier}-TEST-KEY-1234`, 'test@example.com')
+    saveLicense(tier, `QAA-${tier}-TEST-KEY-1234`, 'test@example.com')
   }
 }
 
@@ -62,7 +62,6 @@ function testFreeTierCaps() {
 
   if (
     freeCaps.maxPrivateRepos === 1 &&
-    freeCaps.maxLinesOfCode === 2000 &&
     freeCaps.maxDependencyPRsPerMonth === 10 &&
     freeCaps.maxPrePushRunsPerMonth === 50
   ) {
@@ -70,7 +69,7 @@ function testFreeTierCaps() {
     return true
   } else {
     console.error('  ❌ FREE tier caps incorrect')
-    console.error('  Expected: 1 repo, 2k LOC, 10 PRs, 50 runs')
+    console.error('  Expected: 1 repo, 10 PRs, 50 runs')
     console.error('  Got:', freeCaps)
     process.exit(1)
   }
@@ -88,7 +87,6 @@ function testPaidTiersUnlimited() {
     const features = FEATURES[LICENSE_TIERS[tier]]
     if (
       features.maxPrivateRepos !== Infinity ||
-      features.maxLinesOfCode !== Infinity ||
       features.maxDependencyPRsPerMonth !== Infinity ||
       features.maxPrePushRunsPerMonth !== Infinity
     ) {
@@ -285,30 +283,6 @@ function testDependencyPRCap() {
   }
 }
 
-/**
- * Test 10: LOC cap tracking
- */
-function testLOCCap() {
-  cleanTestEnv()
-  console.log('Test 10: LOC cap tracking')
-
-  setTier('FREE')
-
-  // Set LOC to exceed limit
-  incrementUsage('loc', 3000)
-
-  const result = checkUsageCaps('loc')
-
-  if (result.allowed === false && result.reason.includes('lines of code')) {
-    console.log('  ✅ LOC cap enforced\n')
-    return true
-  } else {
-    console.error('  ❌ LOC cap not enforced')
-    console.error('  Result:', result)
-    process.exit(1)
-  }
-}
-
 // Run all tests
 try {
   testFreeTierCaps()
@@ -320,7 +294,6 @@ try {
   testTeamTierFeatures()
   testUsageSummaryRemaining()
   testDependencyPRCap()
-  testLOCCap()
 
   // Cleanup
   if (fs.existsSync(TEST_LICENSE_DIR)) {

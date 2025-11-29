@@ -79,16 +79,16 @@ node create-saas-monetization.js
 
 ### Method 2: Manual Template Copy
 
-⚠️ **CRITICAL SECURITY WARNING:** Only use create-quality-automation v4.1.1 or later as the source. Earlier versions contain critical security vulnerabilities in the licensing system.
+⚠️ **CRITICAL SECURITY WARNING:** Only use create-qa-architect v4.1.1 or later as the source. Earlier versions contain critical security vulnerabilities in the licensing system.
 
 ```bash
 # 1. Verify source version first
-npm view create-quality-automation version  # Must be >= 4.1.1
+npm view create-qa-architect version  # Must be >= 4.1.1
 
 # 2. Copy template files
 mkdir -p lib/monetization legal marketing billing
 
-# 3. Copy from create-quality-automation v4.1.1+ project:
+# 3. Copy from create-qa-architect v4.1.1+ project:
 cp -r lib/stripe-integration.js lib/monetization/
 cp -r lib/licensing.js lib/monetization/  # ⚠️ REQUIRES v4.1.1+ for security
 cp -r admin-license.js ./  # Admin tool for license database management
@@ -452,8 +452,8 @@ After customers purchase licenses through Stripe, add them to the legitimate lic
 node admin-license.js <license-key> <customer-id> <tier> [founder] [email]
 
 # Examples:
-node admin-license.js CQA-ABCD-1234-EFGH-5678 cus_stripe_customer123 PRO false user@company.com
-node admin-license.js CQA-1234-ABCD-5678-EFGH cus_founder456 ENTERPRISE true founder@startup.com
+node admin-license.js QAA-ABCD-1234-EFGH-5678 cus_stripe_customer123 PRO false user@company.com
+node admin-license.js QAA-1234-ABCD-5678-EFGH cus_founder456 ENTERPRISE true founder@startup.com
 ```
 
 **Important Notes:**

@@ -62,7 +62,7 @@ Codex identified 4 critical bugs that testing missed:
 **Prevention**:
 
 - ✅ Test all injected npm scripts actually work in consumer repos
-- ✅ Use `npx create-quality-automation@latest` for CLI references
+- ✅ Use `npx create-qa-architect@latest` for CLI references
 - ✅ E2E test: Install → Run all scripts → Verify success
 
 ---
@@ -129,7 +129,7 @@ Codex identified 4 critical bugs that testing missed:
 **1. No Consumer Perspective Testing**
 
 - Command focused on unit tests of source code
-- Never simulated: "I'm a user who just ran `npx create-quality-automation@latest`"
+- Never simulated: "I'm a user who just ran `npx create-qa-architect@latest`"
 - Missing: Install from tarball → Run setup → Use generated files → Run CI
 
 **2. No Artifact Validation**
@@ -175,14 +175,14 @@ Codex identified 4 critical bugs that testing missed:
 ```bash
 # Test 1: Package Contents
 npm pack
-tar -tzf create-quality-automation-*.tgz | grep ".eslintignore"
+tar -tzf create-qa-architect-*.tgz | grep ".eslintignore"
 # Verify all files in 'files' array are present
 
 # Test 2: Consumer Installation
 cd /tmp/test-consumer
 npm init -y
 npm install /path/to/tarball
-npx create-quality-automation
+npx create-qa-architect
 # Verify all files created
 
 # Test 3: npm Scripts Execution
@@ -199,7 +199,7 @@ npm run lint             # Should work
 # Test 1: Full User Journey
 1. Create clean test directory
 2. git init && npm init -y
-3. npx create-quality-automation@latest
+3. npx create-qa-architect@latest
 4. npm install && npm run prepare
 5. Make a code change
 6. git add . && git commit  # Triggers hooks
@@ -292,7 +292,7 @@ Before ANY release, verify:
 ### Consumer Simulation
 
 - [ ] Install from tarball in clean directory (`npm init -y && npm install ./tarball`)
-- [ ] Run setup: `npx create-quality-automation@latest`
+- [ ] Run setup: `npx create-qa-architect@latest`
 - [ ] Execute ALL generated npm scripts successfully
 - [ ] Verify all documented files were created
 - [ ] Test git hooks actually run on commit
@@ -331,7 +331,7 @@ Comprehensive end-to-end package testing:
 2. Create /tmp/test-consumer-[timestamp]
 3. npm init -y && git init
 4. npm install /path/to/tarball
-5. npx create-quality-automation@latest
+5. npx create-qa-architect@latest
 6. npm install && npm run prepare
 7. Run all npm scripts
 8. Make test commit (verify hooks)

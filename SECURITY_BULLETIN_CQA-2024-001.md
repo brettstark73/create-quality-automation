@@ -1,18 +1,18 @@
-# 🚨 Security Bulletin CQA-2024-001
+# 🚨 Security Bulletin QAA-2024-001
 
 **Title**: Critical License Validation Vulnerabilities
-**Affected Versions**: create-quality-automation < v4.1.1
+**Affected Versions**: create-qa-architect < v4.1.1
 **Severity**: Critical (CVSS 9.1)
 **Date**: November 22, 2024
 **Fixed In**: v4.1.1
 
 ## Executive Summary
 
-Critical security vulnerabilities were discovered in the license validation system of create-quality-automation that allowed unauthorized access to premium features through multiple attack vectors. These vulnerabilities could allow any user to bypass payment validation and gain access to premium functionality.
+Critical security vulnerabilities were discovered in the license validation system of create-qa-architect that allowed unauthorized access to premium features through multiple attack vectors. These vulnerabilities could allow any user to bypass payment validation and gain access to premium functionality.
 
 ## Vulnerability Details
 
-### CVE-CQA-2024-001: License Activation Bypass
+### CVE-QAA-2024-001: License Activation Bypass
 
 **CVSS Score**: 9.1 (Critical)
 **Attack Vector**: Local
@@ -36,15 +36,15 @@ Critical security vulnerabilities were discovered in the license validation syst
 }
 ```
 
-**Exploitation**: An attacker could trigger license activation with any properly formatted license key (CQA-XXXX-XXXX-XXXX-XXXX) while ensuring Stripe validation fails (e.g., by not configuring STRIPE_SECRET_KEY), resulting in PRO tier access being granted and persisted locally.
+**Exploitation**: An attacker could trigger license activation with any properly formatted license key (QAA-XXXX-XXXX-XXXX-XXXX) while ensuring Stripe validation fails (e.g., by not configuring STRIPE_SECRET_KEY), resulting in PRO tier access being granted and persisted locally.
 
-### CVE-CQA-2024-002: License File Tampering
+### CVE-QAA-2024-002: License File Tampering
 
 **CVSS Score**: 8.4 (High)
 **Attack Vector**: Local
 **Impact**: Manual privilege escalation to premium tiers
 
-**Description**: The license validation system read and trusted local license files (`~/.create-quality-automation/license.json`) without cryptographic signature verification.
+**Description**: The license validation system read and trusted local license files (`~/.create-qa-architect/license.json`) without cryptographic signature verification.
 
 **Affected Code**:
 
@@ -63,7 +63,7 @@ if (validateLicenseKey(licenseData.key, licenseData.tier)) {
 
 **Exploitation**: An attacker could manually edit the license file to change `"tier": "FREE"` to `"tier": "PRO"` or create a license file with any desired tier, gaining immediate access to premium features.
 
-### CVE-CQA-2024-003: Missing Dependency Exploitation
+### CVE-QAA-2024-003: Missing Dependency Exploitation
 
 **CVSS Score**: 8.1 (High)
 **Attack Vector**: Network
@@ -98,7 +98,7 @@ if (validateLicenseKey(licenseData.key, licenseData.tier)) {
 
 ### Affected Deployments
 
-All deployments of create-quality-automation versions < v4.1.1, including:
+All deployments of create-qa-architect versions < v4.1.1, including:
 
 - Direct installations via npm
 - Template copies using the SaaS monetization guide
@@ -189,14 +189,14 @@ if (licenseData.validationPayload && licenseData.validationSignature) {
 1. **Update to v4.1.1+** immediately:
 
    ```bash
-   npm update create-quality-automation
+   npm update create-qa-architect
    ```
 
 2. **Regenerate all existing licenses** (they lack cryptographic signatures):
 
    ```bash
-   rm -f ~/.create-quality-automation/license.json
-   npx create-quality-automation@latest --activate-license
+   rm -f ~/.create-qa-architect/license.json
+   npx create-qa-architect@latest --activate-license
    ```
 
 3. **Verify Stripe configuration** is complete:
@@ -209,7 +209,7 @@ if (licenseData.validationPayload && licenseData.validationSignature) {
 #### For Template/Derived Projects
 
 1. **Do NOT copy** licensing code from versions < v4.1.1
-2. **Use only** create-quality-automation v4.1.1+ as template source
+2. **Use only** create-qa-architect v4.1.1+ as template source
 3. **Audit existing deployments** for unauthorized premium access
 4. **Regenerate all license files** in production systems
 
@@ -220,7 +220,7 @@ Run this command to verify the fix is active:
 ```bash
 node -e "
 const { activateLicense } = require('./lib/licensing');
-activateLicense('CQA-1234-5678-9ABC-DEF0', 'test@example.com').then(r =>
+activateLicense('QAA-1234-5678-9ABC-DEF0', 'test@example.com').then(r =>
   console.log(r.error.includes('License activation requires Stripe') ? '✅ SECURE' : '❌ VULNERABLE')
 )"
 ```
@@ -252,7 +252,7 @@ Expected output: `✅ SECURE`
 
 ### Security Contact
 
-For security issues in create-quality-automation:
+For security issues in create-qa-architect:
 
 - **Email**: security@aibuilderlab.com (if available)
 - **GitHub**: Open security issue on the repository

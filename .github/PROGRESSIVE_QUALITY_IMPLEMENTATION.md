@@ -215,7 +215,7 @@ A comprehensive 200+ line design document explaining:
 
 ```bash
 # Run on this project
-cd /home/user/create-quality-automation
+cd /home/user/create-qa-architect
 node lib/project-maturity.js --verbose
 ```
 

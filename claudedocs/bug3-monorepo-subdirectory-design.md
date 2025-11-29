@@ -107,8 +107,8 @@ Generate:
 
 ```bash
 # Run CLI in each service directory
-cd services/api && npx create-quality-automation --deps
-cd ../payment && npx create-quality-automation --deps
+cd services/api && npx create-qa-architect --deps
+cd ../payment && npx create-qa-architect --deps
 ```
 
 ## References

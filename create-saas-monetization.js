@@ -687,7 +687,7 @@ module.exports = { StripeIntegration }
  * Handles free/pro/enterprise tier validation
  *
  * ⚠️ SECURITY WARNING: This is a template file!
- * For production use, copy from create-quality-automation v4.1.1+ which includes:
+ * For production use, copy from create-qa-architect v4.1.1+ which includes:
  * - Cryptographic signature verification
  * - Secure Stripe integration
  * - License tampering prevention
@@ -787,7 +787,7 @@ async function activateLicense(licenseKey, email) {
     }
 
     // ⚠️ PRODUCTION SETUP REQUIRED:
-    // 1. Copy complete licensing system from create-quality-automation v4.1.1+:
+    // 1. Copy complete licensing system from create-qa-architect v4.1.1+:
     //    - lib/stripe-integration.js (Stripe API + secure validation)
     //    - lib/licensing.js (License management + activation)
     //    - admin-license.js (Admin tool for adding purchased licenses)

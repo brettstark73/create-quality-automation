@@ -13,12 +13,11 @@ const baseScripts = {
   'security:audit': 'npm audit --audit-level high',
   'security:secrets':
     "node -e \"const fs=require('fs');const content=fs.readFileSync('package.json','utf8');if(/[\\\"\\'][a-zA-Z0-9+/]{20,}[\\\"\\']/.test(content)){console.error('❌ Potential hardcoded secrets in package.json');process.exit(1)}else{console.log('✅ No secrets detected in package.json')}\"",
-  'security:config': 'npx create-quality-automation@latest --security-config',
+  'security:config': 'npx create-qa-architect@latest --security-config',
   'lighthouse:ci': 'lhci autorun',
   'lighthouse:upload': 'lhci upload',
-  'validate:docs': 'npx create-quality-automation@latest --validate-docs',
-  'validate:comprehensive':
-    'npx create-quality-automation@latest --comprehensive',
+  'validate:docs': 'npx create-qa-architect@latest --validate-docs',
+  'validate:comprehensive': 'npx create-qa-architect@latest --comprehensive',
   'validate:all': 'npm run validate:comprehensive && npm run security:audit',
   'validate:pre-push':
     'npm run test:patterns --if-present && npm run lint && npm run format:check && npm run test:commands --if-present && npm test --if-present',

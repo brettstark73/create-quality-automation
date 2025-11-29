@@ -156,7 +156,7 @@ git commit            # ← Would catch hook issues
 **Line 112** is the closest it gets:
 
 ```bash
-node ./node_modules/create-quality-automation/setup.js 2>&1 | grep -q "Setting up Quality Automation"
+node ./node_modules/create-qa-architect/setup.js 2>&1 | grep -q "Setting up Quality Automation"
 ```
 
 This just checks if setup prints a message, not if it generates **working** configurations.
@@ -626,7 +626,7 @@ Testing with newer versions than you recommend creates a false sense of security
 Real E2E would be:
 
 ```bash
-npx create-quality-automation@latest
+npx create-qa-architect@latest
 cd new-project
 npm install
 npm run lint  # ← The moment of truth
@@ -642,7 +642,7 @@ Even automated quality tools need quality automation for the quality automation.
 
 - ESLint Flat Config Migration: https://eslint.org/docs/latest/use/configure/migration-guide
 - Original Bug Report: User message (2025-11-20)
-- CLAUDE.md Verification Protocol: `/home/user/create-quality-automation/CLAUDE.md:150-175`
+- CLAUDE.md Verification Protocol: `/home/user/create-qa-architect/CLAUDE.md:150-175`
 
 ---
 

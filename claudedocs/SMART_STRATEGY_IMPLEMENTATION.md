@@ -46,7 +46,7 @@
 
 ## Project-Specific Configurations
 
-### 1. create-quality-automation (CLI Tool)
+### 1. create-qa-architect (CLI Tool)
 
 **High-Risk Patterns:**
 
@@ -297,7 +297,7 @@ echo "💡 Tip: Run 'npm run test:comprehensive' locally for full validation"
 
 **Order (by pain level):**
 
-1. **create-quality-automation** (Day 1)
+1. **create-qa-architect** (Day 1)
    - Current: 10+ hour pre-push
    - Target: 2s (docs) → 2min (high-risk)
    - Impact: CRITICAL - blocks workflow
@@ -345,7 +345,7 @@ echo "💡 Tip: Run 'npm run test:comprehensive' locally for full validation"
 
 **Day 1: High-Priority Projects**
 
-- Morning: create-quality-automation implementation
+- Morning: create-qa-architect implementation
 - Afternoon: letterflow activation + testing
 - Evening: Validate both working
 
@@ -391,7 +391,7 @@ echo "💡 Tip: Run 'npm run test:comprehensive' locally for full validation"
 
 ## Risk Pattern Examples by Project
 
-### create-quality-automation
+### create-qa-architect
 
 ```bash
 HIGH_RISK="setup\.js|lib/.*\.js|templates/.*|config/.*"
@@ -460,9 +460,9 @@ FORCE_MINIMAL=1 git push  # Only lint (use with caution)
 ## Next Actions
 
 1. **Approve this plan** ✓
-2. **Start with create-quality-automation** (Day 1 AM)
+2. **Start with create-qa-architect** (Day 1 AM)
 3. **Activate letterflow** (Day 1 PM)
 4. **Analyze remaining projects** (Day 2)
 5. **Roll out to all projects** (Day 2-3)
 
-**Ready to implement?** Let me know and I'll start with create-quality-automation.
+**Ready to implement?** Let me know and I'll start with create-qa-architect.

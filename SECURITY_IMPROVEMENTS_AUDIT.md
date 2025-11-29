@@ -2,7 +2,7 @@
 
 ## Executive Summary
 
-Following the security findings from project-starter-guide, we conducted a comprehensive audit of create-quality-automation and implemented critical security improvements. This audit prevented supply-chain vulnerabilities and eliminated several high-risk patterns.
+Following the security findings from project-starter-guide, we conducted a comprehensive audit of create-qa-architect and implemented critical security improvements. This audit prevented supply-chain vulnerabilities and eliminated several high-risk patterns.
 
 ## Critical Issues Found & Fixed
 
@@ -97,7 +97,7 @@ npm audit --audit-level high --omit=dev --json
 
 ## Comparison with project-starter-guide Findings
 
-| Finding                         | project-starter-guide                 | create-quality-automation         | Status       |
+| Finding                         | project-starter-guide                 | create-qa-architect               | Status       |
 | ------------------------------- | ------------------------------------- | --------------------------------- | ------------ |
 | **Vulnerable production deps**  | Critical/High CVEs in mobile template | ✅ Zero high/critical vulns       | **SECURE**   |
 | **Committed node_modules**      | ❌ Templates ship with node_modules   | ✅ Fixed - removed from git       | **FIXED**    |
@@ -185,4 +185,4 @@ npm audit --audit-level high --omit=dev --json
 - Clean installs work correctly
 - CI/CD pipelines remain functional
 
-This comprehensive security audit and improvement effort demonstrates proactive security practices and ensures create-quality-automation maintains a strong security posture for all users.
+This comprehensive security audit and improvement effort demonstrates proactive security practices and ensures create-qa-architect maintains a strong security posture for all users.

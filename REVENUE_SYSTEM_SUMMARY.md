@@ -11,7 +11,7 @@ All Priority 1 and Priority 2 tasks completed without user intervention. Your Sa
 #### 1. Stripe Integration (`lib/stripe-integration.js`)
 
 - **Checkout Sessions**: Create Pro/Enterprise subscriptions with founder pricing
-- **License Generation**: Crypto-secure license keys (CQA-XXXX-XXXX-XXXX-XXXX format)
+- **License Generation**: Crypto-secure license keys (QAA-XXXX-XXXX-XXXX-XXXX format)
 - **Webhook Handling**: Complete payment lifecycle management
 - **Customer Portal**: Billing management and subscription updates
 - **Promotional Codes**: Founder discount implementation
@@ -97,14 +97,14 @@ const shouldUsePremium =
 
 ```bash
 # License management
-npx create-quality-automation@latest --license-status
-npx create-quality-automation@latest --activate-license
+npx create-qa-architect@latest --license-status
+npx create-qa-architect@latest --activate-license
 
 # Premium features (Pro/Enterprise only)
-npx create-quality-automation@latest --deps
+npx create-qa-architect@latest --deps
 
 # Free tier (always available)
-npx create-quality-automation@latest  # Quality automation setup
+npx create-qa-architect@latest  # Quality automation setup
 ```
 
 ### **Files Added/Modified:**
@@ -150,11 +150,11 @@ Execute the 5-email sequence from `marketing/beta-user-email-campaign.md`:
 ```bash
 # Test upgrade flow in development mode
 npm test  # Ensure all systems stable
-npx create-quality-automation@latest --deps  # Should show upgrade prompt
-npx create-quality-automation@latest --activate-license  # Test activation
+npx create-qa-architect@latest --deps  # Should show upgrade prompt
+npx create-qa-architect@latest --activate-license  # Test activation
 
 # Enter any valid license key format for testing:
-# License key: CQA-1234-5678-ABCD-EFGH
+# License key: QAA-1234-5678-ABCD-EFGH
 # Email: test@example.com
 # Expected: ⚠️ Development validation mode + ✅ Activation successful
 ```
@@ -167,7 +167,7 @@ export STRIPE_SECRET_KEY=sk_live_...
 export LICENSE_SIGNING_SECRET=your-secure-secret
 
 # Test with real license keys
-npx create-quality-automation@latest --activate-license
+npx create-qa-architect@latest --activate-license
 # Expected: Full Stripe validation + ✅ Activation successful
 ```
 

@@ -21,7 +21,7 @@ const TEST_LICENSE_DIR = path.join(
   os.tmpdir(),
   `cqa-license-test-${Date.now()}`
 )
-process.env.CQA_LICENSE_DIR = TEST_LICENSE_DIR
+process.env.QAA_LICENSE_DIR = TEST_LICENSE_DIR
 
 const { LicenseValidator } = require('../lib/license-validator')
 const { addLegitimateKey, activateLicense } = require('../lib/licensing')
@@ -82,7 +82,7 @@ async function testWebhookLicensePopulation() {
         created: new Date().toISOString(),
         description: 'License database from webhook handler',
       },
-      'CQA-REAL-1234-5678-ABCD': {
+      'QAA-REAL-1234-5678-ABCD': {
         customerId: 'cus_real_customer_123',
         tier: 'PRO',
         isFounder: true,
@@ -91,7 +91,7 @@ async function testWebhookLicensePopulation() {
         addedDate: new Date().toISOString(),
         addedBy: 'stripe_webhook',
       },
-      'CQA-REAL-9999-8888-EFGH': {
+      'QAA-REAL-9999-8888-EFGH': {
         customerId: 'cus_enterprise_456',
         tier: 'ENTERPRISE',
         isFounder: false,
@@ -135,13 +135,13 @@ async function testNetworkLicenseValidation() {
 
     try {
       // Override license DB URL via environment variable (cleaner than mocking fetch)
-      const originalUrl = process.env.CQA_LICENSE_DB_URL
-      process.env.CQA_LICENSE_DB_URL = `http://localhost:${port}/legitimate-licenses.json`
+      const originalUrl = process.env.QAA_LICENSE_DB_URL
+      process.env.QAA_LICENSE_DB_URL = `http://localhost:${port}/legitimate-licenses.json`
 
       // Test license activation with network fetch
       const validator = new LicenseValidator()
       const result = await validator.activateLicense(
-        'CQA-REAL-1234-5678-ABCD',
+        'QAA-REAL-1234-5678-ABCD',
         'customer@example.com'
       )
 
@@ -159,9 +159,9 @@ async function testNetworkLicenseValidation() {
 
         // Restore original URL
         if (originalUrl) {
-          process.env.CQA_LICENSE_DB_URL = originalUrl
+          process.env.QAA_LICENSE_DB_URL = originalUrl
         } else {
-          delete process.env.CQA_LICENSE_DB_URL
+          delete process.env.QAA_LICENSE_DB_URL
         }
         server.close()
         return true
@@ -234,12 +234,12 @@ async function testUnknownLicenseRejection() {
 
     try {
       // Override license DB URL via environment variable
-      const originalUrl = process.env.CQA_LICENSE_DB_URL
-      process.env.CQA_LICENSE_DB_URL = `http://localhost:${port}/legitimate-licenses.json`
+      const originalUrl = process.env.QAA_LICENSE_DB_URL
+      process.env.QAA_LICENSE_DB_URL = `http://localhost:${port}/legitimate-licenses.json`
 
       const validator = new LicenseValidator()
       const result = await validator.activateLicense(
-        'CQA-UNKN-1234-5678-ABCD',
+        'QAA-UNKN-1234-5678-ABCD',
         'unknown@example.com'
       )
 
@@ -255,9 +255,9 @@ async function testUnknownLicenseRejection() {
 
         // Restore original URL
         if (originalUrl) {
-          process.env.CQA_LICENSE_DB_URL = originalUrl
+          process.env.QAA_LICENSE_DB_URL = originalUrl
         } else {
-          delete process.env.CQA_LICENSE_DB_URL
+          delete process.env.QAA_LICENSE_DB_URL
         }
         server.close()
         return true
@@ -283,7 +283,7 @@ async function testNetworkFallback() {
   try {
     // First add a license to local database
     await addLegitimateKey(
-      'CQA-FALL-1234-5678-BACK',
+      'QAA-FALL-1234-5678-BACK',
       'cus_fallback',
       'PRO',
       false,
@@ -298,7 +298,7 @@ async function testNetworkFallback() {
 
     const validator = new LicenseValidator()
     const result = await validator.activateLicense(
-      'CQA-FALL-1234-5678-BACK',
+      'QAA-FALL-1234-5678-BACK',
       'fallback@test.com'
     )
 
@@ -333,7 +333,7 @@ async function testEndToEndRealPurchase() {
         created: new Date().toISOString(),
         description: 'Production license database',
       },
-      'CQA-E2E5-1234-5678-AB12': {
+      'QAA-E2E5-1234-5678-AB12': {
         customerId: 'cus_real_purchase_789',
         tier: 'PRO',
         isFounder: false,
@@ -361,12 +361,12 @@ async function testEndToEndRealPurchase() {
     try {
       // Step 3: Customer receives license key and tries to activate
       // Override license DB URL via environment variable
-      const originalUrl = process.env.CQA_LICENSE_DB_URL
-      process.env.CQA_LICENSE_DB_URL = `http://localhost:${port}/legitimate-licenses.json`
+      const originalUrl = process.env.QAA_LICENSE_DB_URL
+      process.env.QAA_LICENSE_DB_URL = `http://localhost:${port}/legitimate-licenses.json`
 
-      // Step 4: CLI activation (simulating user running npx create-quality-automation@latest --activate-license)
+      // Step 4: CLI activation (simulating user running npx create-qa-architect@latest --activate-license)
       const activationResult = await activateLicense(
-        'CQA-E2E5-1234-5678-AB12',
+        'QAA-E2E5-1234-5678-AB12',
         'realpurchase@example.com'
       )
 
@@ -388,9 +388,9 @@ async function testEndToEndRealPurchase() {
 
           // Restore original URL
           if (originalUrl) {
-            process.env.CQA_LICENSE_DB_URL = originalUrl
+            process.env.QAA_LICENSE_DB_URL = originalUrl
           } else {
-            delete process.env.CQA_LICENSE_DB_URL
+            delete process.env.QAA_LICENSE_DB_URL
           }
           server.close()
           return true

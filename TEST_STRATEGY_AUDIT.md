@@ -332,7 +332,7 @@ test('works with specified versions', () => {
 
 ## Real-World Impact
 
-**Case Study: create-quality-automation**
+**Case Study: create-qa-architect**
 
 - **Before:** 12,258 lines of tests, all passing ✅
 - **Problem:** ESLint `--ext` flag deprecated in v9

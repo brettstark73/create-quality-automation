@@ -126,8 +126,8 @@
 ### CLI Tools Coverage:
 
 - **create-react-app**: ~80%
-- **create-quality-automation (current)**: 86.61%
-- **create-quality-automation (target)**: 90%+
+- **create-qa-architect (current)**: 86.61%
+- **create-qa-architect (target)**: 90%+
 
 ### Our Advantage:
 

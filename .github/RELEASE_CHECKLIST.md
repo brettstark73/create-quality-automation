@@ -76,7 +76,7 @@ diff <(grep -E "^      - name:" .github/workflows/quality.yml) \
 ## 🧪 Pre-Release Testing
 
 - [ ] `npm test` passes
-- [ ] Test in clean directory: `npx create-quality-automation@latest`
+- [ ] Test in clean directory: `npx create-qa-architect@latest`
 - [ ] Verify all documented files are created
 - [ ] Check that workflows run successfully
 
@@ -91,7 +91,7 @@ diff <(grep -E "^      - name:" .github/workflows/quality.yml) \
 
 ## 🔍 Post-Release Verification
 
-- [ ] npm shows correct version: `npm view create-quality-automation version`
+- [ ] npm shows correct version: `npm view create-qa-architect version`
 - [ ] GitHub release tagged correctly
 - [ ] Documentation renders correctly on npm/GitHub
 

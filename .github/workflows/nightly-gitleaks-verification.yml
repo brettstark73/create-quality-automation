@@ -28,7 +28,7 @@ jobs:
       - name: Cache gitleaks binary
         uses: actions/cache@v5
         with:
-          path: ~/.cache/create-quality-automation/gitleaks
+          path: ~/.cache/create-qa-architect/gitleaks
           key: gitleaks-8.28.0-linux-x64-${{ hashFiles('lib/validation/config-security.js') }}
           restore-keys: |
             gitleaks-8.28.0-linux-x64-
@@ -36,7 +36,7 @@ jobs:
       - name: Clear any existing cache for fresh download test
         run: |
           echo "🧹 Clearing gitleaks cache for fresh download test..."
-          rm -rf ~/.cache/create-quality-automation/gitleaks || true
+          rm -rf ~/.cache/create-qa-architect/gitleaks || true
 
       - name: Run real download verification test
         run: |
@@ -55,7 +55,7 @@ jobs:
             console.log('🧪 Testing real gitleaks download and verification...');
 
             const scanner = new ConfigSecurityScanner();
-            const cacheDir = path.join(os.homedir(), '.cache', 'create-quality-automation');
+            const cacheDir = path.join(os.homedir(), '.cache', 'create-qa-architect');
             const gitleaksBinary = path.join(cacheDir, 'gitleaks', '8.28.0', 'gitleaks');
 
             try {
@@ -131,7 +131,7 @@ jobs:
         run: |
           # Cache remains in place for faster regular CI runs
           echo "🎯 Real binary cached for regular CI performance"
-          ls -la ~/.cache/create-quality-automation/gitleaks/8.28.0/ || true
+          ls -la ~/.cache/create-qa-architect/gitleaks/8.28.0/ || true
 
   alert-on-failure:
     name: Alert on Verification Failure

@@ -132,7 +132,7 @@
 ### 1. Skip Individual Checks (in setup.js)
 
 ```bash
-npx create-quality-automation@latest \
+npx create-qa-architect@latest \
   --no-npm-audit \
   --no-gitleaks \
   --no-actionlint \
@@ -143,7 +143,7 @@ npx create-quality-automation@latest \
 ### 2. Custom Templates
 
 ```bash
-npx create-quality-automation@latest --template ./my-org-standards
+npx create-qa-architect@latest --template ./my-org-standards
 # Overrides specific configs with your own
 ```
 
@@ -197,7 +197,7 @@ npm run validate:*    # Various validations
 - Configuration security scanning
 - But input validation is warning-only
 
-### 5. Documentation is CRITICAL for create-quality-automation itself
+### 5. Documentation is CRITICAL for create-qa-architect itself
 
 - CLAUDE.md validated on every change
 - Prevents drift between code and docs

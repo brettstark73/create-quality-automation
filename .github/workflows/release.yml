@@ -42,12 +42,12 @@ jobs:
 
             ## Installation
             ```bash
-            npx create-quality-automation@latest
+            npx create-qa-architect@latest
             ```
 
             ## Update existing projects
             ```bash
-            npx create-quality-automation@latest --update
+            npx create-qa-architect@latest --update
             ```
           draft: false
           prerelease: false

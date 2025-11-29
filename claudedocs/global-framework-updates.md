@@ -122,7 +122,7 @@ const TOP_PYTHON_PACKAGES = [
 
 ## Project-Specific Documentation
 
-Created `CONTRIBUTING.md` in create-quality-automation with:
+Created `CONTRIBUTING.md` in create-qa-architect with:
 
 - Pre-commit quality gates (Husky + ESLint + Prettier)
 - Test-first development workflow
@@ -202,7 +202,7 @@ git log --oneline -1
 **Project Documentation**:
 
 ```
-cd ~/Projects/create-quality-automation
+cd ~/Projects/create-qa-architect
 git log --oneline -1
 # 1804b1e docs: add CONTRIBUTING.md with error prevention strategies
 ```

@@ -2,21 +2,21 @@
 
 ## Check Execution Matrix
 
-| #   | Check Name             | Type        | Location                                          | Trigger                    | Fail Mode   | Fail Condition                                                   | Exclude/Skip Options                           |
-| --- | ---------------------- | ----------- | ------------------------------------------------- | -------------------------- | ----------- | ---------------------------------------------------------------- | ---------------------------------------------- |
-| 1   | Prettier Format        | Formatter   | `npm run format:check`                            | CI/CD (quality.yml:54)     | Hard Fail   | Any file needs formatting                                        | (none - always runs)                           |
-| 2   | ESLint JS/TS           | Linter      | `eslint . --max-warnings=0`                       | CI/CD (quality.yml:57)     | Hard Fail   | Any warning/error with --max-warnings=0                          | `--no-eslint-security` disables security rules |
-| 3   | Stylelint CSS          | Linter      | `stylelint "**/*.{...}" --allow-empty-input`      | CI/CD (quality.yml:60)     | Hard Fail\* | If CSS files exist with errors                                   | (empty projects safe with --allow-empty-input) |
-| 4   | npm audit              | Security    | `npm audit --audit-level high`                    | CI/CD (quality.yml:63)     | Hard Fail   | High or critical vulnerability found                             | Can run `npm audit fix`                        |
-| 5   | Secret Scanning        | Security    | grep patterns                                     | CI/CD (quality.yml:68-84)  | Hard Fail   | Matches: password, secret, key, token with values                | False positives possible                       |
-| 6   | XSS Pattern Detection  | Security    | grep patterns                                     | CI/CD (quality.yml:92-107) | Hard Fail   | innerHTML/$\{}, eval/$\{}, document.write/$\{}, onclick patterns | May flag legitimate code                       |
-| 7   | Input Validation Check | Security    | grep piped patterns                               | CI/CD (quality.yml:127)    | Warn Only\* | Potential unvalidated user inputs                                | Not blocking, manual review suggested          |
-| 8   | Config Security        | Validation  | `npx create-quality-automation --security-config` | CI/CD (quality.yml:141)    | Hard Fail   | Configuration exposure detected                                  | Run locally to debug                           |
-| 9   | Documentation          | Validation  | `npx create-quality-automation --validate-docs`   | CI/CD (quality.yml:147)    | Hard Fail   | Doc inconsistencies detected                                     | Only for create-quality-automation itself      |
-| 10  | Lighthouse CI          | Performance | Conditional on .lighthouserc config               | CI/CD (quality.yml:154)    | Soft Fail\* | Performance threshold failures                                   | continue-on-error: true (not blocking)         |
-| 11  | CLAUDE.md Validation   | Docs        | Scripts validation                                | claude-md-validation.yml   | Hard Fail   | Structure/TODO markers fail                                      | For create-quality-automation only             |
-| 12  | CLAUDE.md Prettier     | Formatting  | `prettier --check CLAUDE.md`                      | claude-md-validation.yml   | Hard Fail   | CLAUDE.md not formatted                                          | For create-quality-automation only             |
-| 13  | CLAUDE.md Package Name | Docs        | grep package name                                 | claude-md-validation.yml   | Hard Fail   | Package name not in CLAUDE.md                                    | For create-quality-automation only             |
+| #   | Check Name             | Type        | Location                                     | Trigger                    | Fail Mode   | Fail Condition                                                   | Exclude/Skip Options                           |
+| --- | ---------------------- | ----------- | -------------------------------------------- | -------------------------- | ----------- | ---------------------------------------------------------------- | ---------------------------------------------- |
+| 1   | Prettier Format        | Formatter   | `npm run format:check`                       | CI/CD (quality.yml:54)     | Hard Fail   | Any file needs formatting                                        | (none - always runs)                           |
+| 2   | ESLint JS/TS           | Linter      | `eslint . --max-warnings=0`                  | CI/CD (quality.yml:57)     | Hard Fail   | Any warning/error with --max-warnings=0                          | `--no-eslint-security` disables security rules |
+| 3   | Stylelint CSS          | Linter      | `stylelint "**/*.{...}" --allow-empty-input` | CI/CD (quality.yml:60)     | Hard Fail\* | If CSS files exist with errors                                   | (empty projects safe with --allow-empty-input) |
+| 4   | npm audit              | Security    | `npm audit --audit-level high`               | CI/CD (quality.yml:63)     | Hard Fail   | High or critical vulnerability found                             | Can run `npm audit fix`                        |
+| 5   | Secret Scanning        | Security    | grep patterns                                | CI/CD (quality.yml:68-84)  | Hard Fail   | Matches: password, secret, key, token with values                | False positives possible                       |
+| 6   | XSS Pattern Detection  | Security    | grep patterns                                | CI/CD (quality.yml:92-107) | Hard Fail   | innerHTML/$\{}, eval/$\{}, document.write/$\{}, onclick patterns | May flag legitimate code                       |
+| 7   | Input Validation Check | Security    | grep piped patterns                          | CI/CD (quality.yml:127)    | Warn Only\* | Potential unvalidated user inputs                                | Not blocking, manual review suggested          |
+| 8   | Config Security        | Validation  | `npx create-qa-architect --security-config`  | CI/CD (quality.yml:141)    | Hard Fail   | Configuration exposure detected                                  | Run locally to debug                           |
+| 9   | Documentation          | Validation  | `npx create-qa-architect --validate-docs`    | CI/CD (quality.yml:147)    | Hard Fail   | Doc inconsistencies detected                                     | Only for create-qa-architect itself            |
+| 10  | Lighthouse CI          | Performance | Conditional on .lighthouserc config          | CI/CD (quality.yml:154)    | Soft Fail\* | Performance threshold failures                                   | continue-on-error: true (not blocking)         |
+| 11  | CLAUDE.md Validation   | Docs        | Scripts validation                           | claude-md-validation.yml   | Hard Fail   | Structure/TODO markers fail                                      | For create-qa-architect only                   |
+| 12  | CLAUDE.md Prettier     | Formatting  | `prettier --check CLAUDE.md`                 | claude-md-validation.yml   | Hard Fail   | CLAUDE.md not formatted                                          | For create-qa-architect only                   |
+| 13  | CLAUDE.md Package Name | Docs        | grep package name                            | claude-md-validation.yml   | Hard Fail   | Package name not in CLAUDE.md                                    | For create-qa-architect only                   |
 
 \*: See notes below
 
@@ -51,7 +51,7 @@
 
 ### CLAUDE.md Validation (Checks #11-13)
 
-- **Only relevant for create-quality-automation package itself**
+- **Only relevant for create-qa-architect package itself**
 - Not part of consumer project workflows
 - Consumer projects don't have CLAUDE.md
 
@@ -94,10 +94,10 @@ grep -r -E "(password|secret|key|token).*[=:].*['\"][^'\"]{8,}" . \
 grep -r -E "innerHTML.*\\\$\{" . --include="*.js" --include="*.jsx" --include="*.ts" --include="*.tsx" --exclude-dir=node_modules
 
 # 7. Configuration security
-npx create-quality-automation@latest --security-config
+npx create-qa-architect@latest --security-config
 
 # 8. Documentation validation
-npx create-quality-automation@latest --validate-docs
+npx create-qa-architect@latest --validate-docs
 ```
 
 ## Safe Configurations for Early-Stage Projects
@@ -120,12 +120,12 @@ npx create-quality-automation@latest --validate-docs
 
 ## Severity Levels
 
-| Severity     | Examples                                 | Impact                                    |
-| ------------ | ---------------------------------------- | ----------------------------------------- |
-| **Critical** | Secret exposure, npm audit high/critical | Must fix before any merge                 |
-| **High**     | XSS patterns, input validation issues    | Must fix for security compliance          |
-| **Medium**   | ESLint violations, formatting issues     | Blocks commit/merge but auto-fixable      |
-| **Low**      | Documentation gaps                       | Blocks only for create-quality-automation |
+| Severity     | Examples                                 | Impact                               |
+| ------------ | ---------------------------------------- | ------------------------------------ |
+| **Critical** | Secret exposure, npm audit high/critical | Must fix before any merge            |
+| **High**     | XSS patterns, input validation issues    | Must fix for security compliance     |
+| **Medium**   | ESLint violations, formatting issues     | Blocks commit/merge but auto-fixable |
+| **Low**      | Documentation gaps                       | Blocks only for create-qa-architect  |
 
 ## Performance Characteristics
 
@@ -142,12 +142,12 @@ npx create-quality-automation@latest --validate-docs
 
 ## Failure Recovery Paths
 
-| Failure         | Quick Fix                                             | Prevention                                            |
-| --------------- | ----------------------------------------------------- | ----------------------------------------------------- |
-| Prettier        | `npm run format && git add . && git commit --amend`   | Run `npm run format` before committing                |
-| ESLint          | `npm run lint:fix && git add . && git commit --amend` | Run `npm run lint:fix` before committing              |
-| Stylelint       | `npm run lint:fix && git add . && git commit --amend` | Use `npm run lint:fix` before committing              |
-| Secret          | Remove from code, rewrite history                     | Use .env files, never commit secrets                  |
-| XSS Pattern     | Refactor to safe DOM methods                          | Use textContent, not innerHTML with variables         |
-| npm audit       | `npm update` or `npm audit fix`                       | Keep deps current, review lock files                  |
-| Config Security | Debug with local validation                           | Use `npx create-quality-automation --security-config` |
+| Failure         | Quick Fix                                             | Prevention                                      |
+| --------------- | ----------------------------------------------------- | ----------------------------------------------- |
+| Prettier        | `npm run format && git add . && git commit --amend`   | Run `npm run format` before committing          |
+| ESLint          | `npm run lint:fix && git add . && git commit --amend` | Run `npm run lint:fix` before committing        |
+| Stylelint       | `npm run lint:fix && git add . && git commit --amend` | Use `npm run lint:fix` before committing        |
+| Secret          | Remove from code, rewrite history                     | Use .env files, never commit secrets            |
+| XSS Pattern     | Refactor to safe DOM methods                          | Use textContent, not innerHTML with variables   |
+| npm audit       | `npm update` or `npm audit fix`                       | Keep deps current, review lock files            |
+| Config Security | Debug with local validation                           | Use `npx create-qa-architect --security-config` |

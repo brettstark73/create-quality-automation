@@ -27,14 +27,14 @@ async function main() {
     console.log('')
     console.log('Examples:')
     console.log(
-      '  node admin-license.js CQA-1234-ABCD-5678-EF90 cus_stripe_customer123 PRO'
+      '  node admin-license.js QAA-1234-ABCD-5678-EF90 cus_stripe_customer123 PRO'
     )
     console.log(
-      '  node admin-license.js CQA-ABCD-1234-EFGH-5678 cus_stripe_founder456 ENTERPRISE true user@company.com'
+      '  node admin-license.js QAA-ABCD-1234-EFGH-5678 cus_stripe_founder456 ENTERPRISE true user@company.com'
     )
     console.log('')
     console.log('Arguments:')
-    console.log('  license-key   The CQA license key to add')
+    console.log('  license-key   The QAA license key to add')
     console.log('  customer-id   Stripe customer ID (or unique identifier)')
     console.log('  tier         PRO or ENTERPRISE')
     console.log('  founder      true/false (optional, default false)')
@@ -71,10 +71,10 @@ async function main() {
 
   // Validate license key format (allow alphanumeric for admin flexibility)
   if (
-    !licenseKey.match(/^CQA-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/)
+    !licenseKey.match(/^QAA-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/)
   ) {
     console.error(
-      '❌ Error: Invalid license key format. Must be CQA-XXXX-XXXX-XXXX-XXXX (alphanumeric)'
+      '❌ Error: Invalid license key format. Must be QAA-XXXX-XXXX-XXXX-XXXX (alphanumeric)'
     )
     process.exit(1)
   }
@@ -90,7 +90,7 @@ async function main() {
 
     if (result.success) {
       // Recompute integrity hash for the local database
-      const licenseDir = path.join(os.homedir(), '.create-quality-automation')
+      const licenseDir = path.join(os.homedir(), '.create-qa-architect')
       const legitimateDBFile = path.join(licenseDir, 'legitimate-licenses.json')
       if (fs.existsSync(legitimateDBFile)) {
         const database = JSON.parse(fs.readFileSync(legitimateDBFile, 'utf8'))
@@ -116,7 +116,7 @@ async function main() {
       console.log('📋 What happens next:')
       console.log('   1. License is stored in legitimate license database')
       console.log(
-        '   2. Users run: npx create-quality-automation@latest --activate-license'
+        '   2. Users run: npx create-qa-architect@latest --activate-license'
       )
       console.log('   3. Users enter license key and purchase email')
       console.log(

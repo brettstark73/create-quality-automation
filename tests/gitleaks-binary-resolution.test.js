@@ -116,11 +116,7 @@ async function runAsyncTest(testName, testFn) {
     }
 
     // Mock cached binary exists
-    const cacheDir = path.join(
-      os.homedir(),
-      '.cache',
-      'create-quality-automation'
-    )
+    const cacheDir = path.join(os.homedir(), '.cache', 'create-qa-architect')
     const cachedBinary = path.join(cacheDir, 'gitleaks', '8.28.0', 'gitleaks')
 
     fs.existsSync = filePath => filePath === cachedBinary
