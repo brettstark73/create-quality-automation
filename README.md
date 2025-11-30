@@ -1,6 +1,8 @@
 # QA Architect
 
-Bootstrap quality automation in JavaScript/TypeScript and Python projects with comprehensive tooling. One command adds ESLint, Prettier, Husky, lint-staged, security scanning, and GitHub Actions to any project.
+Open-source quality automation CLI for JavaScript/TypeScript and Python projects. One command adds ESLint, Prettier, Husky, lint-staged, security scanning, and GitHub Actions to any project.
+
+**This repo = the free CLI.** For the Pro dashboard with repo analytics, CI integration, and automation workflows, see [QA Architect Pro](https://vibebuildlab.com/qa-architect-pro) (included in Vibe Lab Pro).
 
 ---
 
@@ -37,23 +39,24 @@ Bootstrap quality automation in JavaScript/TypeScript and Python projects with c
 npx create-qa-architect@latest
 ```
 
-## Pricing & Licensing
+## Pricing
 
-### Hybrid Model
-
-| Tier       | Price                    | Features                                          |
-| ---------- | ------------------------ | ------------------------------------------------- |
-| **Free**   | $0                       | CLI tool, basic quality automation                |
-| **Pro**    | $29/mo or $199/yr        | Dashboard, Smart Test Strategy, security scanning |
-| **Bundle** | Included in Vibe Lab Pro | Full Pro access                                   |
-
-**Pro access**: Available standalone or through [Vibe Lab Pro](https://vibebuildlab.com/pro) membership ($49/mo or $399/yr)
+| Product | Price | What You Get |
+|---------|-------|--------------|
+| **QA Architect CLI** (this repo) | Free | CLI tool, templates, GitHub Actions |
+| **QA Architect Pro** | Included in Vibe Lab Pro | Dashboard, repo analytics, CI integration, Smart Test Strategy |
 
 ### License
 
-**Open Source (MIT)** - Free for personal and commercial use.
+**MIT License** - Free for personal and commercial use. See [LICENSE](LICENSE).
 
-[Get Started](https://vibebuildlab.com/qa-architect)
+### QA Architect Pro
+
+The Pro dashboard is a separate private product included in [Vibe Lab Pro](https://vibebuildlab.com/pro) ($49/mo or $399/yr). It adds:
+- Multi-repo quality dashboard
+- CI/CD integration and automation
+- Smart Test Strategy (risk-based validation)
+- Team collaboration features
 
 ## Tech Stack
 
@@ -200,14 +203,18 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ## Support
 
-1. Check the [Troubleshooting Guide](./TROUBLESHOOTING.md)
-2. Review GitHub Actions logs
-3. Open an issue in this repository
+1. Review GitHub Actions logs
+2. Open an issue in this repository
 
 ## License
 
 MIT License - free to use in any project. See [LICENSE](LICENSE) for details.
 
+## Legal
+
+- [Privacy Policy](https://vibebuildlab.com/privacy-policy)
+- [Terms of Service](https://vibebuildlab.com/terms)
+
 ---
 
-> Discover more tools at **https://www.vibebuildlab.com**.
+> **Vibe Build Lab LLC** · [vibebuildlab.com](https://vibebuildlab.com)
