@@ -296,4 +296,11 @@ npm run release:patch  # or :minor or :major
 
 For project-specific questions, see `CLAUDE.md` for development notes.
 
-For global Claude Code workflow, see `~/.claude/RULES.md` and related framework docs.
+## Legal
+
+- [Privacy Policy](https://vibebuildlab.com/privacy-policy)
+- [Terms of Service](https://vibebuildlab.com/terms)
+
+---
+
+> **Vibe Build Lab LLC** · [vibebuildlab.com](https://vibebuildlab.com)

@@ -1,400 +1,79 @@
-# Create Quality Automation - Claude Code Configuration
+# CLAUDE.md - QA Architect
 
-This project uses Brett Stark's global Claude Code configuration with specific adaptations for quality automation tooling.
+This file provides guidance to Claude Code when working with QA Architect.
 
-## Project Information
+## Overview
 
-- **Package:** `create-qa-architect`
-- **CLI Command:** `npx create-qa-architect@latest`
-- **Purpose:** Bootstrap quality automation in any project via CLI
+**Product**: QA Architect (create-qa-architect)
+**Type**: CLI quality automation tool
+**Maintainer**: Vibe Build Lab LLC
+**Repository**: https://github.com/vibebuildlab/create-qa-architect
 
-## Project-Specific Commands
+## Pricing (Reference: vibebuildlab/docs/PRICING_STRATEGY.md)
 
-### Linting & Quality Checks
+| Tier | Price | Features |
+|------|-------|----------|
+| Free | $0 | CLI tool, basic quality automation |
+| Pro | $29/mo or $199/yr | Dashboard, Smart Test Strategy |
+| Bundle | Included in Vibe Lab Pro | Full Pro access |
 
-- **Lint:** `npm run lint` - Run ESLint 9 flat config and Stylelint
-- **Lint Fix:** `npm run lint:fix` - Auto-fix linting issues
-- **Format:** `npm run format` - Format all files with Prettier
-- **Format Check:** `npm run format:check` - Check formatting without changes
-- **Test:** `npm run test` - Run setup integration tests
-
-### Development Workflow
-
-- **Setup:** `npm run setup` - Initialize quality automation in target project
-- **Prepare:** `npm run prepare` - Initialize Husky hooks
-- **Validate CLAUDE.md:** `npm run validate:claude` - Validate CLAUDE.md consistency
-- **Validate All:** `npm run validate:all` - Comprehensive validation including CLAUDE.md
-
-## Quality Automation Features
-
-- **ESLint 9 Flat Config** with automatic TypeScript support detection
-- **Stylelint** for CSS/SCSS/Sass/Less/PostCSS linting
-- **Prettier** for code formatting
-- **Husky 9** pre-commit hooks
-- **lint-staged** for staged file processing
-- **GitHub Actions** workflows with quality checks
-- **Smart Test Strategy** (Pro/Enterprise) - Adaptive risk-based test selection
-
-## Smart Test Strategy (Pro/Enterprise Feature)
-
-**Location**: `lib/smart-strategy-generator.js`, `templates/scripts/smart-test-strategy.sh`
-
-An adaptive, risk-based pre-push validation system that intelligently selects test tiers based on change context.
-
-### How It Works
-
-1. **Risk Score Calculation (0-10)**:
-   - High-risk files (auth, payment, security): +4
-   - Security files: +3
-   - API files: +2
-   - Config files: +2
-   - Large changes (>10 files): +2
-   - Branch risk (main/hotfix): +3-4
-
-2. **Test Tier Selection**:
-   - Risk ≥ 7: Comprehensive (all tests + security audit)
-   - Risk 4-6: Medium (fast + integration, exclude slow)
-   - Risk 2-3: Fast (unit tests only)
-   - Risk 0-1: Minimal (lint + format only)
-
-3. **Project Type Detection**:
-   - CLI tools, Web apps, SaaS, APIs, Libraries, Documentation
-   - Auto-detects based on package.json dependencies
-
-### Environment Variable Overrides
+## Key Commands
 
 ```bash
-SKIP_SMART=1 git push          # Always run comprehensive
-FORCE_COMPREHENSIVE=1 git push  # Force full tests
-FORCE_MINIMAL=1 git push        # Lint only (use with caution)
+# Development
+npm run lint            # ESLint 9 flat config + Stylelint
+npm run lint:fix        # Auto-fix linting issues
+npm run format          # Format with Prettier
+npm run format:check    # Check formatting
+npm test                # Run Jest tests
+npm run test:coverage   # Coverage report
+
+# CLI Usage
+npx create-qa-architect@latest              # Bootstrap quality automation
+npx create-qa-architect@latest --update     # Update existing setup
+npx create-qa-architect@latest --deps       # Dependency monitoring
+npx create-qa-architect@latest --check-maturity  # Project maturity report
+
+# Release
+npm run prerelease      # Pre-release validation
+npm run release:patch   # Bump patch version
 ```
 
-### Files Generated
+## Tech Stack
 
-- `scripts/smart-test-strategy.sh` - Risk-based test orchestration
-- `.husky/pre-push` - Calls smart strategy script
-- `package.json` scripts: `test:fast`, `test:medium`, `test:comprehensive`, `test:smart`
+- **Runtime**: Node.js 20+
+- **Linting**: ESLint 9 (flat config)
+- **Formatting**: Prettier 3
+- **CSS**: Stylelint 16
+- **Git Hooks**: Husky 9 + lint-staged 15
+- **Python**: Black, Ruff, mypy, pytest
+- **Security**: Gitleaks, npm audit
 
-### Monetization
+## Architecture
 
-- **Free Tier**: Basic pre-push (runs all tests, slow)
-- **Pro Tier ($39/month)**: Smart Test Strategy (70% faster average)
-- **Enterprise**: Smart + custom risk patterns
+- `setup.js` - Main CLI entry point
+- `lib/` - Core functionality modules
+- `templates/` - Project templates
+- `config/` - Language-specific configs
+- `tests/` - Jest test suite
 
-## Development Notes
+## Smart Test Strategy (Pro Feature)
 
-- Always run `npm run lint` and `npm run format:check` before committing
-- This is an npm package with CLI functionality - test with `npm run test`
-- Setup script is conservative and merge-safe for existing projects
-- Supports Node.js ≥20 with Volta configuration
-- Package is published to npm as an unscoped CLI (`create-qa-architect`)
+Risk-based pre-push validation:
+- Risk ≥7: Comprehensive (all tests + security)
+- Risk 4-6: Medium (fast + integration)
+- Risk 2-3: Fast (unit tests only)
+- Risk 0-1: Minimal (lint + format)
 
-## CLAUDE.md Maintenance Automation
+## When Editing
 
-This project includes automated CLAUDE.md validation to ensure this file stays current and accurate:
+1. Run tests: `npm test`
+2. Check lint: `npm run lint`
+3. Run prerelease before version bump: `npm run prerelease`
+4. Use Conventional Commits
 
-- **Pre-commit Hook**: Validates CLAUDE.md on every commit via lint-staged
-- **GitHub Actions**: CI/CD validation on push and PRs (`.github/workflows/claude-md-validation.yml`)
-- **Manual Validation**: `npm run validate:claude` for on-demand checks
-- **Validation Rules**: Checks required sections, package references, script documentation, and outdated patterns
+## Legal References
 
-**Validation Script**: `scripts/validate-claude-md.js`
-**Documentation**: `.github/CLAUDE_MD_AUTOMATION.md`
+- Privacy: https://vibebuildlab.com/privacy-policy
+- Terms: https://vibebuildlab.com/terms
 
-This automation prevents documentation drift and ensures CLAUDE.md accuracy across the project lifecycle.
-
-## Release Process
-
-**CRITICAL**: Before any version bump or npm publish, ALWAYS run:
-
-```bash
-npm run prerelease  # Runs docs:check + tests
-```
-
-This catches documentation gaps that manual review misses. Also reference:
-
-- `.github/RELEASE_CHECKLIST.md` - Comprehensive pre-release checklist
-- `scripts/check-docs.sh` - Automated documentation consistency verification
-
-**Why this matters**: Documentation gaps weren't caught in v2.1.0 release because we relied on manual memory instead of systematic verification.
-
-## Bash Command Permissions
-
-This project has approval for the following Bash commands (no permission prompts):
-
-- `npm publish` - Publishing releases to npm registry
-- `npm version` - Bumping package versions
-- `npm run prerelease` - Pre-release validation
-
-## 🚨 CRITICAL: Code Change Verification Protocol
-
-### **When Making ANY Code Change:**
-
-1. **Systematic Search**: Use multiple search methods to find ALL instances
-
-   ```bash
-   # Example: Removing 'grep' usage
-   grep -r "grep" . --exclude-dir=node_modules --exclude-dir=.git
-   rg "grep" --type js --type ts
-   find . -name "*.js" -o -name "*.ts" | xargs grep "grep"
-   ```
-
-2. **Verify Complete Removal**: After edits, re-search to confirm ZERO instances
-
-   ```bash
-   # Must return NO results
-   grep -r "target_pattern" . --exclude-dir=node_modules --exclude-dir=.git
-   ```
-
-3. **Test the Specific Issue**: Create minimal reproduction of the reported problem
-
-   ```bash
-   # Example: Test Windows grep issue
-   node setup.js --security-config 2>&1 | grep "not recognized"
-   ```
-
-4. **Integration Test**: Run full test suite to ensure no regressions
-
-   ```bash
-   npm test
-   ```
-
-5. **Edge Case Testing**: Test the specific environment mentioned (Windows, Node versions, etc.)
-
-### **Before Declaring "Fixed":**
-
-- [ ] **Search Verification**: Multiple search methods confirm target is eliminated
-- [ ] **Functional Test**: The reported error condition no longer occurs
-- [ ] **Integration Test**: Full test suite passes
-- [ ] **Documentation**: Update/add tests to prevent regression
-
-### **Example Verification Checklist for Windows Compatibility:**
-
-```bash
-# 1. Verify no grep usage anywhere
-grep -r "| grep" . --exclude-dir=node_modules --exclude-dir=.git
-grep -r "\| grep" . --exclude-dir=node_modules --exclude-dir=.git
-rg "\| grep" --type js
-
-# 2. Test the exact command that was failing
-node setup.js --security-config
-
-# 3. Simulate Windows environment (if possible)
-# Or ensure cross-platform compatibility via Node.js only
-
-# 4. Check that ESLint security actually runs and detects issues
-# (not just silently skipped)
-```
-
-## Never Accept "It Should Work" - Always Verify
-
-**Bad**: "I removed the grep, so it should work on Windows now"
-**Good**: "I verified zero grep usage remains, tested the command, and confirmed ESLint security detection still functions"
-
-## 🔧 **Development Process Improvements (Post-Security Audit)**
-
-**Context**: Analysis of gaps that allowed critical issues to reach production despite multiple review cycles.
-
-### **Mandatory Verification Commands After ANY Change**
-
-Execute these commands automatically after making changes to prevent the five critical gaps identified:
-
-#### 1. **Dependency Verification** (js-yaml gap)
-
-```bash
-# After adding require('any-package') to any file:
-npm test  # MUST pass - catches missing dependencies immediately
-npm install --package-lock-only  # Verify lockfile consistency
-grep -r "require.*packagename" . --include="*.js" | wc -l  # Count usage
-grep "packagename" package.json | wc -l  # Verify declared
-```
-
-#### 2. **CI Workflow Validation** (custom patterns gap)
-
-```bash
-# After modifying .github/workflows/quality.yml:
-actionlint .github/workflows/quality.yml  # Syntax validation
-npm run docs:check  # Verify workflow changes documented
-grep -E "(grep|secret|xss)" .github/workflows/quality.yml  # Flag custom patterns
-```
-
-#### 3. **Security Tool Integration** (maintenance gap)
-
-```bash
-# After any security-related changes:
-npx gitleaks detect --no-banner --redact  # Test gitleaks works
-npx semgrep --config=p/security-audit --error --quiet .  # Test semgrep works
-npm run security:audit  # Comprehensive security check
-```
-
-#### 4. **YAML Generation Validation** (post-write gap)
-
-```bash
-# After modifying any YAML generation code:
-node -e "const mod = require('./lib/dependency-monitoring-premium.js'); console.log('Premium loads')"
-node -e "const mod = require('./lib/dependency-monitoring-basic.js'); console.log('Basic loads')"
-node tests/premium-dependency-monitoring.test.js  # Test YAML validation
-node tests/dependency-monitoring-basic.test.js  # Test basic validation
-```
-
-#### 5. **Documentation Integration** (automation gap)
-
-```bash
-# After creating any new security/audit documentation:
-bash scripts/check-docs.sh  # Verify integration
-grep -r "FILENAME" .github/ scripts/  # Check automation references
-npm run validate:all  # Comprehensive validation
-```
-
-### **Agent/Tool Recommendations for Gap Prevention**
-
-#### **Use Specialized Agents Proactively**
-
-- **security-engineer**: For ANY security-related changes (workflows, dependencies, validation)
-- **backend-architect**: For dependency management and module structure changes
-- **quality-engineer**: For CI/CD workflow modifications and testing strategy
-- **devops-architect**: For build processes and automation scripts
-
-#### **MCP Server Integration**
-
-- **Context7**: Before changing dependencies, verify official documentation
-- **Sequential**: For complex multi-step changes requiring systematic validation
-- **Morphllm**: For batch pattern changes across multiple files
-
-#### **Validation Orchestration**
-
-```bash
-# Comprehensive pre-commit validation (use after ANY significant change):
-npm run prerelease  # Runs all validations + tests
-npm run validate:all  # Comprehensive validation including CLAUDE.md
-bash scripts/check-docs.sh  # Documentation consistency
-npm audit --audit-level high  # Security audit
-```
-
-### **Root Cause Analysis: Why These Gaps Occurred**
-
-1. **Missing Dependency Testing**: Changed require() statements but didn't run tests to verify imports work
-2. **CI Assumptions**: Modified workflows assuming they worked without testing the actual tools
-3. **Partial Implementation**: Added security improvements without completing validation patterns
-4. **Documentation Isolation**: Created security docs without integrating into automation
-5. **Tool Verification Gaps**: Assumed tools work without testing in isolation
-
-### **Prevention Strategy: Always Test the Change**
-
-**Before**: Change code → Assume it works → Move on
-**After**: Change code → Test specific change → Verify integration → Test full system → Document
-
-#### **Specific Commands by Change Type**
-
-```yaml
-dependency_changes:
-  - npm test # Verify imports work
-  - npm install --package-lock-only # Lock consistency
-
-workflow_changes:
-  - actionlint .github/workflows/*.yml # Syntax check
-  - npm run docs:check # Documentation sync
-
-security_changes:
-  - npx gitleaks detect # Test secret detection
-  - npx semgrep --error . # Test vulnerability scanning
-  - npm run security:audit # Comprehensive audit
-
-yaml_generation:
-  - node tests/dependency-monitoring*.test.js # Test generators
-  - node -e "require('./lib/file.js')" # Test module loads
-
-documentation:
-  - bash scripts/check-docs.sh # Integration check
-  - npm run validate:all # Comprehensive validation
-```
-
-### **Quality Gate: Never Skip Integration Testing**
-
-**Critical Rule**: After ANY change, run the full test suite and validation commands.
-**Rationale**: Integration issues only surface when components interact - unit changes can break system integration.
-
-**Implementation**:
-
-```bash
-# Standard post-change workflow:
-npm test && npm run validate:all && bash scripts/check-docs.sh
-```
-
-### **Meta-Learning: Improve the Process**
-
-When gaps are found:
-
-1. **Analyze the gap**: Why wasn't it caught?
-2. **Add verification**: What command would have caught it?
-3. **Document the pattern**: Update this guide
-4. **Automate the check**: Add to scripts/validation
-
-This ensures the development process continuously improves and prevents repeated gaps.
-
-## 🔄 **Git Workflow Standards (Post-Divergent Branch Prevention)**
-
-**Context**: After resolving divergent branch issues that caused merge conflicts during v4.1.0 development.
-
-### **Daily Sync Protocol**
-
-**CRITICAL**: Run before starting any development work to prevent divergent branches:
-
-```bash
-# Automated sync command:
-npm run git:sync
-
-# Or manually:
-git fetch origin                          # Get latest remote state
-git status                               # Check local state
-git log --oneline origin/master..HEAD   # Check unpushed work
-git push                                 # Push completed work
-```
-
-### **Git Configuration Standards**
-
-Repository is configured with safe defaults:
-
-```bash
-# Auto-push tags with commits
-git config push.followTags true
-
-# Track remote branches automatically
-git config branch.autosetupmerge always
-
-# Rebase by default on pull (avoid merge commits)
-git config pull.rebase true
-```
-
-### **Branch Protection Workflow**
-
-For major features, use feature branches:
-
-```bash
-git checkout -b feature/my-work        # Create feature branch
-git push -u origin feature/my-work     # Push branch immediately
-# Work → commit → push frequently
-# Create PR when complete
-```
-
-### **Repository Health Checks**
-
-Weekly maintenance:
-
-```bash
-git remote update                      # Update all remote refs
-git branch -vv                        # Show tracking branch status
-git log --graph --oneline --all -20   # Visual history
-npm run prerelease                     # Comprehensive validation
-```
-
-### **Prevention Rules**
-
-1. **Never work directly on main/master** - Always use feature branches for non-trivial changes
-2. **Always sync before starting** - `npm run git:sync` before any development
-3. **Push frequently** - Don't let local commits accumulate
-4. **Validate before release** - `npm run prerelease` catches issues early
-
----
-
-_Inherits all global preferences from Brett Stark's universal Claude Code configuration_
