@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Breaking Changes
 
 - **Renamed to QA Architect** (`create-qa-architect`)
-  - Package renamed from `create-quality-automation` to `create-qa-architect`
+  - Package renamed from `create-qa-architect` to `create-qa-architect`
   - All URLs updated from `/cqa` to `/qaa`
   - Update your install commands: `npx create-qa-architect@latest`
 
