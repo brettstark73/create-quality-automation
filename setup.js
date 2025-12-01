@@ -969,7 +969,7 @@ HELP:
           // Register this repo
           incrementUsage('repo', 1, repoId)
           console.log(
-            `✅ Registered repo (FREE tier: ${currentRepos.length + 1}/1 repos used)`
+            `✅ Registered repo (FREE tier: ${(repoCheck.usage?.repoCount || 0) + 1}/1 repos used)`
           )
         }
       }

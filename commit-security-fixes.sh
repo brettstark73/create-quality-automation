@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Commit security review fixes to public repository
-cd /Users/brettstark/Projects/create-quality-automation
+cd /Users/brettstark/Projects/qa-architect
 
 echo "📂 Current directory: $(pwd)"
 echo "🔍 Git status:"

@@ -17,17 +17,26 @@ TERMS OF USE:
    - Standard pre-commit hooks
 
 2. PAID TIERS
-   - Pro: $29/month or $199/year
-     - Dashboard access
+   - Pro: $59/month or $590/year
+     - Security scanning (Gitleaks + ESLint security)
      - Smart Test Strategy
-     - Priority support
-   - Enterprise: $197/month
+     - Multi-language support
+     - Unlimited repos
+   - Team: $15/user/month (5-seat minimum)
      - All Pro features
-     - Custom integrations
-     - Dedicated support
+     - RBAC and team policies
+     - Slack alerts
+     - Multi-repo dashboard
+   - Enterprise: $249/month + $499 onboarding
+     - All Team features
+     - SSO/SAML integration
+     - Custom policies
+     - Compliance pack
+     - Dedicated TAM
 
 3. VIBE LAB PRO BUNDLE
-   Pro tier is included in the Vibe Lab Pro subscription ($49/month).
+   Pro tier is included in the Vibe Lab Pro subscription.
+   Team and Enterprise tiers are standalone purchases.
 
 4. PERMITTED USES
    - Use the free tier without restriction

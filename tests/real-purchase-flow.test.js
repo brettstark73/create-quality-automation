@@ -23,6 +23,9 @@ const TEST_LICENSE_DIR = path.join(
 )
 process.env.QAA_LICENSE_DIR = TEST_LICENSE_DIR
 
+// Disable developer mode for purchase flow tests
+delete process.env.QAA_DEVELOPER
+
 const { LicenseValidator } = require('../lib/license-validator')
 const { addLegitimateKey, activateLicense } = require('../lib/licensing')
 

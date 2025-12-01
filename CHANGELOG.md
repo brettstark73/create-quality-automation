@@ -5,6 +5,50 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.0.0] - 2025-11-30
+
+### Breaking Changes
+
+- **Renamed to QA Architect** (`create-qa-architect`)
+  - Package renamed from `create-quality-automation` to `create-qa-architect`
+  - All URLs updated from `/cqa` to `/qaa`
+  - Update your install commands: `npx create-qa-architect@latest`
+
+- **Commercial License** (freemium model)
+  - Changed from MIT to Commercial License
+  - Free tier remains free for personal and commercial use
+  - Pro features require paid subscription
+
+### Added
+
+- **4-Tier Pricing Structure**
+  - Free: $0 (basic CLI, 1 private repo, 50 runs/mo cap)
+  - Pro: $59/mo or $590/yr (security scanning, Smart Test Strategy, unlimited)
+  - Team: $15/user/mo, 5-seat min (RBAC, Slack alerts, team dashboard)
+  - Enterprise: $249/mo + $499 onboarding (SSO/SAML, compliance, dedicated TAM)
+
+- **Smart Test Strategy** (Pro feature)
+  - Risk-based pre-push validation (70% faster)
+  - Project type detection (CLI, Web, SaaS, API, Library, Docs)
+  - Risk scoring: High (≥7), Medium (4-6), Fast (2-3), Minimal (0-1)
+
+- **Security Scanning** (Pro feature)
+  - Gitleaks integration for secrets detection
+  - ESLint security plugin rules
+  - Feature-gated to Pro+ tiers
+
+- **Usage Cap Enforcement** (Free tier)
+  - 1 private repo limit
+  - 50 pre-push runs per month
+  - 10 dependency PRs per month
+  - Monthly reset with tracking
+
+### Changed
+
+- Pro included in Vibe Lab Pro bundle
+- Team/Enterprise are standalone purchases
+- Aligned with Vibe Build Lab product strategy
+
 ## [4.2.0] - 2025-11-24
 
 ### Added

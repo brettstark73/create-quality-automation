@@ -106,4 +106,4 @@ fi
 
 echo ""
 echo "💡 Tip: Run 'npm run test:comprehensive' locally for full validation"
-echo "💎 Smart Test Strategy powered by create-quality-automation Pro"
+echo "💎 Smart Test Strategy powered by QA Architect Pro"

@@ -16,6 +16,9 @@ const TEST_LICENSE_DIR = path.join(
 )
 process.env.QAA_LICENSE_DIR = TEST_LICENSE_DIR
 
+// Disable developer mode for licensing tests
+delete process.env.QAA_DEVELOPER
+
 // Now require licensing.js (will use QAA_LICENSE_DIR environment variable)
 const {
   getLicenseInfo,
