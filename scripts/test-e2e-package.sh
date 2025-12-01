@@ -108,7 +108,7 @@ pass "Package installed"
 # 3. Run setup
 echo ""
 echo "🚀 Step 3: Running setup..."
-SETUP_OUTPUT=$(node ./node_modules/create-quality-automation/setup.js 2>&1)
+SETUP_OUTPUT=$(QAA_DEVELOPER=true node ./node_modules/create-qa-architect/setup.js 2>&1)
 echo "$SETUP_OUTPUT" | grep -q "Setting up Quality Automation" && pass "Setup executed" || fail "Setup failed"
 echo "  Setup output:"
 echo "$SETUP_OUTPUT" | head -20
@@ -161,13 +161,13 @@ fi
 echo ""
 echo "🔍 Step 6: Validating npm scripts use npx..."
 
-if grep -q "\"security:config.*npx create-quality-automation" package.json; then
+if grep -q "\"security:config.*npx create-qa-architect" package.json; then
   pass "  security:config uses npx"
 else
   fail "  security:config doesn't use npx (Codex finding regression!)"
 fi
 
-if grep -q "\"validate:docs.*npx create-quality-automation" package.json; then
+if grep -q "\"validate:docs.*npx create-qa-architect" package.json; then
   pass "  validate:docs uses npx"
 else
   fail "  validate:docs doesn't use npx (Codex finding regression!)"

@@ -1,5 +1,5 @@
 #!/bin/bash
-# Smart Test Strategy - create-quality-automation
+# Smart Test Strategy - QA Architect
 set -e
 
 echo "🧠 Analyzing changes for optimal test strategy..."

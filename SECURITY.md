@@ -4,9 +4,10 @@
 
 **Please do not report security vulnerabilities through public GitHub issues.**
 
-Instead, please report them via email to: **support@northwestregisteredagent.com**
+Instead, please report them via email to: **security@vibebuildlab.com**
 
 Include:
+
 - Description of the vulnerability
 - Steps to reproduce
 - Potential impact
@@ -40,6 +41,7 @@ Security patches are released as soon as possible after discovery. Subscribe to 
 ## Responsible Disclosure
 
 We follow responsible disclosure practices:
+
 1. Reporter contacts us privately
 2. We acknowledge within 48 hours
 3. We investigate and develop a fix
@@ -54,4 +56,3 @@ We follow responsible disclosure practices:
 ---
 
 > **Vibe Build Lab LLC** · [vibebuildlab.com](https://vibebuildlab.com)
-

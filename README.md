@@ -1,6 +1,6 @@
 # QA Architect
 
-Open-source quality automation CLI for JavaScript/TypeScript and Python projects. One command adds ESLint, Prettier, Husky, lint-staged, security scanning, and GitHub Actions to any project.
+Quality automation CLI for JavaScript/TypeScript and Python projects. One command adds ESLint, Prettier, Husky, lint-staged, and GitHub Actions. Pro tiers add security scanning (Gitleaks), Smart Test Strategy, and multi-language support.
 
 **This repo = the free CLI.** For the Pro dashboard with repo analytics, CI integration, and automation workflows, see [QA Architect Pro](https://vibebuildlab.com/qa-architect-pro) (included in Vibe Lab Pro).
 
@@ -21,7 +21,7 @@ Open-source quality automation CLI for JavaScript/TypeScript and Python projects
 - **GitHub Actions** - Automated quality checks in CI/CD
 - **TypeScript Smart** - Auto-detects and configures TypeScript projects
 - **Python Support** - Complete Python toolchain with Black, Ruff, isort, mypy, pytest
-- **Security Automation** - npm audit and hardcoded secrets scanning
+- **Security Automation** - npm audit (Free), Gitleaks + ESLint security (Pro)
 - **Progressive Quality** - Adaptive checks based on project maturity
 - **Smart Test Strategy** - Risk-based pre-push validation (Pro feature)
 
@@ -41,35 +41,39 @@ npx create-qa-architect@latest
 
 ## Pricing
 
-| Product | Price | What You Get |
-|---------|-------|--------------|
-| **QA Architect CLI** (this repo) | Free | CLI tool, templates, GitHub Actions |
-| **QA Architect Pro** | Included in Vibe Lab Pro | Dashboard, repo analytics, CI integration, Smart Test Strategy |
+| Tier           | Price                     | What You Get                                                                                       |
+| -------------- | ------------------------- | -------------------------------------------------------------------------------------------------- |
+| **Free**       | $0                        | CLI tool, basic linting/formatting, npm audit (capped: 1 private repo, 50 runs/mo)                 |
+| **Pro**        | $59/mo or $590/yr         | **Security scanning (Gitleaks + ESLint security)**, Smart Test Strategy, multi-language, unlimited |
+| **Team**       | $15/user/mo (5-seat min)  | + RBAC, Slack alerts, multi-repo dashboard, team audit log                                         |
+| **Enterprise** | $249/mo + $499 onboarding | + SSO/SAML, custom policies, compliance pack, dedicated TAM                                        |
+
+> **Pro included in [Vibe Lab Pro](https://vibebuildlab.com/pro)** — Team/Enterprise are standalone purchases.
+
+### Security Features by Tier
+
+| Feature                     | Free | Pro+ |
+| --------------------------- | ---- | ---- |
+| npm audit (basic)           | ✅   | ✅   |
+| Gitleaks (secrets scanning) | ❌   | ✅   |
+| ESLint security rules       | ❌   | ✅   |
 
 ### License
 
-**MIT License** - Free for personal and commercial use. See [LICENSE](LICENSE).
-
-### QA Architect Pro
-
-The Pro dashboard is a separate private product included in [Vibe Lab Pro](https://vibebuildlab.com/pro) ($49/mo or $399/yr). It adds:
-- Multi-repo quality dashboard
-- CI/CD integration and automation
-- Smart Test Strategy (risk-based validation)
-- Team collaboration features
+**MIT License** for the CLI (this repository). Pro features require a paid subscription or Vibe Lab Pro membership. See [LICENSE](LICENSE).
 
 ## Tech Stack
 
-| Component       | Technology                |
-| --------------- | ------------------------- |
-| **Runtime**     | Node.js 20+               |
-| **Linting**     | ESLint 9 (flat config)    |
-| **Formatting**  | Prettier 3                |
-| **CSS Linting** | Stylelint 16              |
-| **Git Hooks**   | Husky 9 + lint-staged 15  |
-| **Python**      | Black, Ruff, mypy, pytest |
-| **Performance** | Lighthouse CI             |
-| **Security**    | Gitleaks, npm audit       |
+| Component       | Technology                                         |
+| --------------- | -------------------------------------------------- |
+| **Runtime**     | Node.js 20+                                        |
+| **Linting**     | ESLint 9 (flat config)                             |
+| **Formatting**  | Prettier 3                                         |
+| **CSS Linting** | Stylelint 16                                       |
+| **Git Hooks**   | Husky 9 + lint-staged 15                           |
+| **Python**      | Black, Ruff, mypy, pytest                          |
+| **Performance** | Lighthouse CI                                      |
+| **Security**    | npm audit (Free), Gitleaks + ESLint security (Pro) |
 
 ## Getting Started
 
@@ -161,6 +165,8 @@ your-project/
 ├── .husky/                      # Pre-commit hooks
 ├── .editorconfig                # Editor defaults
 ├── .eslintignore                # ESLint ignore patterns
+├── .lighthouserc.js             # Lighthouse CI config
+├── .npmrc                       # npm configuration
 ├── .nvmrc                       # Node version pinning
 ├── .prettierrc                  # Prettier configuration
 ├── .stylelintrc.json            # Stylelint rules
@@ -208,7 +214,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ## License
 
-MIT License - free to use in any project. See [LICENSE](LICENSE) for details.
+MIT License - the CLI is free to use in any project. Pro/Team/Enterprise features require a paid subscription. See [LICENSE](LICENSE) for details.
 
 ## Legal
 
