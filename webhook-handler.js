@@ -112,15 +112,19 @@ function generateLicenseKey(customerId, tier, isFounder = false) {
  */
 function mapPriceToTier(priceId) {
   // Configure these based on your Stripe price IDs (founder pricing retired)
-  const priceMapping = {
-    price_pro_monthly: { tier: 'PRO', isFounder: false },
-    price_pro_annual: { tier: 'PRO', isFounder: false },
-    price_team_monthly: { tier: 'TEAM', isFounder: false },
-    price_team_annual: { tier: 'TEAM', isFounder: false },
-    price_enterprise_annual: { tier: 'ENTERPRISE', isFounder: false },
-  }
+  // Using Map to avoid object-injection warnings from eslint-plugin-security
+  const priceMapping = new Map([
+    ['price_pro_monthly', { tier: 'PRO', isFounder: false }],
+    ['price_pro_annual', { tier: 'PRO', isFounder: false }],
+    ['price_team_monthly', { tier: 'TEAM', isFounder: false }],
+    ['price_team_annual', { tier: 'TEAM', isFounder: false }],
+    ['price_enterprise_annual', { tier: 'ENTERPRISE', isFounder: false }],
+  ])
 
-  return priceMapping[priceId] || { tier: 'PRO', isFounder: false }
+  if (typeof priceId === 'string' && priceMapping.has(priceId)) {
+    return priceMapping.get(priceId)
+  }
+  return { tier: 'PRO', isFounder: false }
 }
 
 /**
@@ -128,8 +132,18 @@ function mapPriceToTier(priceId) {
  */
 function addLicenseToDatabase(licenseKey, customerInfo) {
   try {
+    // Validate license key format to prevent object injection
+    if (
+      typeof licenseKey !== 'string' ||
+      !/^QAA-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(licenseKey)
+    ) {
+      console.error('Invalid license key format:', licenseKey)
+      return false
+    }
+
     const database = loadLicenseDatabase()
 
+    // eslint-disable-next-line security/detect-object-injection -- licenseKey validated by regex above (QAA-XXXX-XXXX-XXXX-XXXX format)
     database[licenseKey] = {
       customerId: customerInfo.customerId,
       tier: customerInfo.tier,
