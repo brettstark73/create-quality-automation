@@ -16,9 +16,13 @@ async function testMonorepoEdgeCases() {
   await testPnpmWorkspaces()
   await testYarnWorkspaces()
   await testLernaMonorepo()
+  await testNxMonorepo()
+  await testTurborepoMonorepo()
+  await testRushMonorepo()
   await testNestedPackageJson()
   await testWorkspacePackageSetup()
   await testMixedLanguageMonorepo()
+  await testDependabotPerPackageConfig()
 
   console.log('\n✅ All monorepo edge case tests passed!\n')
 }
@@ -330,6 +334,212 @@ async function testLernaMonorepo() {
 }
 
 /**
+ * Test Nx monorepo detection
+ */
+async function testNxMonorepo() {
+  console.log('🔍 Testing Nx monorepo detection...')
+
+  const { detectMonorepoType } = require('../lib/package-utils')
+  const testDir = fs.mkdtempSync(path.join(os.tmpdir(), 'nx-test-'))
+
+  try {
+    // Create nx.json
+    const nxConfig = {
+      targetDefaults: {
+        build: { dependsOn: ['^build'] },
+      },
+      defaultBase: 'main',
+    }
+
+    fs.writeFileSync(
+      path.join(testDir, 'nx.json'),
+      JSON.stringify(nxConfig, null, 2)
+    )
+
+    // Create root package.json with workspaces
+    const rootPackageJson = {
+      name: 'nx-monorepo',
+      version: '1.0.0',
+      private: true,
+      workspaces: ['packages/*', 'apps/*'],
+    }
+
+    fs.writeFileSync(
+      path.join(testDir, 'package.json'),
+      JSON.stringify(rootPackageJson, null, 2)
+    )
+
+    // Create workspace packages
+    const packagesDir = path.join(testDir, 'packages', 'shared')
+    fs.mkdirSync(packagesDir, { recursive: true })
+    fs.writeFileSync(
+      path.join(packagesDir, 'package.json'),
+      JSON.stringify({ name: '@nx-mono/shared', version: '1.0.0' }, null, 2)
+    )
+
+    const appsDir = path.join(testDir, 'apps', 'web')
+    fs.mkdirSync(appsDir, { recursive: true })
+    fs.writeFileSync(
+      path.join(appsDir, 'package.json'),
+      JSON.stringify({ name: '@nx-mono/web', version: '1.0.0' }, null, 2)
+    )
+
+    // Detect monorepo
+    const result = detectMonorepoType(testDir)
+
+    if (!result.isMonorepo) {
+      throw new Error('Should detect Nx project as monorepo')
+    }
+
+    if (result.type !== 'nx') {
+      throw new Error(`Expected type 'nx', got '${result.type}'`)
+    }
+
+    if (result.tool !== 'nx') {
+      throw new Error(`Expected tool 'nx', got '${result.tool}'`)
+    }
+
+    // Should have resolved packages
+    if (!result.resolvedPackages || result.resolvedPackages.length === 0) {
+      throw new Error('Should resolve workspace packages for Nx')
+    }
+
+    console.log('  ✅ Nx monorepo detection works correctly')
+  } finally {
+    fs.rmSync(testDir, { recursive: true, force: true })
+  }
+}
+
+/**
+ * Test Turborepo detection
+ */
+async function testTurborepoMonorepo() {
+  console.log('🔍 Testing Turborepo detection...')
+
+  const { detectMonorepoType } = require('../lib/package-utils')
+  const testDir = fs.mkdtempSync(path.join(os.tmpdir(), 'turbo-test-'))
+
+  try {
+    // Create turbo.json
+    const turboConfig = {
+      $schema: 'https://turbo.build/schema.json',
+      globalDependencies: ['**/.env.*local'],
+      pipeline: {
+        build: {
+          dependsOn: ['^build'],
+          outputs: ['dist/**'],
+        },
+        lint: {},
+        test: {},
+      },
+    }
+
+    fs.writeFileSync(
+      path.join(testDir, 'turbo.json'),
+      JSON.stringify(turboConfig, null, 2)
+    )
+
+    // Create root package.json with workspaces
+    const rootPackageJson = {
+      name: 'turbo-monorepo',
+      version: '1.0.0',
+      private: true,
+      workspaces: ['packages/*'],
+    }
+
+    fs.writeFileSync(
+      path.join(testDir, 'package.json'),
+      JSON.stringify(rootPackageJson, null, 2)
+    )
+
+    // Create workspace packages
+    const pkgDir = path.join(testDir, 'packages', 'ui')
+    fs.mkdirSync(pkgDir, { recursive: true })
+    fs.writeFileSync(
+      path.join(pkgDir, 'package.json'),
+      JSON.stringify({ name: '@turbo-mono/ui', version: '1.0.0' }, null, 2)
+    )
+
+    // Detect monorepo
+    const result = detectMonorepoType(testDir)
+
+    if (!result.isMonorepo) {
+      throw new Error('Should detect Turborepo project as monorepo')
+    }
+
+    if (result.type !== 'turborepo') {
+      throw new Error(`Expected type 'turborepo', got '${result.type}'`)
+    }
+
+    if (result.tool !== 'turborepo') {
+      throw new Error(`Expected tool 'turborepo', got '${result.tool}'`)
+    }
+
+    console.log('  ✅ Turborepo detection works correctly')
+  } finally {
+    fs.rmSync(testDir, { recursive: true, force: true })
+  }
+}
+
+/**
+ * Test Rush monorepo detection
+ */
+async function testRushMonorepo() {
+  console.log('🔍 Testing Rush monorepo detection...')
+
+  const { detectMonorepoType } = require('../lib/package-utils')
+  const testDir = fs.mkdtempSync(path.join(os.tmpdir(), 'rush-test-'))
+
+  try {
+    // Create rush.json (simplified)
+    const rushConfig = {
+      $schema:
+        'https://developer.microsoft.com/json-schemas/rush/v5/rush.schema.json',
+      rushVersion: '5.100.0',
+      pnpmVersion: '8.0.0',
+      nodeSupportedVersionRange: '>=18.0.0',
+      projects: [{ packageName: '@rush-mono/app', projectFolder: 'apps/app' }],
+    }
+
+    fs.writeFileSync(
+      path.join(testDir, 'rush.json'),
+      JSON.stringify(rushConfig, null, 2)
+    )
+
+    // Create root package.json
+    const rootPackageJson = {
+      name: 'rush-monorepo',
+      version: '1.0.0',
+      private: true,
+    }
+
+    fs.writeFileSync(
+      path.join(testDir, 'package.json'),
+      JSON.stringify(rootPackageJson, null, 2)
+    )
+
+    // Detect monorepo
+    const result = detectMonorepoType(testDir)
+
+    if (!result.isMonorepo) {
+      throw new Error('Should detect Rush project as monorepo')
+    }
+
+    if (result.type !== 'rush') {
+      throw new Error(`Expected type 'rush', got '${result.type}'`)
+    }
+
+    if (result.tool !== 'rush') {
+      throw new Error(`Expected tool 'rush', got '${result.tool}'`)
+    }
+
+    console.log('  ✅ Rush monorepo detection works correctly')
+  } finally {
+    fs.rmSync(testDir, { recursive: true, force: true })
+  }
+}
+
+/**
  * Test nested package.json handling
  */
 async function testNestedPackageJson() {
@@ -573,6 +783,120 @@ async function testMixedLanguageMonorepo() {
     }
 
     console.log('  ✅ Mixed JS+Python monorepo configuration works correctly')
+  } finally {
+    fs.rmSync(testDir, { recursive: true, force: true })
+  }
+}
+
+/**
+ * Test Dependabot per-package directory configuration for monorepos
+ */
+async function testDependabotPerPackageConfig() {
+  console.log('🔍 Testing Dependabot per-package config generation...')
+
+  const { detectMonorepoType } = require('../lib/package-utils')
+  const {
+    generateBasicDependabotConfig,
+  } = require('../lib/dependency-monitoring-basic')
+  const testDir = fs.mkdtempSync(path.join(os.tmpdir(), 'dependabot-monorepo-'))
+
+  try {
+    // Create root package.json with workspaces
+    const rootPackageJson = {
+      name: 'monorepo-root',
+      version: '1.0.0',
+      private: true,
+      workspaces: ['packages/*'],
+    }
+
+    fs.writeFileSync(
+      path.join(testDir, 'package.json'),
+      JSON.stringify(rootPackageJson, null, 2)
+    )
+
+    // Create workspace packages
+    const pkg1Dir = path.join(testDir, 'packages', 'core')
+    fs.mkdirSync(pkg1Dir, { recursive: true })
+    fs.writeFileSync(
+      path.join(pkg1Dir, 'package.json'),
+      JSON.stringify({ name: '@mono/core', version: '1.0.0' }, null, 2)
+    )
+
+    const pkg2Dir = path.join(testDir, 'packages', 'utils')
+    fs.mkdirSync(pkg2Dir, { recursive: true })
+    fs.writeFileSync(
+      path.join(pkg2Dir, 'package.json'),
+      JSON.stringify({ name: '@mono/utils', version: '1.0.0' }, null, 2)
+    )
+
+    // Detect monorepo
+    const monorepoInfo = detectMonorepoType(testDir)
+
+    if (!monorepoInfo.isMonorepo) {
+      throw new Error('Should detect as monorepo')
+    }
+
+    if (
+      !monorepoInfo.resolvedPackages ||
+      monorepoInfo.resolvedPackages.length !== 2
+    ) {
+      throw new Error(
+        `Should resolve 2 packages, got ${monorepoInfo.resolvedPackages?.length}`
+      )
+    }
+
+    // Generate Dependabot config with monorepo info
+    const config = generateBasicDependabotConfig({
+      projectPath: testDir,
+      monorepoInfo,
+    })
+
+    if (!config) {
+      throw new Error('Should generate Dependabot config')
+    }
+
+    // Should have: root npm + 2 package npm + github-actions = 4 entries
+    const npmUpdates = config.updates.filter(
+      u => u['package-ecosystem'] === 'npm'
+    )
+    const actionsUpdates = config.updates.filter(
+      u => u['package-ecosystem'] === 'github-actions'
+    )
+
+    if (npmUpdates.length !== 3) {
+      throw new Error(
+        `Expected 3 npm update entries (root + 2 packages), got ${npmUpdates.length}`
+      )
+    }
+
+    if (actionsUpdates.length !== 1) {
+      throw new Error(
+        `Expected 1 github-actions entry, got ${actionsUpdates.length}`
+      )
+    }
+
+    // Verify per-package directories
+    const directories = npmUpdates.map(u => u.directory).sort()
+    const expectedDirs = ['/', '/packages/core', '/packages/utils'].sort()
+
+    if (JSON.stringify(directories) !== JSON.stringify(expectedDirs)) {
+      throw new Error(
+        `Expected directories ${JSON.stringify(expectedDirs)}, got ${JSON.stringify(directories)}`
+      )
+    }
+
+    // Verify labels include package names
+    const coreUpdate = npmUpdates.find(u => u.directory === '/packages/core')
+    if (!coreUpdate.labels.includes('@mono/core')) {
+      throw new Error('Core package should have package name as label')
+    }
+
+    // Verify commit-message prefix includes package name
+    if (!coreUpdate['commit-message'].prefix.includes('@mono/core')) {
+      throw new Error('Core package should have package name in commit prefix')
+    }
+
+    console.log('  ✅ Dependabot per-package config generation works correctly')
   } finally {
     fs.rmSync(testDir, { recursive: true, force: true })
   }

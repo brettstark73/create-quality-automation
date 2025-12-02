@@ -13,6 +13,16 @@
  * - Conversion landing page
  * - Beta user email campaigns
  * - Upgrade prompts and messaging
+ *
+ * Roadmap / Future Ideas:
+ * - Extract licensing to shared npm package (@vibebuildlab/licensing)
+ *   - Single source of truth across all Vibe Lab products
+ *   - Central license server with one API for all products
+ *   - Device/activation limits (optional enforcement)
+ *   - License revocation for chargebacks
+ * - Team/seat-based licensing with org management
+ * - SSO/SAML integration for Enterprise tier
+ * - Usage-based billing option (metered pricing)
  */
 
 'use strict'

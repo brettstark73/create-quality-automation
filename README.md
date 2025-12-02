@@ -192,9 +192,9 @@ npm run validate:pre-push   # Pre-push validation
 - [x] Progressive quality (maturity detection)
 - [x] Python toolchain support
 - [x] Smart test strategy (Pro)
+- [x] Monorepo support (Nx, Turborepo, Lerna, Rush, npm/pnpm/yarn workspaces)
 - [ ] Rust and Go support
 - [ ] VS Code extension
-- [ ] Monorepo support
 
 ## Contributing
 
