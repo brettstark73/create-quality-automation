@@ -1,0 +1,47 @@
+stages:
+  - install
+  - lint
+  - test
+  - security
+
+variables:
+  NODE_VERSION: '20'
+
+default:
+  image: node:${NODE_VERSION}
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - node_modules/
+
+install:
+  stage: install
+  script:
+    - npm ci || npm install
+  artifacts:
+    paths:
+      - node_modules/
+    expire_in: 1h
+
+lint:
+  stage: lint
+  needs: ['install']
+  script:
+    - npm run format:check || npm run format
+    - npm run lint
+
+test:
+  stage: test
+  needs: ['install']
+  script:
+    - npm test
+
+security:
+  stage: security
+  needs: ['install']
+  script:
+    - npm run security:audit || echo "⚠️ npm audit failed; review vulnerabilities"
+    - npx gitleaks detect --redact --verbose || echo "⚠️ gitleaks failures (configure GITLEAKS_LICENSE for premium features)"
+  artifacts:
+    when: always
+    expire_in: 1 week

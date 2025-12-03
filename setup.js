@@ -113,6 +113,27 @@ const STYLELINT_EXTENSION_GLOB = `*.{${STYLELINT_EXTENSIONS.join(',')}}`
 const STYLELINT_SCAN_EXCLUDES = new Set(EXCLUDE_DIRECTORIES.STYLELINT)
 const MAX_STYLELINT_SCAN_DEPTH = SCAN_LIMITS.STYLELINT_MAX_DEPTH
 
+function injectCollaborationSteps(workflowContent, options = {}) {
+  const { enableSlackAlerts = false, enablePrComments = false } = options
+  let updated = workflowContent
+
+  if (workflowContent.includes('# ALERTS_PLACEHOLDER')) {
+    const alertsJob = enableSlackAlerts
+      ? `  alerts:\n    runs-on: ubuntu-latest\n    needs: [summary]\n    if: failure() || cancelled()\n    steps:\n      - name: Notify Slack on failures\n        env:\n          SLACK_WEBHOOK_URL: \${{ secrets.SLACK_WEBHOOK_URL }}\n        run: |\n          if [ -z "$SLACK_WEBHOOK_URL" ]; then\n            echo "::warning::SLACK_WEBHOOK_URL not set; skipping Slack notification"\n            exit 0\n          fi\n          payload='{"text":"❌ Quality checks failed for $GITHUB_REPOSITORY ($GITHUB_REF)"}'\n          curl -X POST -H 'Content-type: application/json' --data "$payload" "$SLACK_WEBHOOK_URL"\n`
+      : '  # Slack alerts not enabled (use --alerts-slack to add)'
+    updated = updated.replace('# ALERTS_PLACEHOLDER', alertsJob)
+  }
+
+  if (workflowContent.includes('# PR_COMMENTS_PLACEHOLDER')) {
+    const prSteps = enablePrComments
+      ? `      - name: Post PR summary comment\n        if: github.event_name == 'pull_request'\n        uses: actions/github-script@v7\n        with:\n          script: |\n            const summaryPath = process.env.GITHUB_STEP_SUMMARY\n            const fs = require('fs')\n            const body = summaryPath && fs.existsSync(summaryPath)\n              ? fs.readFileSync(summaryPath, 'utf8')\n              : 'Quality checks completed.'\n            const { context, github } = require('@actions/github')\n            await github.rest.issues.createComment({\n              owner: context.repo.owner,\n              repo: context.repo.repo,\n              issue_number: context.payload.pull_request.number,\n              body,\n            })\n`
+      : '      # PR comment step not enabled (use --pr-comments to add)'
+    updated = updated.replace('# PR_COMMENTS_PLACEHOLDER', prSteps)
+  }
+
+  return updated
+}
+
 /**
  * Safely reads directory contents without throwing on permission errors
  *
@@ -312,6 +333,13 @@ function parseArguments(rawArgs) {
   const isValidateConfigMode = sanitizedArgs.includes('--validate-config')
   const isActivateLicenseMode = sanitizedArgs.includes('--activate-license')
   const isDryRun = sanitizedArgs.includes('--dry-run')
+  const ciProviderIndex = sanitizedArgs.findIndex(arg => arg === '--ci')
+  const ciProvider =
+    ciProviderIndex !== -1 && sanitizedArgs[ciProviderIndex + 1]
+      ? sanitizedArgs[ciProviderIndex + 1].toLowerCase()
+      : 'github'
+  const enableSlackAlerts = sanitizedArgs.includes('--alerts-slack')
+  const enablePrComments = sanitizedArgs.includes('--pr-comments')
 
   // Custom template directory - use raw args to preserve valid path characters (&, <, >, etc.)
   // Normalize path to prevent traversal attacks and make absolute
@@ -344,6 +372,9 @@ function parseArguments(rawArgs) {
     isValidateConfigMode,
     isActivateLicenseMode,
     isDryRun,
+    ciProvider,
+    enableSlackAlerts,
+    enablePrComments,
     customTemplatePath,
     disableNpmAudit,
     disableGitleaks,
@@ -378,6 +409,9 @@ function parseArguments(rawArgs) {
     isValidateConfigMode,
     isActivateLicenseMode,
     isDryRun,
+    ciProvider,
+    enableSlackAlerts,
+    enablePrComments,
     customTemplatePath,
     disableNpmAudit,
     disableGitleaks,
@@ -444,7 +478,12 @@ function parseArguments(rawArgs) {
       isTelemetryStatusMode,
       isErrorReportingStatusMode,
       isCheckMaturityMode,
+      isValidateConfigMode,
+      isActivateLicenseMode,
       isDryRun,
+      ciProvider,
+      enableSlackAlerts,
+      enablePrComments,
       customTemplatePath,
       disableNpmAudit,
       disableGitleaks,
@@ -481,6 +520,7 @@ SETUP OPTIONS:
   --update          Update existing configuration
   --deps            Add basic dependency monitoring (Free Tier)
   --dependency-monitoring  Same as --deps
+  --ci <provider>   Select CI provider: github (default) | gitlab | circleci
   --template <path> Use custom templates from specified directory
   --dry-run         Preview changes without modifying files
 
@@ -505,6 +545,10 @@ GRANULAR TOOL CONTROL:
   --no-actionlint        Disable actionlint GitHub Actions workflow validation
   --no-markdownlint      Disable markdownlint markdown formatting checks
   --no-eslint-security   Disable ESLint security rule checking
+
+ALERTING & COLLABORATION (GitHub CI):
+  --alerts-slack        Add Slack webhook notification step (expects secret SLACK_WEBHOOK_URL)
+  --pr-comments         Add PR summary comment step (uses GitHub token)
 
 EXAMPLES:
   npx create-qa-architect@latest
@@ -1351,28 +1395,72 @@ HELP:
         process.exit(1)
       }
 
-      // Create .github/workflows directory if it doesn't exist
+      // Create CI configuration based on provider
       const configSpinner = showProgress('Copying configuration files...')
-      const workflowDir = path.join(process.cwd(), '.github', 'workflows')
-      if (!fs.existsSync(workflowDir)) {
-        fs.mkdirSync(workflowDir, { recursive: true })
-        console.log('📁 Created .github/workflows directory')
-      }
+      const githubWorkflowDir = path.join(process.cwd(), '.github', 'workflows')
 
-      // Copy workflow file if it doesn't exist
-      const workflowFile = path.join(workflowDir, 'quality.yml')
-      if (!fs.existsSync(workflowFile)) {
-        const templateWorkflow =
-          templateLoader.getTemplate(
-            templates,
-            path.join('.github', 'workflows', 'quality.yml')
-          ) ||
-          fs.readFileSync(
-            path.join(__dirname, '.github/workflows/quality.yml'),
-            'utf8'
-          )
-        fs.writeFileSync(workflowFile, templateWorkflow)
-        console.log('✅ Added GitHub Actions workflow')
+      if (ciProvider === 'gitlab') {
+        const gitlabConfigPath = path.join(process.cwd(), '.gitlab-ci.yml')
+        if (!fs.existsSync(gitlabConfigPath)) {
+          const templateGitlab =
+            templateLoader.getTemplate(
+              templates,
+              path.join('ci', 'gitlab-ci.yml')
+            ) ||
+            fs.readFileSync(
+              path.join(__dirname, 'templates/ci/gitlab-ci.yml'),
+              'utf8'
+            )
+          fs.writeFileSync(gitlabConfigPath, templateGitlab)
+          console.log('✅ Added GitLab CI workflow')
+        }
+      } else if (ciProvider === 'circleci') {
+        const circleDir = path.join(process.cwd(), '.circleci')
+        if (!fs.existsSync(circleDir)) {
+          fs.mkdirSync(circleDir, { recursive: true })
+          console.log('📁 Created .circleci directory')
+        }
+        const circleConfigPath = path.join(circleDir, 'config.yml')
+        if (!fs.existsSync(circleConfigPath)) {
+          const templateCircle =
+            templateLoader.getTemplate(
+              templates,
+              path.join('ci', 'circleci-config.yml')
+            ) ||
+            fs.readFileSync(
+              path.join(__dirname, 'templates/ci/circleci-config.yml'),
+              'utf8'
+            )
+          fs.writeFileSync(circleConfigPath, templateCircle)
+          console.log('✅ Added CircleCI workflow')
+        }
+      } else {
+        // Default: GitHub Actions
+        if (!fs.existsSync(githubWorkflowDir)) {
+          fs.mkdirSync(githubWorkflowDir, { recursive: true })
+          console.log('📁 Created .github/workflows directory')
+        }
+
+        const workflowFile = path.join(githubWorkflowDir, 'quality.yml')
+        if (!fs.existsSync(workflowFile)) {
+          let templateWorkflow =
+            templateLoader.getTemplate(
+              templates,
+              path.join('.github', 'workflows', 'quality.yml')
+            ) ||
+            fs.readFileSync(
+              path.join(__dirname, '.github/workflows/quality.yml'),
+              'utf8'
+            )
+
+          templateWorkflow = injectCollaborationSteps(templateWorkflow, {
+            enableSlackAlerts,
+            enablePrComments,
+          })
+
+          fs.writeFileSync(workflowFile, templateWorkflow)
+          console.log('✅ Added GitHub Actions workflow')
+        }
       }
 
       // Copy Prettier config if it doesn't exist
@@ -1762,20 +1850,25 @@ echo "✅ Pre-push validation passed!"
           console.log('✅ Added requirements-dev.txt')
         }
 
-        // Copy Python workflow
-        const pythonWorkflowFile = path.join(workflowDir, 'quality-python.yml')
-        if (!fs.existsSync(pythonWorkflowFile)) {
-          const templatePythonWorkflow =
-            templateLoader.getTemplate(
-              templates,
-              path.join('config', 'quality-python.yml')
-            ) ||
-            fs.readFileSync(
-              path.join(__dirname, 'config/quality-python.yml'),
-              'utf8'
-            )
-          fs.writeFileSync(pythonWorkflowFile, templatePythonWorkflow)
-          console.log('✅ Added Python GitHub Actions workflow')
+        // Copy Python workflow (GitHub Actions only)
+        if (ciProvider === 'github') {
+          const pythonWorkflowFile = path.join(
+            githubWorkflowDir,
+            'quality-python.yml'
+          )
+          if (!fs.existsSync(pythonWorkflowFile)) {
+            const templatePythonWorkflow =
+              templateLoader.getTemplate(
+                templates,
+                path.join('config', 'quality-python.yml')
+              ) ||
+              fs.readFileSync(
+                path.join(__dirname, 'config/quality-python.yml'),
+                'utf8'
+              )
+            fs.writeFileSync(pythonWorkflowFile, templatePythonWorkflow)
+            console.log('✅ Added Python GitHub Actions workflow')
+          }
         }
 
         // Create tests directory if it doesn't exist

@@ -1,0 +1,35 @@
+version: 2.1
+
+orbs:
+  node: circleci/node@5.2.0
+
+jobs:
+  lint-test-security:
+    executor:
+      name: node/default
+      tag: '20.11'
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: npm
+          override-ci-command: npm ci || npm install
+      - run:
+          name: Format Check
+          command: npm run format:check || npm run format
+      - run:
+          name: Lint
+          command: npm run lint
+      - run:
+          name: Tests
+          command: npm test
+      - run:
+          name: Security Scan
+          command: npm run security:audit || echo "⚠️ npm audit failed; review vulnerabilities"
+      - run:
+          name: Gitleaks Secrets Scan
+          command: npx gitleaks detect --redact --verbose || echo "⚠️ gitleaks failures; set GITLEAKS_LICENSE for premium features"
+
+workflows:
+  quality:
+    jobs:
+      - lint-test-security
