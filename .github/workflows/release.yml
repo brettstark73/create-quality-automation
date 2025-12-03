@@ -4,6 +4,10 @@ on:
   push:
     tags: ['v*']
 
+permissions:
+  id-token: write # Required for OIDC trusted publishing to npm
+  contents: write # Required for creating GitHub releases
+
 jobs:
   release:
     runs-on: ubuntu-latest
@@ -23,18 +27,13 @@ jobs:
       - name: Run pre-release checks
         run: npm run prerelease
 
-      - name: Publish to npm
-        run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Publish to npm with provenance
+        run: npm publish --provenance
 
       - name: Create GitHub Release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.ref_name }}
-          release_name: Release ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
           body: |
             ## Changes in ${{ github.ref_name }}
 
