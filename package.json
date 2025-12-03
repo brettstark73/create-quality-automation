@@ -1,6 +1,6 @@
 {
   "name": "create-qa-architect",
-  "version": "5.0.0",
+  "version": "5.0.1",
   "description": "QA Architect - Bootstrap quality automation for JavaScript/TypeScript and Python projects with GitHub Actions, pre-commit hooks, linting, formatting, and smart test strategy",
   "main": "setup.js",
   "bin": {
@@ -25,7 +25,7 @@
     "test:unit": "export QAA_DEVELOPER=true && node tests/setup.test.js && node tests/error-paths.test.js && node tests/error-messages.test.js && node tests/cache-manager.test.js && node tests/template-loader.test.js && node tests/telemetry.test.js && node tests/error-reporter.test.js && node tests/validation-factory.test.js && node tests/setup-error-coverage.test.js && node tests/licensing.test.js && node tests/security-licensing.test.js && node tests/base-validator.test.js && node tests/dependency-monitoring-basic.test.js && node tests/workflow-validation.test.js && node tests/setup-critical-paths.test.js && node tests/project-maturity.test.js && node tests/package-manager-detection.test.js && node tests/check-docs.test.js && node tests/validate-claude-md.test.js && node tests/validate-command-patterns.test.js && node tests/gitleaks-binary-resolution.test.js && node tests/gitleaks-production-checksums.test.js && node tests/gitleaks-checksum-verification.test.js",
     "test:fast": "npm run test:unit",
     "test:medium": "npm run test:fast && npm run test:patterns && npm run test:commands",
-    "test:slow": "export QAA_DEVELOPER=true && node tests/python-integration.test.js && node tests/interactive.test.js && node tests/monorepo.test.js && node tests/critical-fixes.test.js && node tests/interactive-routing-fix.test.js && node tests/premium-dependency-monitoring.test.js && node tests/multi-language-dependency-monitoring.test.js && node tests/cli-deps-integration.test.js && node tests/real-world-packages.test.js && node tests/python-detection-sensitivity.test.js && node tests/python-parser-fixes.test.js && node tests/real-purchase-flow.test.js && node tests/project-maturity-cli.test.js && node tests/gitleaks-real-binary-test.test.js && npm run test:e2e",
+    "test:slow": "export QAA_DEVELOPER=true && node tests/python-integration.test.js && node tests/interactive.test.js && node tests/monorepo.test.js && node tests/critical-fixes.test.js && node tests/interactive-routing-fix.test.js && node tests/premium-dependency-monitoring.test.js && node tests/multi-language-dependency-monitoring.test.js && node tests/cli-deps-integration.test.js && node tests/real-world-packages.test.js && node tests/python-detection-sensitivity.test.js && node tests/python-parser-fixes.test.js && node tests/real-purchase-flow.test.js && node tests/project-maturity-cli.test.js && node tests/gitleaks-real-binary-test.js && npm run test:e2e",
     "test:comprehensive": "npm run test:patterns && npm test && npm run test:commands && npm run test:e2e && npm run security:audit",
     "test:real-binary": "RUN_REAL_BINARY_TEST=1 node tests/gitleaks-real-binary-test.js",
     "test:commands": "export QAA_DEVELOPER=true && node tests/command-execution.test.js",
@@ -68,9 +68,11 @@
     "setup.js",
     "create-saas-monetization.js",
     "config/",
+    "docs/",
     "lib/",
     "legal/",
     "marketing/",
+    "templates/",
     ".github/",
     ".prettierrc",
     ".prettierignore",

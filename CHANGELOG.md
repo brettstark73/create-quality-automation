@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.0.1] - 2025-12-03
+
+### Added
+
+- CI provider selector (`--ci github|gitlab|circleci`) with new GitLab and CircleCI workflow templates
+- Optional collaboration hooks for GitHub CI (`--alerts-slack`, `--pr-comments`) to send Slack alerts and PR summary comments
+- Default test scaffolding now includes unit and e2e smoke stubs to keep new projects green
+- New docs: SLA/merge-gate recommendations (`docs/SLA_GATES.md`) and SOC 2 starter checklist (`docs/security/SOC2_STARTER.md`)
+
+### Fixed
+
+- Packaging: ensure templates/docs ship in the npm tarball
+- Resolved Python setup crash when non-GitHub CI providers are selected
+
 ## [5.0.0] - 2025-11-30
 
 ### Breaking Changes
