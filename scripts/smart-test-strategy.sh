@@ -4,6 +4,20 @@ set -e
 
 echo "🧠 Analyzing changes for optimal test strategy..."
 
+# =============================================================================
+# SECURITY: Always run npm audit for critical vulnerabilities (fast, ~2 seconds)
+# =============================================================================
+echo ""
+echo "🔒 Running security audit (critical vulnerabilities only)..."
+if npm audit --audit-level=critical --omit=dev 2>/dev/null; then
+  echo "✅ No critical vulnerabilities found"
+else
+  echo "❌ CRITICAL vulnerabilities detected! Fix before pushing."
+  echo "   Run: npm audit fix"
+  exit 1
+fi
+echo ""
+
 # Collect metrics
 CHANGED_FILES=$(git diff --name-only HEAD~1..HEAD 2>/dev/null | wc -l | tr -d ' ')
 CHANGED_LINES=$(git diff --stat HEAD~1..HEAD 2>/dev/null | tail -1 | grep -o '[0-9]* insertions' | grep -o '[0-9]*' || echo "0")
