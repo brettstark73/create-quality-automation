@@ -11,9 +11,9 @@ Perform a thorough code review following this systematic checklist:
 ## 2. Dependency & Build Health
 
 - Inventory runtime/dev dependencies (package managers, lockfiles) and flag:
-    - Outdated or deprecated packages.
-    - Known security-issue packages.
-    - Version mismatches across modules.
+  - Outdated or deprecated packages.
+  - Known security-issue packages.
+  - Version mismatches across modules.
 - Execute install/build steps (use custom commands above if provided); report failures or warnings.
 - Run npm audit, yarn audit, cargo audit, etc. as applicable; capture notable advisories.
 
@@ -27,10 +27,10 @@ Perform a thorough code review following this systematic checklist:
 ## 4. Code Quality & Architecture
 
 - Perform a targeted code review:
-    - Project structure & module boundaries.
-    - Patterns for data access, state, caching, and error handling.
-    - Security posture: auth, validation, secrets management, logging.
-    - Performance considerations and scalability.
+  - Project structure & module boundaries.
+  - Patterns for data access, state, caching, and error handling.
+  - Security posture: auth, validation, secrets management, logging.
+  - Performance considerations and scalability.
 - Highlight duplicated logic or refactoring opportunities.
 - Recommend architectural improvements aligned with project goals.
 

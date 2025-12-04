@@ -980,7 +980,7 @@ HELP:
       const hasTypeScriptDependency = Boolean(
         (packageJson.devDependencies &&
           packageJson.devDependencies.typescript) ||
-          (packageJson.dependencies && packageJson.dependencies.typescript)
+        (packageJson.dependencies && packageJson.dependencies.typescript)
       )
 
       const tsconfigCandidates = ['tsconfig.json', 'tsconfig.base.json']
