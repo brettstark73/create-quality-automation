@@ -866,9 +866,31 @@ HELP:
       showUpgradeMessage('Framework-Aware Dependency Grouping')
     }
 
+    // Auto-enable Dependabot on GitHub if token available
+    console.log('\n🔧 Attempting to enable Dependabot on GitHub...')
+    try {
+      const { setupDependabot } = require('./lib/github-api')
+      const result = await setupDependabot(projectPath, { verbose: true })
+
+      if (result.success) {
+        console.log('✅ Dependabot alerts and security updates enabled!')
+      } else if (result.errors.length > 0) {
+        console.log('⚠️  Could not auto-enable Dependabot:')
+        result.errors.forEach(err => console.log(`   • ${err}`))
+        console.log('\n💡 Manual steps needed:')
+        console.log('   • Go to GitHub repo → Settings → Code security')
+        console.log(
+          '   • Enable "Dependabot alerts" and "Dependabot security updates"'
+        )
+      }
+    } catch (error) {
+      console.log('⚠️  Could not auto-enable Dependabot:', error.message)
+      console.log('\n💡 Manual steps:')
+      console.log('   • Enable Dependabot in GitHub repo settings')
+    }
+
     console.log('\n💡 Next steps:')
     console.log('   • Review and commit .github/dependabot.yml')
-    console.log('   • Enable Dependabot alerts in GitHub repository settings')
     console.log(
       '   • Dependabot will start monitoring weekly for dependency updates'
     )
