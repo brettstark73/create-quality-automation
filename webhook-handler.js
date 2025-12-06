@@ -23,8 +23,10 @@ const express = require('express')
 // Environment variables required
 const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY
 const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET
-const LICENSE_DATABASE_PATH =
+const LICENSE_DATABASE_PATH = path.resolve(
+  process.cwd(),
   process.env.LICENSE_DATABASE_PATH || './legitimate-licenses.json'
+)
 const PORT = process.env.PORT || 3000
 
 if (!STRIPE_SECRET_KEY || !STRIPE_WEBHOOK_SECRET) {
@@ -45,7 +47,10 @@ app.use(express.json())
  */
 function loadLicenseDatabase() {
   try {
+    // Path resolved once at startup; no untrusted user input is allowed here
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
     if (fs.existsSync(LICENSE_DATABASE_PATH)) {
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
       return JSON.parse(fs.readFileSync(LICENSE_DATABASE_PATH, 'utf8'))
     }
   } catch (error) {
@@ -68,7 +73,10 @@ function saveLicenseDatabase(database) {
   try {
     // Ensure directory exists
     const dir = path.dirname(LICENSE_DATABASE_PATH)
+    // Path resolved once at startup; no untrusted user input is allowed here
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
     if (!fs.existsSync(dir)) {
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
       fs.mkdirSync(dir, { recursive: true })
     }
 
@@ -85,6 +93,8 @@ function saveLicenseDatabase(database) {
       sha256: sha,
     }
 
+    // Path resolved once at startup; no untrusted user input is allowed here
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
     fs.writeFileSync(LICENSE_DATABASE_PATH, JSON.stringify(database, null, 2))
     return true
   } catch (error) {
@@ -300,6 +310,8 @@ app.get('/health', (req, res) => {
   res.json({
     status: 'ok',
     timestamp: new Date().toISOString(),
+    // Path resolved once at startup; no untrusted user input is allowed here
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
     database: fs.existsSync(LICENSE_DATABASE_PATH) ? 'exists' : 'missing',
   })
 })

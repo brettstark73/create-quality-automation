@@ -48,7 +48,7 @@ Use real packages from the ecosystem, not toy examples:
 const TOP_PYTHON_PACKAGES = [
   'django-cors-headers',
   'scikit-learn',
-  'pytest-cov'
+  'pytest-cov',
 ]
 ```
 
@@ -59,4 +59,3 @@ Always run before release:
 ```bash
 npm run prerelease  # Runs docs:check + all tests
 ```
-

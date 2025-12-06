@@ -51,4 +51,3 @@ Risk-based pre-push validation that adapts to change context:
 - `--security-config` - Security validation
 - `--check-maturity` - Project maturity report
 - `--comprehensive` - Full validation suite
-
