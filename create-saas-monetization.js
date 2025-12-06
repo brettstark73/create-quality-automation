@@ -39,7 +39,7 @@ const FOUNDER_ENTERPRISE_PRICE = '74.50'
 
 class SaaSMonetizationBootstrap {
   constructor() {
-    this.projectRoot = process.cwd()
+    this.projectRoot = path.resolve(process.cwd())
     this.config = {}
     this.templates = {
       stripe: this.getStripeTemplate(),
@@ -48,6 +48,56 @@ class SaaSMonetizationBootstrap {
       marketing: this.getMarketingTemplates(),
       billing: this.getBillingTemplate(),
     }
+  }
+
+  resolveProjectPath(relativePath) {
+    const normalizedRoot = this.projectRoot.endsWith(path.sep)
+      ? this.projectRoot
+      : `${this.projectRoot}${path.sep}`
+    const resolvedPath = path.resolve(this.projectRoot, relativePath)
+
+    if (
+      resolvedPath !== this.projectRoot &&
+      !resolvedPath.startsWith(normalizedRoot)
+    ) {
+      throw new Error(
+        `Refusing to access path outside project root: ${relativePath}`
+      )
+    }
+
+    return resolvedPath
+  }
+
+  ensureDir(relativePath) {
+    const target = this.resolveProjectPath(relativePath)
+    // Path is constrained to the project root before touching the filesystem
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    if (!fs.existsSync(target)) {
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
+      fs.mkdirSync(target, { recursive: true })
+    }
+    return target
+  }
+
+  writeProjectFile(relativePath, content) {
+    const target = this.resolveProjectPath(relativePath)
+    // Path is constrained to the project root before touching the filesystem
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    fs.writeFileSync(target, content)
+  }
+
+  readProjectFile(relativePath) {
+    const target = this.resolveProjectPath(relativePath)
+    // Path is constrained to the project root before touching the filesystem
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    return fs.readFileSync(target, 'utf8')
+  }
+
+  projectFileExists(relativePath) {
+    const target = this.resolveProjectPath(relativePath)
+    // Path is constrained to the project root before touching the filesystem
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    return fs.existsSync(target)
   }
 
   async run() {
@@ -159,10 +209,7 @@ class SaaSMonetizationBootstrap {
     const dirs = ['lib/monetization', 'legal', 'marketing', 'billing']
 
     dirs.forEach(dir => {
-      const fullPath = path.join(this.projectRoot, dir)
-      if (!fs.existsSync(fullPath)) {
-        fs.mkdirSync(fullPath, { recursive: true })
-      }
+      this.ensureDir(dir)
     })
   }
 
@@ -172,8 +219,8 @@ class SaaSMonetizationBootstrap {
       .replace(/{{PRO_PRICE}}/g, this.config.proPrice)
       .replace(/{{ENTERPRISE_PRICE}}/g, this.config.enterprisePrice)
 
-    fs.writeFileSync(
-      path.join(this.projectRoot, 'lib/monetization/stripe-integration.js'),
+    this.writeProjectFile(
+      path.join('lib/monetization', 'stripe-integration.js'),
       stripeCode
     )
   }
@@ -188,8 +235,8 @@ class SaaSMonetizationBootstrap {
       .replace(/{{FOUNDER_PRO_PRICE}}/g, this.config.founderProPrice)
       .replace(/{{DOMAIN}}/g, this.config.domain)
 
-    fs.writeFileSync(
-      path.join(this.projectRoot, 'lib/monetization/licensing.js'),
+    this.writeProjectFile(
+      path.join('lib/monetization', 'licensing.js'),
       licensingCode
     )
   }
@@ -204,7 +251,7 @@ class SaaSMonetizationBootstrap {
         .replace(/{{DESCRIPTION}}/g, this.config.description)
         .replace(/{{DATE}}/g, new Date().toISOString().split('T')[0])
 
-      fs.writeFileSync(path.join(this.projectRoot, 'legal', filename), content)
+      this.writeProjectFile(path.join('legal', filename), content)
     }
   }
 
@@ -233,10 +280,7 @@ class SaaSMonetizationBootstrap {
         )
         .replace(/{{SUPPORT_EMAIL}}/g, this.config.supportEmail)
 
-      fs.writeFileSync(
-        path.join(this.projectRoot, 'marketing', filename),
-        content
-      )
+      this.writeProjectFile(path.join('marketing', filename), content)
     }
   }
 
@@ -252,17 +296,14 @@ class SaaSMonetizationBootstrap {
       )
       .replace(/{{PREMIUM_FEATURES}}/g, this.config.premiumFeatures)
 
-    fs.writeFileSync(
-      path.join(this.projectRoot, 'billing/dashboard.html'),
-      billingCode
-    )
+    this.writeProjectFile(path.join('billing', 'dashboard.html'), billingCode)
   }
 
   async updatePackageJson() {
-    const packagePath = path.join(this.projectRoot, 'package.json')
+    const packagePath = 'package.json'
 
-    if (fs.existsSync(packagePath)) {
-      const pkg = JSON.parse(fs.readFileSync(packagePath, 'utf8'))
+    if (this.projectFileExists(packagePath)) {
+      const pkg = JSON.parse(this.readProjectFile(packagePath))
 
       // Add monetization scripts
       pkg.scripts = pkg.scripts || {}
@@ -276,7 +317,7 @@ class SaaSMonetizationBootstrap {
       pkg.dependencies.stripe = '^14.15.0'
       pkg.dependencies.crypto = '^1.0.1'
 
-      fs.writeFileSync(packagePath, JSON.stringify(pkg, null, 2))
+      this.writeProjectFile(packagePath, JSON.stringify(pkg, null, 2))
     }
   }
 
@@ -307,7 +348,7 @@ COMPANY_NAME=${this.config.companyName}
 # STRIPE_PUBLISHABLE_KEY=pk_live_your_live_key_here
 `
 
-    fs.writeFileSync(path.join(this.projectRoot, '.env.template'), envTemplate)
+    this.writeProjectFile('.env.template', envTemplate)
   }
 
   async generateDeploymentGuide() {
@@ -483,10 +524,7 @@ For implementation questions:
 **Revenue Potential**: $1,500-5,000/month recurring
 `
 
-    fs.writeFileSync(
-      path.join(this.projectRoot, 'MONETIZATION_GUIDE.md'),
-      guide
-    )
+    this.writeProjectFile('MONETIZATION_GUIDE.md', guide)
   }
 
   // Template methods (condensed versions of our implementations)

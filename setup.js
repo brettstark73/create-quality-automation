@@ -1692,7 +1692,7 @@ let tier = 'FREE'
 try {
   const data = JSON.parse(fs.readFileSync(licenseFile, 'utf8'))
   tier = (data && data.tier) || 'FREE'
-} catch (_error) {
+} catch {
   tier = 'FREE'
 }
 
@@ -1705,7 +1705,7 @@ try {
   if (data.month === currentMonth) {
     usage = { ...usage, ...data }
   }
-} catch (_error) {
+} catch {
   // First run or corrupt file – start fresh
 }
 
