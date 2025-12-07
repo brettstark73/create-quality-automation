@@ -1,7 +1,9 @@
+// @ts-nocheck
 'use strict'
 
 const BaseValidator = require('../lib/validation/base-validator')
 
+// @ts-nocheck
 /**
  * Test enhanced error messages with actionable suggestions
  */

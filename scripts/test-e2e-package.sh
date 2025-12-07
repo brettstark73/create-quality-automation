@@ -4,6 +4,12 @@
 
 set -e
 
+# Use isolated npm cache to avoid permission issues on shared caches
+export npm_config_cache="${npm_config_cache:-$(mktemp -d)}"
+export NPM_CONFIG_CACHE="$npm_config_cache"
+# Disable husky during packaging so pack works in CI/sandboxed environments
+export HUSKY=0
+
 echo "🧪 E2E Package Validation Test"
 echo "================================"
 echo ""
@@ -32,8 +38,8 @@ warn() {
 
 # 1. Package Contents Validation
 echo "📦 Step 1: Validating package contents..."
-echo "Running: npm pack"
-TARBALL=$(npm pack 2>&1 | tail -1)
+echo "Running: npm pack (scripts disabled)"
+TARBALL=$(npm pack --ignore-scripts 2>&1 | tail -1)
 
 if [ ! -f "$TARBALL" ]; then
   fail "npm pack failed to create tarball"

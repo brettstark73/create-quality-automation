@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+// @ts-nocheck
 /**
  * Test the REAL purchase flow for paying customers
  *

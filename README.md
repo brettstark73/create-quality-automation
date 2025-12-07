@@ -60,7 +60,7 @@ npx create-qa-architect@latest
 
 ### License
 
-**MIT License** for the CLI (this repository). Pro features require a paid subscription or Vibe Lab Pro membership. See [LICENSE](LICENSE).
+**Commercial License (freemium)** — free tier covers the basic CLI; Pro/Team/Enterprise features require a paid subscription. See [LICENSE](LICENSE).
 
 ## Tech Stack
 
@@ -214,7 +214,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ## License
 
-MIT License - the CLI is free to use in any project. Pro/Team/Enterprise features require a paid subscription. See [LICENSE](LICENSE) for details.
+Commercial freemium license — the base CLI is free to use; Pro/Team/Enterprise features require a paid subscription. See [LICENSE](LICENSE) for details.
 
 ## Legal
 

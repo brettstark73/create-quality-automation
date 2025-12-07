@@ -4,6 +4,13 @@
 const STYLELINT_EXTENSIONS = ['css', 'scss', 'sass', 'less', 'pcss']
 const DEFAULT_STYLELINT_TARGET = `**/*.{${STYLELINT_EXTENSIONS.join(',')}}`
 
+/**
+ * @typedef {Object} DefaultsOptions
+ * @property {string[]=} stylelintTargets
+ * @property {boolean=} typescript
+ * @property {boolean=} python
+ */
+
 const baseScripts = {
   format: 'prettier --write .',
   'format:check': 'prettier --check .',
@@ -41,7 +48,12 @@ const stylelintBraceGroup = stylelintTargets => {
   return `{${targets.join(',')}}`
 }
 
-const baseLintScripts = ({ stylelintTargets }) => {
+/**
+ * @param {DefaultsOptions} [options]
+ * @returns {Record<string, string>}
+ */
+const baseLintScripts = (options = {}) => {
+  const { stylelintTargets } = options
   const stylelintTarget = stylelintBraceGroup(stylelintTargets)
   return {
     lint: `eslint . && stylelint "${stylelintTarget}" --allow-empty-input`,
@@ -96,6 +108,9 @@ const TS_LINT_STAGED_PATTERN = '**/*.{js,jsx,ts,tsx,mjs,cjs,html}'
 
 const clone = value => JSON.parse(JSON.stringify(value))
 
+/**
+ * @param {DefaultsOptions} [options]
+ */
 function getDefaultScripts({ stylelintTargets } = {}) {
   return {
     ...clone(baseScripts),
@@ -103,6 +118,9 @@ function getDefaultScripts({ stylelintTargets } = {}) {
   }
 }
 
+/**
+ * @param {DefaultsOptions} [options]
+ */
 function getDefaultDevDependencies({ typescript } = {}) {
   const devDeps = { ...clone(baseDevDependencies) }
   if (typescript) {
@@ -111,6 +129,9 @@ function getDefaultDevDependencies({ typescript } = {}) {
   return devDeps
 }
 
+/**
+ * @param {DefaultsOptions} [options]
+ */
 function getDefaultLintStaged({ typescript, stylelintTargets, python } = {}) {
   const pattern = typescript ? TS_LINT_STAGED_PATTERN : JS_LINT_STAGED_PATTERN
   return clone(baseLintStaged(pattern, stylelintTargets, python))

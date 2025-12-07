@@ -1120,6 +1120,8 @@ HELP:
           description: '',
           main: 'index.js',
           scripts: {},
+          devDependencies: {},
+          'lint-staged': {},
         }
       }
 
@@ -1281,8 +1283,8 @@ HELP:
       }
 
       packageJson['lint-staged'] = mergeLintStaged(
-        packageJson['lint-staged'] || {},
         finalLintStaged,
+        packageJson['lint-staged'] || {},
         { stylelintTargets },
         patternIncludesStylelintExtension
       )
