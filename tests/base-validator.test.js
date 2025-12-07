@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Comprehensive BaseValidator test suite
  * Target: >90% coverage
@@ -614,3 +615,5 @@ async function runAllTests() {
 }
 
 runAllTests()
+;('use strict')
+// @ts-nocheck

@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+// @ts-nocheck
 /**
  * Stripe Webhook Handler for License Management
  *
