@@ -922,11 +922,11 @@ HELP:
         console.log('\n❌ License activation failed.')
         console.log('• Check your license key format (QAA-XXXX-XXXX-XXXX-XXXX)')
         console.log('• Verify your email address')
-        console.log('• Contact support: hello@aibuilderlab.com')
+        console.log('• Contact support: support@vibebuildlab.com')
       }
     } catch (error) {
       console.error('\n❌ License activation error:', error.message)
-      console.log('Contact support for assistance: hello@aibuilderlab.com')
+      console.log('Contact support for assistance: support@vibebuildlab.com')
     }
 
     process.exit(0)
