@@ -27,14 +27,12 @@ Use this checklist before any version bump or npm publication.
 
 ### Security Audit Compliance
 
-- [ ] `KEYFLASH_INSPIRED_SECURITY_AUDIT.md` findings remain resolved
+- [ ] `npm audit` shows no high/critical vulnerabilities
+- [ ] `gitleaks detect --source . --redact` passes (no secrets)
 - [ ] **CRITICAL**: Gitleaks checksums are real SHA256 values, not placeholders
 - [ ] `lib/validation/config-security.js` GITLEAKS_CHECKSUMS contains verified hashes
 - [ ] No "PLACEHOLDER_CHECKSUM" strings exist in security validation code
 - [ ] Gitleaks pinned version in code matches documented security version
-- [ ] No new security vulnerabilities introduced since audit
-- [ ] All security fixes from audit still in place
-- [ ] Security audit document references current version (or base version for pre-releases like `4.0.1-rc.1`)
 
 ### Real Binary Verification
 
