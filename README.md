@@ -2,7 +2,7 @@
 
 Quality automation CLI for JavaScript/TypeScript and Python projects. One command adds ESLint, Prettier, Husky, lint-staged, and GitHub Actions. Pro tiers add security scanning (Gitleaks), Smart Test Strategy, and multi-language support.
 
-**This repo = the free CLI.** For the Pro dashboard with repo analytics, CI integration, and automation workflows, see [QA Architect Pro](https://vibebuildlab.com/qa-architect-pro) (included in Vibe Lab Pro).
+**This repo = the free CLI.** For the Pro dashboard with repo analytics, CI integration, and automation workflows, see [QA Architect Pro](https://vibebuildlab.com/tools/qa-architect) (included in VBL Starter Kit).
 
 ---
 
@@ -48,7 +48,7 @@ npx create-qa-architect@latest
 | **Team**       | $15/user/mo (5-seat min)  | + RBAC, Slack alerts, multi-repo dashboard, team audit log                                         |
 | **Enterprise** | $249/mo + $499 onboarding | + SSO/SAML, custom policies, compliance pack, dedicated TAM                                        |
 
-> **Pro included in [Vibe Lab Pro](https://vibebuildlab.com/pro)** — Team/Enterprise are standalone purchases.
+> **Pro included in [VBL Starter Kit](https://vibebuildlab.com/starter-kit)** — Team/Enterprise are standalone purchases.
 
 ### Security Features by Tier
 
