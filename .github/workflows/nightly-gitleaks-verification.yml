@@ -42,7 +42,7 @@ jobs:
         run: |
           echo "🔐 Running REAL gitleaks download and verification test..."
           echo "Platform: $(uname -s)-$(uname -m)"
-          echo "Expected checksum: a65b5253807a68ac0cafa4414031fd740aeb55f54fb7e55f386acb52e6a840eb"
+          echo "Expected checksum: 5fd1b3b0073269484d40078662e921d07427340ab9e6ed526ccd215a565b3298"
 
           # Create a test script that downloads and verifies gitleaks
           cat > test-real-download.js << 'EOF'
