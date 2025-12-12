@@ -19,16 +19,16 @@ const { ConfigSecurityScanner } = require('../lib/validation/config-security')
 
 console.log('🧪 Running Real Gitleaks Binary Positive Path Test...')
 
-// Expected checksums for real gitleaks v8.28.0 release
+// Expected checksums for EXTRACTED BINARIES from gitleaks v8.28.0 release
 const REAL_CHECKSUMS = {
   'linux-x64':
-    'a65b5253807a68ac0cafa4414031fd740aeb55f54fb7e55f386acb52e6a840eb',
+    '5fd1b3b0073269484d40078662e921d07427340ab9e6ed526ccd215a565b3298',
   'darwin-x64':
-    'edf5a507008b0d2ef4959575772772770586409c1f6f74dabf19cbe7ec341ced',
+    'cf09ad7a85683d90221db8324f036f23c8c29107145e1fc4a0dffbfa9e89c09a',
   'darwin-arm64':
     '5588b5d942dffa048720f7e6e1d274283219fb5722a2c7564d22e83ba39087d7',
   'win32-x64':
-    'da6458e8864af553807de1c46a7a8eac0880bd6b99ba56288e87e86a45af884f',
+    '54230c22688d19939f316cd3e2e040cd067ece40a3a8c5b684e5110c62ecbf52',
 }
 
 function downloadFile(url, targetPath) {
