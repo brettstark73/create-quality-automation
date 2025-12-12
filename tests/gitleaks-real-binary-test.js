@@ -95,7 +95,7 @@ async function runTest() {
 
     // Download the real gitleaks binary
     const tarballUrl =
-      'https://github.com/gitleaks/gitleaks/releases/download/v8.28.0/gitleaks_8.28.0_linux_amd64.tar.gz'
+      'https://github.com/gitleaks/gitleaks/releases/download/v8.28.0/gitleaks_8.28.0_linux_x64.tar.gz'
     const tarballPath = path.join(tempDir, 'gitleaks.tar.gz')
 
     console.log('📥 Downloading real gitleaks v8.28.0 linux-x64...')
