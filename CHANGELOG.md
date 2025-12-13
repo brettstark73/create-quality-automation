@@ -60,9 +60,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **4-Tier Pricing Structure**
   - Free: $0 (basic CLI, 1 private repo, 50 runs/mo cap)
-  - Pro: $59/mo or $590/yr (security scanning, Smart Test Strategy, unlimited)
-  - Team: $15/user/mo, 5-seat min (RBAC, Slack alerts, team dashboard)
-  - Enterprise: $249/mo + $499 onboarding (SSO/SAML, compliance, dedicated TAM)
+  - Pro: $19/mo or $190/yr (security scanning, Smart Test Strategy, unlimited)
+  - Team: Contact us (RBAC, Slack alerts, team dashboard) - coming soon
+  - Enterprise: Contact us (SSO/SAML, compliance, dedicated TAM) - coming soon
 
 - **Smart Test Strategy** (Pro feature)
   - Risk-based pre-push validation (70% faster)
