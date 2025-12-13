@@ -41,12 +41,12 @@ npx create-qa-architect@latest
 
 ## Pricing
 
-| Tier           | Price                     | What You Get                                                                                       |
-| -------------- | ------------------------- | -------------------------------------------------------------------------------------------------- |
-| **Free**       | $0                        | CLI tool, basic linting/formatting, npm audit (capped: 1 private repo, 50 runs/mo)                 |
-| **Pro**        | $59/mo or $590/yr         | **Security scanning (Gitleaks + ESLint security)**, Smart Test Strategy, multi-language, unlimited |
-| **Team**       | $15/user/mo (5-seat min)  | + RBAC, Slack alerts, multi-repo dashboard, team audit log                                         |
-| **Enterprise** | $249/mo + $499 onboarding | + SSO/SAML, custom policies, compliance pack, dedicated TAM                                        |
+| Tier           | Price             | What You Get                                                                                       |
+| -------------- | ----------------- | -------------------------------------------------------------------------------------------------- |
+| **Free**       | $0                | CLI tool, basic linting/formatting, npm audit (capped: 1 private repo, 50 runs/mo)                 |
+| **Pro**        | $19/mo or $190/yr | **Security scanning (Gitleaks + ESLint security)**, Smart Test Strategy, multi-language, unlimited |
+| **Team**       | Contact us        | + RBAC, Slack alerts, multi-repo dashboard, team audit log _(coming soon)_                         |
+| **Enterprise** | Contact us        | + SSO/SAML, custom policies, compliance pack, dedicated TAM _(coming soon)_                        |
 
 > **Pro included in [VBL Starter Kit](https://vibebuildlab.com/starter-kit)** — Team/Enterprise are standalone purchases.
 
