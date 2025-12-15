@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.0.7] - 2025-12-12
+
+### Added
+
+- Dependabot auto-merge workflow for patch/minor dependency updates
+- Published `BACKLOG.md` to share upcoming roadmap items
+
+### Changed
+
+- Updated pricing to $19/mo Pro with Team/Enterprise now contact-us (README, LICENSE, billing dashboard, CLI upgrade messaging)
+- Bumped packaging/docs tooling (@npmcli/package-json 7.0.4, markdownlint-cli2 0.20.0)
+
 ## [5.0.6] - 2025-12-12
 
 ### Fixed
