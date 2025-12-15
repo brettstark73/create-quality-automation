@@ -2,7 +2,7 @@
 
 > CLI quality automation tool that bootstraps linting, formatting, security, and CI/CD for JS/TS/Python projects.
 
-**npm**: `create-qa-architect` | **Version**: 5.0.2
+**npm**: `create-qa-architect` | **Version**: 5.0.7
 
 ## Tech Stack
 
@@ -35,6 +35,10 @@ npx create-qa-architect --dry-run
 
 # Validation
 npx create-qa-architect --validate
+npx create-qa-architect --validate-docs
+npx create-qa-architect --validate-config
+npx create-qa-architect --alerts-slack
+npx create-qa-architect --pr-comments
 npx create-qa-architect --check-maturity
 
 # License
@@ -58,7 +62,7 @@ qa-architect/
 
 ## Coverage Thresholds
 
-- Lines: 75% | Functions: 70% | Branches: 65%
+- Lines/Statements/Functions/Branches: 75%+ overall (Setup.js 80% target)
 
 ## What NOT to Do
 
