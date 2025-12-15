@@ -2,14 +2,13 @@
 
 ## Overview
 
-QA Architect uses Jest for testing with a focus on integration tests that validate real CLI workflows.
+QA Architect uses plain Node-based test runners (no Jest) with a heavy focus on integration tests that validate real CLI workflows end to end.
 
 ## Running Tests
 
 ```bash
-npm test                 # Run all tests
-npm run test:coverage    # Run with coverage report
-npm run test:watch       # Watch mode for development
+npm test                 # Run all tests (sequential Node scripts)
+npm run test:coverage    # Run with coverage report via c8
 ```
 
 ## Test Structure

@@ -9,18 +9,18 @@ QA Architect is a CLI tool that bootstraps quality automation in JavaScript/Type
 ```
 create-qa-architect/
 ├── setup.js              # Main CLI entry point
-├── lib/
-│   ├── smart-strategy-generator.js    # Smart test strategy (Pro)
-│   ├── dependency-monitoring-*.js     # Dependency monitoring
-│   └── validation/                    # Validation utilities
+├── lib/                  # Core logic (validation, licensing, maturity, telemetry, dependency monitoring)
 ├── templates/            # Project templates
-│   ├── eslint.config.cjs
-│   ├── .prettierrc
-│   ├── .husky/
-│   └── scripts/
-└── config/               # Language-specific configs
-    ├── pyproject.toml
-    └── quality-python.yml
+│   ├── ci/               # GitHub Actions + CircleCI/GitLab samples
+│   ├── scripts/          # Helper scripts (smart test strategy, etc.)
+│   ├── integration-tests/# Starter integration tests
+│   ├── test-stubs/       # Unit/E2E placeholders
+│   ├── python/           # Python quality config
+│   └── QUALITY_TROUBLESHOOTING.md
+├── config/               # Defaults and language-specific configs
+│   ├── pyproject.toml
+│   └── quality-python.yml
+└── docs/                 # Architecture/testing/SLA/security docs
 ```
 
 ## Data Flow
@@ -50,4 +50,8 @@ Risk-based pre-push validation that adapts to change context:
 - `--deps` - Dependency monitoring only
 - `--security-config` - Security validation
 - `--check-maturity` - Project maturity report
-- `--comprehensive` - Full validation suite
+- `--validate` / `--comprehensive` - Full validation suite
+- `--validate-docs` - Documentation validation only
+- `--validate-config` - Validate `.qualityrc.json`
+- `--alerts-slack` / `--pr-comments` - Collaboration hooks
+- `--license-status` - Show current tier/features

@@ -20,7 +20,7 @@ You should receive a response within 48 hours. We will work with you to understa
 ### What We Do
 
 - **Dependency Scanning**: Regular `npm audit` and automated security updates
-- **Secret Detection**: Pre-commit hooks scan for hardcoded secrets
+- **Secret Detection**: CI/CLI secret scans (gitleaks/`npm run security:secrets`) to block hardcoded secrets
 - **Code Review**: All changes reviewed before merge
 - **Environment Variables**: Secrets stored in environment variables, never in code
 

@@ -1,14 +1,14 @@
 # Preflight Review: QA Architect (create-qa-architect)
 
 **Depth**: standard
-**Date**: 2025-12-09
-**Version**: 5.0.2
+**Date**: 2025-12-13
+**Version**: 5.0.7
 
 ---
 
-## Overall Status: ✅ PASS
+## Overall Status: ✅ PASS (prerelease suite)
 
-All critical launch blockers pass. Minor issues documented below are acceptable for npm package release.
+Prerelease (`npm run prerelease`) executed for 5.0.7, including docs check, command patterns, full test suite, command tests, and e2e package validation.
 
 ---
 
@@ -22,44 +22,44 @@ All critical launch blockers pass. Minor issues documented below are acceptable 
 
 ## Important Issues (P1) - Should Fix
 
-| Issue                    | Category | Location         | Recommendation                                                                                                                 |
-| ------------------------ | -------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| Gitleaks false positives | Security | tests/\*.test.js | Test fixtures use fake API key patterns (QAA-XXXX format); not real secrets. Consider adding `.gitleaksignore` for test files. |
-| npm version mismatch     | Release  | package.json     | Local 5.0.2, npm shows 5.0.1. Publish pending or recently published.                                                           |
+| Issue                    | Category | Location         | Recommendation                                                                                               |
+| ------------------------ | -------- | ---------------- | ------------------------------------------------------------------------------------------------------------ |
+| Gitleaks false positives | Security | tests/\*.test.js | Test fixtures use fake API key patterns (QAA-XXXX format); consider a scoped `.gitleaksignore` for fixtures. |
+| Publish verification     | Release  | package.json     | Confirm npm shows 5.0.7 after publishing; update if propagation is pending.                                  |
 
 ---
 
 ## P0 Functional Checks
 
-| Check             | Status | Notes                  |
-| ----------------- | ------ | ---------------------- |
-| All tests passing | ✅     | Full test suite passes |
-| npm audit         | ✅     | 0 vulnerabilities      |
-| ESLint            | ✅     | No errors              |
-| Build/validation  | ✅     | Core validation passes |
+| Check             | Status | Notes                                                              |
+| ----------------- | ------ | ------------------------------------------------------------------ |
+| All tests passing | ✅     | `npm run prerelease` (includes full test suite)                    |
+| npm audit         | ⚠️     | Not run in prerelease; run `npm run security:audit` before publish |
+| ESLint            | ⚠️     | Not run in prerelease; run `npm run lint` if desired               |
+| Build/validation  | ✅     | Covered via prerelease command + e2e package test                  |
 
 ---
 
 ## P0 Security Checks
 
-| Check                     | Status | Notes                                                                |
-| ------------------------- | ------ | -------------------------------------------------------------------- |
-| npm audit (high/critical) | ✅     | 0 vulnerabilities found                                              |
-| Hardcoded secrets scan    | ⚠️     | 4 findings - all in test files with fake keys (QAA-1234-XXXX format) |
-| No production secrets     | ✅     | No `.env` files, no real API keys                                    |
+| Check                     | Status | Notes                                                                                 |
+| ------------------------- | ------ | ------------------------------------------------------------------------------------- |
+| npm audit (high/critical) | ⚠️     | Not run in prerelease; run `npm run security:audit`                                   |
+| Hardcoded secrets scan    | ⚠️     | Re-run gitleaks/`npm run security:secrets`; expect fixture false positives (QAA-XXXX) |
+| No production secrets     | ✅     | No `.env` files, no real API keys committed                                           |
 
 ---
 
 ## Product Packaging
 
-| Item         | Status | Notes                   |
-| ------------ | ------ | ----------------------- |
-| CHANGELOG.md | ✅     | Present                 |
-| LICENSE      | ✅     | Present                 |
-| README.md    | ✅     | Present                 |
-| .env.example | N/A    | Not needed for CLI tool |
-| Version tags | ✅     | v4.3.0 - v5.0.2         |
-| Git status   | ✅     | Clean working tree      |
+| Item         | Status | Notes                          |
+| ------------ | ------ | ------------------------------ |
+| CHANGELOG.md | ✅     | Present                        |
+| LICENSE      | ✅     | Present                        |
+| README.md    | ✅     | Present                        |
+| .env.example | N/A    | Not needed for CLI tool        |
+| Version tags | ⚠️     | Confirm v5.0.7 tag pushed      |
+| Git status   | ⚠️     | Verify clean before publishing |
 
 ---
 
@@ -87,22 +87,14 @@ All critical launch blockers pass. Minor issues documented below are acceptable 
 
 ## Next Steps
 
-1. **Optional**: Add `.gitleaksignore` to exclude test files with fake license keys
-2. **Verify**: Confirm npm publish completed for 5.0.2 (may be propagating)
-3. **Ready**: Proceed with launch/release announcement
+1. Run `npm run security:audit` (and optional gitleaks scan) before publish
+2. Confirm npm publish and tag for 5.0.7 are visible on npm/GitHub
+3. Add `.gitleaksignore` scoped to test fixtures if false positives remain
 
 ---
 
 ## Recommendation
 
-**✅ CLEARED FOR LAUNCH**
+**✅ Cleared for launch (5.0.7)**
 
-This is an npm CLI package, not a web application. All critical checks pass:
-
-- Tests passing
-- No security vulnerabilities
-- No real secrets
-- Clean git state
-- Proper versioning and packaging
-
-The gitleaks findings are false positives on intentional test fixtures using fake license key formats.
+Prerelease suite passed for 5.0.7. Run `npm run security:audit`, confirm publish/tag visibility, and handle fixture gitleaks ignores if needed; then proceed with release comms. This remains an npm CLI package (no web surface), so focus stays on docs/CI/security validation.

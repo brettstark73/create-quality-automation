@@ -60,7 +60,7 @@ npm run test:coverage
 **View detailed report**:
 
 ```bash
-npm run coverage  # Opens coverage/index.html
+npm run coverage  # Generates coverage report (see coverage/index.html)
 ```
 
 ### Real-World Data Testing
@@ -106,8 +106,8 @@ npm run lint:fix    # Auto-fix where possible
 
 ```bash
 # Terminal 1: Code editing
-# Terminal 2: Watch mode (future enhancement)
-npm run test:watch  # Re-run tests on file changes
+# Terminal 2: Fast loop
+npm run test:fast  # Quick subset for iteration
 ```
 
 ### 3. Integration Test Coverage

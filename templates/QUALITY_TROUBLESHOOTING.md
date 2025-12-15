@@ -11,7 +11,7 @@
 
 ```bash
 # Check if tests are TypeScript validated
-npm run type-check:tests
+npm run type-check:tests || npx tsc --noEmit --project tests/tsconfig.json
 
 # If command doesn't exist, add to package.json:
 {
@@ -29,13 +29,13 @@ npm run type-check:tests
   "compilerOptions": {
     "rootDir": "..",
     "noEmit": true,
-    "types": ["vitest/globals", "node"]
+    "types": ["node"] // add your test runner types (jest/vitest) if used
   },
   "include": ["../src/**/*", "../tests/**/*"]
 }
 ```
 
-**Prevention**: Run `npm run quality:check` before commits
+**Prevention**: Run `npm run lint && npm test` (or `npm run validate:pre-push` if available) before commits
 
 ### Pre-commit Hooks Too Narrow
 
@@ -47,7 +47,8 @@ npm run type-check:tests
 cat .husky/pre-commit
 
 # Should run comprehensive checks:
-npx lint-staged && npm run type-check:all && npm test
+npx lint-staged && npm run lint && npm test
+# If your project has TypeScript, add: npm run type-check || npm run type-check:all
 ```
 
 **Fix**: Enhance `.husky/pre-commit`:
@@ -55,8 +56,9 @@ npx lint-staged && npm run type-check:all && npm test
 ```bash
 #!/usr/bin/env sh
 npx lint-staged
-npm run type-check:all
-npm run test:fast
+npm run lint
+npm test
+# Optional: npm run type-check || npm run type-check:all
 ```
 
 ## 🔍 Diagnostic Commands
@@ -64,15 +66,15 @@ npm run test:fast
 ### Quick Health Check
 
 ```bash
-# Run all quality gates (should complete without errors)
-npm run quality:check
-
-# If this fails, debug individual components:
-npm run type-check:all      # TypeScript issues
-npm run lint               # ESLint issues
-npm run format:check       # Prettier issues
+# Run core quality gates (should complete without errors)
+npm run lint               # ESLint/Stylelint
+npm run format:check       # Prettier
 npm test                   # Test failures
 npm run security:audit     # Security vulnerabilities
+
+# If you use TypeScript:
+npm run type-check || npx tsc --noEmit
+npm run type-check:all  # when defined to cover src + tests
 ```
 
 ### TypeScript Troubleshooting
@@ -89,7 +91,7 @@ npx tsc --noEmit path/to/file.ts
 
 # Common issues:
 # 1. Missing type definitions: npm install --save-dev @types/package-name
-# 2. Test globals: Add "vitest/globals" to types in tsconfig
+# 2. Test globals: Add your test runner types (e.g., jest or vitest) to tsconfig
 # 3. Node types: Add "node" to types array
 ```
 
@@ -99,10 +101,12 @@ npx tsc --noEmit path/to/file.ts
 # Run tests with verbose output
 npm test -- --reporter=verbose
 
-# Run specific test file
-npx vitest path/to/test.test.js
+# Run specific test file (Node-based runner)
+node path/to/test.test.js
 
-# Debug integration tests
+# Debug integration tests (when scripts exist)
+DEBUG=* npm test
+# or
 DEBUG=* npm run test:integration
 
 # Common issues:
@@ -135,10 +139,10 @@ npx eslint . --ext .js,.ts --config eslint-security.config.js
 
 ```bash
 # Database connection tests
-npm run test:integration
+npm run test:integration  # if defined; otherwise run npm test
 
 # API endpoint tests
-npm run test:e2e
+npm run test:e2e          # if defined
 
 # Common issues:
 # 1. Database not running: docker-compose up db
@@ -150,13 +154,13 @@ npm run test:e2e
 
 ```bash
 # Component integration tests
-npm run test:component
+npm run test:component    # if defined
 
 # Browser E2E tests
-npm run test:e2e
+npm run test:e2e          # if defined
 
 # Accessibility checks
-npm run accessibility:check
+npm run accessibility:check  # if defined
 
 # Common issues:
 # 1. Build process: npm run build && npm run test:e2e
@@ -187,7 +191,7 @@ npm run type-check && tsc --noEmit --skipLibCheck
 # Profile test performance
 npm test -- --reporter=verbose --logHeapUsage
 
-# Run only fast tests for development
+# Run only fast tests for development (if defined)
 npm run test:fast
 
 # Optimize strategies:
@@ -316,14 +320,9 @@ npm audit --package=package-name
 # Generate coverage report
 npm run test:coverage
 
-# Check coverage thresholds
-npx vitest run --coverage --reporter=verbose
-
 # Common targets:
-# - Lines: >80%
-# - Functions: >80%
-# - Branches: >70%
-# - Statements: >80%
+# - Lines/Statements/Functions/Branches: >=75% overall
+# - Critical files (e.g., setup.js): >=80%
 ```
 
 ### Code Quality Metrics
@@ -382,7 +381,6 @@ npm run type-check:all  # Should pass
 
 - [ESLint Troubleshooting](https://eslint.org/docs/user-guide/troubleshooting)
 - [TypeScript Handbook](https://www.typescriptlang.org/docs/)
-- [Vitest Documentation](https://vitest.dev/guide/)
 - [Playwright Debugging](https://playwright.dev/docs/debug)
 
 ### Debug Environment Setup
@@ -392,10 +390,11 @@ npm run type-check:all  # Should pass
 export DEBUG=quality-automation:*
 
 # Run with verbose output
-npm run quality:check -- --verbose
+npm run lint -- --max-warnings=0
+npm test -- --reporter=verbose
 
 # Generate debug report
-npm run validate:comprehensive > debug-report.txt 2>&1
+npm run validate:pre-push > debug-report.txt 2>&1
 ```
 
 ---
