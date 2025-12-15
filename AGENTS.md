@@ -2,7 +2,7 @@
 
 ## Quick Orientation
 
-This repo packages the `create-qa-architect` CLI and supporting assets for quality automation. Treat `setup.js` as the entrypoint, keep scripts in `lib/` and `server/`, and look to `config/`, `templates/`, and `.github/workflows/` for defaults and CI glue.
+This repo packages the `create-qa-architect` CLI and supporting assets for quality automation. Treat `setup.js` as the entrypoint, keep CLI helpers in `lib/` and `scripts/`, and look to `config/`, `templates/`, `docs/`, and `.github/workflows/` (daily deploy checks, weekly audits, Dependabot auto-merge) for defaults and CI glue.
 
 ## Project Structure & Module Organization
 
@@ -16,9 +16,10 @@ This repo packages the `create-qa-architect` CLI and supporting assets for quali
 ## Build, Test, and Development Commands
 
 - `npm run format` / `npm run format:check` — run Prettier across the repo. Use `npm run lint:fix` for auto-fixes.
-- `npm run lint` — flat ESLint config plus Stylelint coverage over CSS/SCSS/PCSS assets.
+- `npm run lint` / `npm run type-check` — flat ESLint config plus Stylelint coverage over CSS/SCSS/PCSS assets, and TS type checks via `tsconfig.json`.
 - `npm test` (or `npm run test:fast`/`:medium`/`:slow`) — sequentially executes the full `tests/*.test.js` suite; `test:fast` mirrors the unit subset.
 - `npm run validate:pre-push` — runs pattern checks, lint, formatting, command tests, and the core suite; mimic this before pushing PRs.
+- `npm run docs:check` / `npm run validate:docs` — verify markdown and docs wiring after edits.
 - `npm run security:audit|security:secrets|security:config` — run npm audit, inspect for secrets, and verify security-aware setup paths.
 
 ## Coding Style & Naming Conventions
@@ -42,6 +43,6 @@ This repo packages the `create-qa-architect` CLI and supporting assets for quali
 
 ## Security & Configuration Tips
 
-- Re-run `npm run validate:docs` / `npm run validate:claude` after editing markdown assets.
+- Re-run `npm run docs:check` or `npm run validate:docs` after editing markdown assets.
 - Use `npm run security:config` to regenerate ARM/OCI-friendly configs before publishing templates.
 - Keep `.nvmrc` and `package.json` engines in sync (Node 20+, npm 10 via Volta) to avoid inconsistent developer environments.
