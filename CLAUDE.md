@@ -1,76 +1,96 @@
-# QA Architect - Claude Guide
+# CLAUDE.md
 
-> CLI quality automation tool that bootstraps linting, formatting, security, and CI/CD for JS/TS/Python projects.
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 **npm**: `create-qa-architect` | **Version**: 5.0.7
 
-## Tech Stack
+## Project Overview
 
-| Layer    | Technology                           |
-| -------- | ------------------------------------ |
-| Runtime  | Node.js 20+, JavaScript (ES6+)       |
-| Linting  | ESLint 9 + Prettier 3 + Stylelint 16 |
-| Hooks    | Husky 9 + lint-staged 15             |
-| Security | Gitleaks, ESLint security            |
-| Coverage | c8 (75% lines, 70% functions)        |
+QA Architect is a CLI tool (`create-qa-architect`) that bootstraps quality automation for JS/TS/Python projects. One command adds ESLint, Prettier, Husky, lint-staged, and GitHub Actions. Pro tiers add security scanning (Gitleaks), Smart Test Strategy, and multi-language support.
 
-## Key Commands
+## Commands
 
 ```bash
-npm run lint             # ESLint + Stylelint
-npm run format           # Prettier
-npm test                 # All tests
-npm run test:coverage    # Coverage report
-npm run validate:all     # All validation
-npm run prerelease       # Pre-release validation
-```
+# Development
+npm test                    # Run all tests (40+ test files)
+npm run test:unit           # Fast unit tests only
+npm run test:slow           # Integration tests (Python, monorepo, etc.)
+npm run test:coverage       # Coverage report (75% lines, 70% functions required)
+npm run lint                # ESLint + Stylelint
+npm run format              # Prettier
 
-## CLI Flags
-
-```bash
-# Setup
-npx create-qa-architect          # Full setup
-npx create-qa-architect --interactive
-npx create-qa-architect --dry-run
+# Run single test file
+node tests/licensing.test.js
+QAA_DEVELOPER=true node tests/setup.test.js
 
 # Validation
-npx create-qa-architect --validate
-npx create-qa-architect --validate-docs
-npx create-qa-architect --validate-config
-npx create-qa-architect --alerts-slack
-npx create-qa-architect --pr-comments
-npx create-qa-architect --check-maturity
+npm run validate:all        # Full validation suite
+npm run prerelease          # Required before publishing
 
-# License
-npx create-qa-architect --license-status
-npx create-qa-architect --activate-license
+# CLI testing
+npx . --dry-run             # Test setup without changes
+npx . --check-maturity      # Show project maturity detection
+npx . --validate            # Run validation checks
 ```
 
-## Project Structure
+## Architecture
 
 ```
-qa-architect/
-├── setup.js             # Main CLI entry
+setup.js                    # Main CLI entry - argument parsing, orchestration
 ├── lib/
-│   ├── licensing.js     # Feature gating
-│   ├── smart-strategy-generator.js
-│   └── project-maturity.js
-├── templates/           # Config templates
-├── tests/              # 40+ test files
-└── docs/               # Architecture, testing, SLA gates
+│   ├── licensing.js        # Tier system (FREE/PRO/TEAM/ENTERPRISE), feature gating
+│   ├── project-maturity.js # Detects project stage (minimal→production-ready)
+│   ├── smart-strategy-generator.js  # Risk-based test selection (Pro)
+│   ├── dependency-monitoring-*.js   # Dependabot config generation
+│   ├── validation/         # Validators (security, docs, config)
+│   ├── interactive/        # TTY prompt system
+│   └── template-loader.js  # Custom template merging
+├── templates/              # Config file templates
+├── config/                 # Language-specific configs (Python, etc.)
+└── tests/                  # 40+ test files
 ```
 
-## Coverage Thresholds
+### Data Flow
 
-- Lines/Statements/Functions/Branches: 75%+ overall (Setup.js 80% target)
+1. **Parse args** → `parseArguments()` handles CLI flags
+2. **Route command** → validation-only, deps, license, or full setup
+3. **Detect project** → TypeScript, Python, Stylelint targets
+4. **Load templates** → merge custom templates with defaults
+5. **Generate configs** → ESLint, Prettier, Husky hooks, workflows
+6. **Apply enhancements** → production quality fixes
 
-## What NOT to Do
+### License Tier System
 
-- Don't bypass quality gates
-- Don't use `--no-verify` on commits
-- Don't publish without `npm run prerelease`
-- Don't hardcode secrets
+The tool uses a freemium model with feature gating in `lib/licensing.js`:
 
----
+- **FREE**: Basic linting/formatting, 1 private repo, 50 runs/month
+- **PRO**: Security scanning, Smart Test Strategy, unlimited
+- **TEAM/ENTERPRISE**: RBAC, Slack alerts, multi-repo dashboard
 
-_See `docs/` for ARCHITECTURE, TESTING, SLA_GATES. Global rules in `~/.claude/CLAUDE.md`._
+Check tier with `hasFeature('smartTestStrategy')` or `getLicenseInfo()`.
+
+## Key Files
+
+- `setup.js:390-500` - Main entry, interactive mode handling
+- `setup.js:985-2143` - Core setup flow (`runMainSetup`)
+- `lib/licensing.js` - All tier logic, usage caps, feature gates
+- `lib/project-maturity.js` - Maturity detection algorithm
+- `config/defaults.js` - Default scripts, dependencies, lint-staged config
+
+## Testing Patterns
+
+Tests use real filesystem operations with temp directories:
+
+```javascript
+const testDir = createTempGitRepo()
+execSync('node setup.js --deps', { cwd: testDir })
+assert(fs.existsSync(path.join(testDir, '.github/dependabot.yml')))
+```
+
+The `QAA_DEVELOPER=true` env var bypasses license checks during testing.
+
+## Quality Gates
+
+- Coverage: 75% lines, 70% functions, 65% branches
+- Pre-push: lint, format:check, test:patterns, test:commands, test
+- Pre-release: `npm run prerelease` (docs:check + all tests + e2e)
