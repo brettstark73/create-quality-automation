@@ -188,13 +188,7 @@ npm run validate:pre-push   # Pre-push validation
 
 ## Roadmap
 
-- [x] ESLint 9 flat config support
-- [x] Progressive quality (maturity detection)
-- [x] Python toolchain support
-- [x] Smart test strategy (Pro)
-- [x] Monorepo support (Nx, Turborepo, Lerna, Rush, npm/pnpm/yarn workspaces)
-- [ ] Rust and Go support
-- [ ] VS Code extension
+See [ROADMAP.md](ROADMAP.md) for planned features and strategic direction.
 
 ## Contributing
 
