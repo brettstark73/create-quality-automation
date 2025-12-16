@@ -8,7 +8,7 @@
 - [ ] **Deploy Stripe payment flow** - Enable Pro tier purchases
   - Create Stripe products (Pro Monthly $19, Pro Annual $190)
   - Deploy webhook handler to Vercel
-  - Add checkout to vibebuildlab.com/tools/qa-architect
+  - Add checkout to vibebuildlab.com/qa-architect
   - Test end-to-end purchase flow
 
 ## P1 - Important (Should Do Soon)
