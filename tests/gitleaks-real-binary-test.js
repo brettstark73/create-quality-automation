@@ -23,6 +23,8 @@ console.log('🧪 Running Real Gitleaks Binary Positive Path Test...')
 const REAL_CHECKSUMS = {
   'linux-x64':
     '5fd1b3b0073269484d40078662e921d07427340ab9e6ed526ccd215a565b3298',
+  'linux-arm64':
+    '3770c7ebeb625e3e96c183525ca18285a01aedef2d75a2c41ceb3e141af2e8b7',
   'darwin-x64':
     'cf09ad7a85683d90221db8324f036f23c8c29107145e1fc4a0dffbfa9e89c09a',
   'darwin-arm64':
