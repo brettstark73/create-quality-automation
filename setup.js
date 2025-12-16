@@ -746,7 +746,7 @@ HELP:
       if (!capCheck.allowed) {
         console.error(`❌ ${capCheck.reason}`)
         console.error(
-          '   Upgrade to Pro, Team, or Enterprise for unlimited runs: https://vibebuildlab.com/tools/qa-architect'
+          '   Upgrade to Pro, Team, or Enterprise for unlimited runs: https://vibebuildlab.com/qa-architect'
         )
         process.exit(1)
       }
@@ -1032,7 +1032,7 @@ HELP:
           if (!repoCheck.allowed) {
             console.error(`\n❌ ${repoCheck.reason}`)
             console.error(
-              '   Upgrade to Pro for unlimited repos: https://vibebuildlab.com/tools/qa-architect'
+              '   Upgrade to Pro for unlimited repos: https://vibebuildlab.com/qa-architect'
             )
             process.exit(1)
           }
@@ -1719,7 +1719,7 @@ try {
 const CAP = 50
 if (usage.prePushRuns >= CAP) {
 console.error('❌ Free tier limit reached: ' + usage.prePushRuns + '/' + CAP + ' pre-push runs this month')
-  console.error('   Upgrade to Pro, Team, or Enterprise: https://vibebuildlab.com/tools/qa-architect')
+  console.error('   Upgrade to Pro, Team, or Enterprise: https://vibebuildlab.com/qa-architect')
   process.exit(1)
 }
 
