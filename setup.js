@@ -355,6 +355,7 @@ function parseArguments(rawArgs) {
   const disableActionlint = sanitizedArgs.includes('--no-actionlint')
   const disableMarkdownlint = sanitizedArgs.includes('--no-markdownlint')
   const disableEslintSecurity = sanitizedArgs.includes('--no-eslint-security')
+  const allowLatestGitleaks = sanitizedArgs.includes('--allow-latest-gitleaks')
 
   return {
     sanitizedArgs,
@@ -381,6 +382,7 @@ function parseArguments(rawArgs) {
     disableActionlint,
     disableMarkdownlint,
     disableEslintSecurity,
+    allowLatestGitleaks,
   }
 }
 
@@ -418,6 +420,7 @@ function parseArguments(rawArgs) {
     disableActionlint,
     disableMarkdownlint,
     disableEslintSecurity,
+    allowLatestGitleaks,
   } = parsedConfig
 
   // Initialize telemetry session (opt-in only, fails silently)
@@ -490,6 +493,7 @@ function parseArguments(rawArgs) {
       disableActionlint,
       disableMarkdownlint,
       disableEslintSecurity,
+      allowLatestGitleaks,
     } = parsedConfig)
 
     console.log('📋 Configuration after interactive selections applied\n')
@@ -652,6 +656,7 @@ HELP:
       disableActionlint,
       disableMarkdownlint,
       disableEslintSecurity,
+      allowLatestGitleaks,
     }
     const validator = new ValidationRunner(validationOptions)
 
