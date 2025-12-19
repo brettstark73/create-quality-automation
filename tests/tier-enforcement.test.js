@@ -48,7 +48,12 @@ function setTier(tier) {
   if (tier === 'FREE') {
     removeLicense()
   } else {
-    saveLicense(tier, `QAA-${tier}-TEST-KEY-1234`, 'test@example.com')
+    const tierKeys = {
+      PRO: 'QAA-AAAA-BBBB-CCCC-DDDD',
+      TEAM: 'QAA-BBBB-CCCC-DDDD-EEEE',
+      ENTERPRISE: 'QAA-CCCC-DDDD-EEEE-FFFF',
+    }
+    saveLicense(tier, tierKeys[tier], 'test@example.com')
   }
 }
 

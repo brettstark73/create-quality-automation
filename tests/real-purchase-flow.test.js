@@ -86,7 +86,7 @@ async function testWebhookLicensePopulation() {
         created: new Date().toISOString(),
         description: 'License database from webhook handler',
       },
-      'QAA-REAL-1234-5678-ABCD': {
+      'QAA-1234-5678-ABCD-EF90': {
         customerId: 'cus_real_customer_123',
         tier: 'PRO',
         isFounder: true,
@@ -95,7 +95,7 @@ async function testWebhookLicensePopulation() {
         addedDate: new Date().toISOString(),
         addedBy: 'stripe_webhook',
       },
-      'QAA-REAL-9999-8888-EFGH': {
+      'QAA-9999-8888-EFGH-1234': {
         customerId: 'cus_enterprise_456',
         tier: 'ENTERPRISE',
         isFounder: false,
@@ -145,7 +145,7 @@ async function testNetworkLicenseValidation() {
       // Test license activation with network fetch
       const validator = new LicenseValidator()
       const result = await validator.activateLicense(
-        'QAA-REAL-1234-5678-ABCD',
+        'QAA-1234-5678-ABCD-EF90',
         'customer@example.com'
       )
 
