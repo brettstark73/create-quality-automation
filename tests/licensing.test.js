@@ -8,6 +8,7 @@
 const fs = require('fs')
 const path = require('path')
 const os = require('os')
+const crypto = require('crypto')
 
 // Set up temporary license directory for tests (before requiring licensing.js)
 const TEST_LICENSE_DIR = path.join(
@@ -49,6 +50,44 @@ function getTestLicensePaths() {
   const licenseDir = TEST_LICENSE_DIR
   const licenseFile = path.join(licenseDir, 'license.json')
   return { licenseDir, licenseFile }
+}
+
+function buildSignedLicense({
+  tier,
+  licenseKey,
+  email,
+  expires = null,
+  customerId = null,
+  isFounder = false,
+}) {
+  const normalizedKey = licenseKey.trim().toUpperCase()
+  const payload = {
+    customerId,
+    tier,
+    isFounder: Boolean(isFounder),
+    email,
+    issued: Date.now(),
+    version: '1.0',
+  }
+  const signature = crypto
+    .createHmac(
+      'sha256',
+      process.env.LICENSE_SIGNING_SECRET || 'cqa-dev-secret-change-in-prod'
+    )
+    .update(JSON.stringify(payload))
+    .digest('hex')
+
+  return {
+    tier,
+    licenseKey: normalizedKey,
+    email,
+    expires,
+    activated: new Date().toISOString(),
+    customerId,
+    isFounder: Boolean(isFounder),
+    payload,
+    signature,
+  }
 }
 
 console.log('🧪 Testing licensing.js...\n')
@@ -107,13 +146,12 @@ function testGetLicenseInfoValidPro() {
   console.log('Test 2: getLicenseInfo() with valid PRO license')
 
   // Create valid PRO license
-  const licenseData = {
+  const licenseData = buildSignedLicense({
     tier: LICENSE_TIERS.PRO,
-    licenseKey: 'QAA-PRO-1234567890ABCDEFGHIJK',
+    licenseKey: 'QAA-ABCD-1234-EF56-7890',
     email: 'test@example.com',
     expires: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(), // 1 year
-    activated: new Date().toISOString(),
-  }
+  })
 
   const { licenseDir, licenseFile } = getTestLicensePaths()
   if (!fs.existsSync(licenseDir)) {
@@ -147,13 +185,12 @@ function testGetLicenseInfoExpired() {
   setupTest()
   console.log('Test 3: getLicenseInfo() with expired license')
 
-  const licenseData = {
+  const licenseData = buildSignedLicense({
     tier: LICENSE_TIERS.PRO,
-    licenseKey: 'QAA-PRO-1234567890ABCDEFGHIJK',
+    licenseKey: 'QAA-BCDE-2345-FG67-8901',
     email: 'test@example.com',
     expires: new Date(Date.now() - 1000).toISOString(), // Expired 1 second ago
-    activated: new Date().toISOString(),
-  }
+  })
 
   const { licenseDir, licenseFile } = getTestLicensePaths()
   if (!fs.existsSync(licenseDir)) {
@@ -187,13 +224,11 @@ function testGetLicenseInfoInvalidKey() {
   setupTest()
   console.log('Test 4: getLicenseInfo() with invalid key format')
 
-  const licenseData = {
+  const licenseData = buildSignedLicense({
     tier: LICENSE_TIERS.PRO,
     licenseKey: 'INVALID-KEY', // Too short and wrong prefix
     email: 'test@example.com',
-    expires: null,
-    activated: new Date().toISOString(),
-  }
+  })
 
   const { licenseDir, licenseFile } = getTestLicensePaths()
   if (!fs.existsSync(licenseDir)) {
@@ -218,6 +253,47 @@ function testGetLicenseInfoInvalidKey() {
     teardownTest()
     process.exit(1)
   }
+}
+
+/**
+ * Test 4b: getLicenseInfo() rejects unsigned license
+ */
+function testUnsignedLicenseRejected() {
+  setupTest()
+  console.log('Test 4b: getLicenseInfo() rejects unsigned license')
+
+  const licenseData = {
+    tier: LICENSE_TIERS.PRO,
+    licenseKey: 'QAA-AAAA-BBBB-CCCC-DDDD',
+    email: 'test@example.com',
+    expires: null,
+    activated: new Date().toISOString(),
+  }
+
+  const { licenseDir, licenseFile } = getTestLicensePaths()
+  if (!fs.existsSync(licenseDir)) {
+    fs.mkdirSync(licenseDir, { recursive: true })
+  }
+
+  fs.writeFileSync(licenseFile, JSON.stringify(licenseData, null, 2))
+
+  const license = getLicenseInfo()
+
+  if (
+    license.tier === LICENSE_TIERS.FREE &&
+    license.valid === true &&
+    license.error &&
+    license.error.includes('signature verification failed')
+  ) {
+    console.log('  ✅ Rejects unsigned license\n')
+    teardownTest()
+    return true
+  }
+
+  console.error('  ❌ Unsigned license was not rejected')
+  console.error('  Received:', license)
+  teardownTest()
+  process.exit(1)
 }
 
 /**
@@ -306,13 +382,11 @@ function testHasFeature() {
   }
 
   // Create PRO license
-  const licenseData = {
+  const licenseData = buildSignedLicense({
     tier: LICENSE_TIERS.PRO,
-    licenseKey: 'QAA-PRO-1234567890ABCDEFGHIJK',
+    licenseKey: 'QAA-CDEF-3456-GH78-9012',
     email: 'test@example.com',
-    expires: null,
-    activated: new Date().toISOString(),
-  }
+  })
 
   const { licenseDir, licenseFile } = getTestLicensePaths()
   if (!fs.existsSync(licenseDir)) {
@@ -349,13 +423,11 @@ function testGetDependencyMonitoringLevel() {
   }
 
   // Create PRO license
-  const licenseData = {
+  const licenseData = buildSignedLicense({
     tier: LICENSE_TIERS.PRO,
-    licenseKey: 'QAA-PRO-1234567890ABCDEFGHIJK',
+    licenseKey: 'QAA-DEFA-4567-HI89-0123',
     email: 'test@example.com',
-    expires: null,
-    activated: new Date().toISOString(),
-  }
+  })
 
   const { licenseDir, licenseFile } = getTestLicensePaths()
   if (!fs.existsSync(licenseDir)) {
@@ -409,7 +481,7 @@ function testSaveAndRemoveLicense() {
   // Save license
   const saveResult = saveLicense(
     LICENSE_TIERS.PRO,
-    'QAA-PRO-TEST123456789ABCD',
+    'QAA-EFAB-5678-IJ90-1234',
     'save-test@example.com',
     new Date(Date.now() + 1000000).toISOString()
   )
@@ -488,13 +560,11 @@ function testShowUpgradeMessagePro() {
   setupTest()
 
   // Create PRO license
-  const licenseData = {
+  const licenseData = buildSignedLicense({
     tier: LICENSE_TIERS.PRO,
-    licenseKey: 'QAA-PRO-1234567890ABCDEFGHIJK',
+    licenseKey: 'QAA-FABC-6789-JK01-2345',
     email: 'test@example.com',
-    expires: null,
-    activated: new Date().toISOString(),
-  }
+  })
 
   const { licenseDir, licenseFile } = getTestLicensePaths()
   if (!fs.existsSync(licenseDir)) {
@@ -561,13 +631,12 @@ function testShowLicenseStatusPro() {
 
   // Create PRO license with expiration
   const expiryDate = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000)
-  const licenseData = {
+  const licenseData = buildSignedLicense({
     tier: LICENSE_TIERS.PRO,
-    licenseKey: 'QAA-PRO-1234567890ABCDEFGHIJK',
+    licenseKey: 'QAA-AB12-34CD-56EF-7890',
     email: 'pro@example.com',
     expires: expiryDate.toISOString(),
-    activated: new Date().toISOString(),
-  }
+  })
 
   const { licenseDir, licenseFile } = getTestLicensePaths()
   if (!fs.existsSync(licenseDir)) {
@@ -607,13 +676,11 @@ function testValidEnterpriseLicense() {
   setupTest()
   console.log('Test 15: Valid ENTERPRISE license')
 
-  const licenseData = {
+  const licenseData = buildSignedLicense({
     tier: LICENSE_TIERS.ENTERPRISE,
-    licenseKey: 'QAA-ENTERPRISE-1234567890ABCDEFG',
+    licenseKey: 'QAA-1234-ABCD-5678-EF90',
     email: 'enterprise@company.com',
-    expires: null,
-    activated: new Date().toISOString(),
-  }
+  })
 
   const { licenseDir, licenseFile } = getTestLicensePaths()
   if (!fs.existsSync(licenseDir)) {
@@ -646,13 +713,12 @@ function testLicenseStatusWithError() {
   setupTest()
 
   // Create expired license
-  const licenseData = {
+  const licenseData = buildSignedLicense({
     tier: LICENSE_TIERS.PRO,
-    licenseKey: 'QAA-PRO-1234567890ABCDEFGHIJK',
+    licenseKey: 'QAA-2345-BCDE-6789-F012',
     email: 'expired@example.com',
     expires: new Date(Date.now() - 1000).toISOString(),
-    activated: new Date().toISOString(),
-  }
+  })
 
   const { licenseDir, licenseFile } = getTestLicensePaths()
   if (!fs.existsSync(licenseDir)) {
@@ -694,6 +760,7 @@ testGetLicenseInfoNoFile()
 testGetLicenseInfoValidPro()
 testGetLicenseInfoExpired()
 testGetLicenseInfoInvalidKey()
+testUnsignedLicenseRejected()
 testGetLicenseInfoMalformedJSON()
 testGetLicenseInfoIncomplete()
 testHasFeature()
