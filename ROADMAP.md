@@ -28,8 +28,8 @@
 
 ## In Progress (This Week)
 
-- [ ] Stripe payment flow for Pro tier purchases (~4 hours)
-- [ ] Landing page at vibebuildlab.com/qa-architect (~2 hours)
+- [x] Stripe payment flow for Pro tier purchases - ✅ DONE (test mode, copy to live)
+- [x] Landing page at vibebuildlab.com/qa-architect - ✅ LIVE with comparison table
 
 ## Ready to Build (When Prioritized)
 

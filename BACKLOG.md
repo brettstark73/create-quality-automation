@@ -1,22 +1,23 @@
 # qa-architect - Backlog
 
-**Last Updated**: 2025-12-19
+**Last Updated**: 2025-12-23
 **Priority System**: P0 (Critical) → P1 (Important) → P2 (Nice-to-have) → P3 (Future)
 
 ## P0 - Critical (Blocking Revenue)
 
-- [ ] **Deploy Stripe payment flow** - Enable Pro tier purchases
-  - Create Stripe products (Pro Monthly $19, Pro Annual $190)
-  - Deploy webhook handler to Vercel
-  - Add checkout to vibebuildlab.com/qa-architect
-  - Test end-to-end purchase flow
+- [x] ~~**Deploy Stripe payment flow**~~ - ✅ DONE (test mode)
+  - [x] Create Stripe products (Pro Monthly $19, Pro Annual $190)
+  - [x] Deploy webhook handler to Vercel
+  - [x] Add checkout to vibebuildlab.com/qa-architect
+  - [x] Test end-to-end purchase flow
+  - [ ] **Copy test products to live mode** (final step!)
 
 ## P1 - Important (Should Do Soon)
 
-- [ ] **Landing page improvements** - Better conversion
-  - Add live demo / playground
-  - Customer testimonials (when available)
-  - Comparison table vs manual setup
+- [x] **Landing page improvements** - Better conversion
+  - [ ] Add live demo / playground
+  - [ ] Customer testimonials (when available)
+  - [x] Comparison table vs manual setup
 
 - [ ] **Usage analytics** - Understand adoption
   - Anonymous telemetry opt-in
