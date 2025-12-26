@@ -7,3 +7,4 @@ coverage/
 .nyc_output/
 .create-quality-automation-cache/
 coverage/
+.playwright-mcp/
