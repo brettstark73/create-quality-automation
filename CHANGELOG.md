@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.1.0] - 2025-12-26
+
 ### Added
 
 - License validation and security test improvements
@@ -15,11 +17,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Gitleaks download redirect handling
   - License validator integrity checks
   - npm audit parsing validation
+- Auto-create GitHub release on tag push (CI workflow)
 
 ### Changed
 
 - Enhanced license-validator.js and licensing.js
 - Improved config-security validation
+
+### Fixed
+
+- Handle actionlint WASM limitations gracefully
 
 ## [5.0.7] - 2025-12-12
 
