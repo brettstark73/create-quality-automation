@@ -7,16 +7,16 @@
 
 ## 🚨 Technical Debt (SOTA Audit 2025-12-30)
 
-| ID  | Issue                                | Severity | Location                      | Status             |
-| --- | ------------------------------------ | -------- | ----------------------------- | ------------------ |
-| TD1 | Hardcoded dev secret fallback        | Critical | `licensing.js:396`            | ✅ Fixed           |
-| TD2 | `setup.js` 2100+ lines needs split   | P0       | `setup.js` → `/lib/commands/` | ✅ Fixed (partial) |
-| TD3 | Command injection in linkinator call | Medium   | `prelaunch-validator.js:281`  | ✅ Fixed           |
-| TD4 | Unused `_vars` bypass ESLint         | Medium   | Multiple files                | ✅ Fixed           |
-| TD5 | No rate limiting on GitHub API       | Medium   | `lib/github-api.js`           | Backlog            |
-| TD6 | Missing security headers on webhook  | Low      | `webhook-handler.js`          | Backlog            |
-| TD7 | Inconsistent async patterns          | Low      | `lib/validation/index.js`     | Backlog            |
-| TD8 | Commented-out validation code        | Low      | `setup.js:1613`               | Backlog            |
+| ID  | Issue                                | Severity | Location                      | Status   |
+| --- | ------------------------------------ | -------- | ----------------------------- | -------- |
+| TD1 | Hardcoded dev secret fallback        | Critical | `licensing.js:396`            | ✅ Fixed |
+| TD2 | `setup.js` 2100+ lines needs split   | P0       | `setup.js` → `/lib/commands/` | ✅ Fixed |
+| TD3 | Command injection in linkinator call | Medium   | `prelaunch-validator.js:281`  | ✅ Fixed |
+| TD4 | Unused `_vars` bypass ESLint         | Medium   | Multiple files                | ✅ Fixed |
+| TD5 | No rate limiting on GitHub API       | Medium   | `lib/github-api.js`           | Backlog  |
+| TD6 | Missing security headers on webhook  | Low      | `webhook-handler.js`          | Backlog  |
+| TD7 | Inconsistent async patterns          | Low      | `lib/validation/index.js`     | Backlog  |
+| TD8 | Commented-out validation code        | Low      | `setup.js:1613`               | Backlog  |
 
 ---
 
@@ -51,12 +51,15 @@
 
 ## Completed ✅
 
-| ID  | Feature                         | Completed  |
-| --- | ------------------------------- | ---------- |
-| ✓   | Stripe payment flow (test mode) | 2025-12-23 |
-| ✓   | Landing page comparison table   | 2025-12-23 |
-| ✓   | Terminal demo animation         | 2025-12-26 |
-| ✓   | Expanded FAQs                   | 2025-12-26 |
+| ID  | Feature                             | Completed  |
+| --- | ----------------------------------- | ---------- |
+| ✓   | SOTA audit: TD1-TD4 security/arch   | 2025-12-30 |
+| ✓   | Pre-launch validation suite (5.3.0) | 2025-12-29 |
+| ✓   | Quality tools integration (5.2.0)   | 2025-12-29 |
+| ✓   | Stripe payment flow (test mode)     | 2025-12-23 |
+| ✓   | Landing page comparison table       | 2025-12-23 |
+| ✓   | Terminal demo animation             | 2025-12-26 |
+| ✓   | Expanded FAQs                       | 2025-12-26 |
 
 ---
 
