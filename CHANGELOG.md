@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Security**: Removed hardcoded dev secret fallback in license verification (TD1)
+- **Security**: Fixed command injection vulnerability in linkinator integration (TD3)
+- **Code Quality**: Removed underscore-prefixed unused variables across codebase (TD4)
+
+### Changed
+
+- **Architecture**: Extracted command handlers from `setup.js` to `lib/commands/` for maintainability (TD2)
+  - New modules: `lib/commands/validate.js`, `lib/commands/deps.js`, `lib/commands/index.js`
+  - Reduces setup.js from 2100+ lines, improves testability
+
 ## [5.3.0] - 2025-12-29
 
 ### Added
