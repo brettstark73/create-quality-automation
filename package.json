@@ -4,8 +4,7 @@
   "description": "QA Architect - Bootstrap quality automation for JavaScript/TypeScript and Python projects with GitHub Actions, pre-commit hooks, linting, formatting, and smart test strategy",
   "main": "setup.js",
   "bin": {
-    "create-qa-architect": "./setup.js",
-    "create-saas-monetization": "./create-saas-monetization.js"
+    "create-qa-architect": "./setup.js"
   },
   "scripts": {
     "prepare": "husky",
@@ -66,7 +65,6 @@
   "license": "SEE LICENSE IN LICENSE",
   "files": [
     "setup.js",
-    "create-saas-monetization.js",
     "config/",
     "docs/",
     "lib/",

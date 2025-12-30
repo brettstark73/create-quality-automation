@@ -13,8 +13,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Security**: Fixed command injection vulnerability in linkinator integration (TD3)
 - **Code Quality**: Removed underscore-prefixed unused variables across codebase (TD4)
 
+### Removed
+
+- **create-saas-monetization.js** - Separated from qa-architect; this was a standalone SaaS monetization generator not related to the core quality automation product
+
 ### Changed
 
+- **Security**: License signing migrated from HMAC to Ed25519 public/private key cryptography
+  - Client-side verification no longer requires shared secrets
+  - Signed public registry for tamper-proof license distribution
+  - Atomic file writes prevent database corruption
+  - Unknown Stripe price IDs now fail explicitly (no silent fallback)
+- **Security**: Gitleaks execution uses `spawnSync` with args array to prevent command injection
 - **Architecture**: Extracted command handlers from `setup.js` to `lib/commands/` for maintainability (TD2)
   - New modules: `lib/commands/validate.js`, `lib/commands/deps.js`, `lib/commands/index.js`
   - Reduces setup.js from 2100+ lines, improves testability

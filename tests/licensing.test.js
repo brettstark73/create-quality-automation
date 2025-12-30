@@ -8,7 +8,11 @@
 const fs = require('fs')
 const path = require('path')
 const os = require('os')
-const crypto = require('crypto')
+const {
+  createTestKeyPair,
+  setTestPublicKeyEnv,
+  buildSignedLicenseEntry,
+} = require('./license-test-helpers')
 
 // Set up temporary license directory for tests (before requiring licensing.js)
 const TEST_LICENSE_DIR = path.join(
@@ -17,9 +21,9 @@ const TEST_LICENSE_DIR = path.join(
 )
 process.env.QAA_LICENSE_DIR = TEST_LICENSE_DIR
 
-// Set test secret for license signing/verification (matches buildSignedLicense)
-// This is required since security fix removed hardcoded dev fallback
-process.env.LICENSE_SIGNING_SECRET = 'cqa-test-secret-for-unit-tests'
+const { publicKey, privateKey } = createTestKeyPair()
+setTestPublicKeyEnv(publicKey)
+process.env.LICENSE_REGISTRY_PRIVATE_KEY = privateKey
 
 // Disable developer mode for licensing tests (tests need to verify FREE tier behavior)
 delete process.env.QAA_DEVELOPER
@@ -65,19 +69,13 @@ function buildSignedLicense({
   isFounder = false,
 }) {
   const normalizedKey = licenseKey.trim().toUpperCase()
-  const payload = {
-    customerId,
+  const entry = buildSignedLicenseEntry({
+    licenseKey: normalizedKey,
     tier,
-    isFounder: Boolean(isFounder),
+    isFounder,
     email,
-    issued: Date.now(),
-    version: '1.0',
-  }
-  // Use the test secret set at top of file (must match LICENSE_SIGNING_SECRET env var)
-  const signature = crypto
-    .createHmac('sha256', process.env.LICENSE_SIGNING_SECRET)
-    .update(JSON.stringify(payload))
-    .digest('hex')
+    privateKey,
+  })
 
   return {
     tier,
@@ -87,8 +85,8 @@ function buildSignedLicense({
     activated: new Date().toISOString(),
     customerId,
     isFounder: Boolean(isFounder),
-    payload,
-    signature,
+    payload: entry.payload,
+    signature: entry.signature,
   }
 }
 
