@@ -17,6 +17,10 @@ const TEST_LICENSE_DIR = path.join(
 )
 process.env.QAA_LICENSE_DIR = TEST_LICENSE_DIR
 
+// Set test secret for license signing/verification (matches buildSignedLicense)
+// This is required since security fix removed hardcoded dev fallback
+process.env.LICENSE_SIGNING_SECRET = 'cqa-test-secret-for-unit-tests'
+
 // Disable developer mode for licensing tests (tests need to verify FREE tier behavior)
 delete process.env.QAA_DEVELOPER
 
@@ -69,11 +73,9 @@ function buildSignedLicense({
     issued: Date.now(),
     version: '1.0',
   }
+  // Use the test secret set at top of file (must match LICENSE_SIGNING_SECRET env var)
   const signature = crypto
-    .createHmac(
-      'sha256',
-      process.env.LICENSE_SIGNING_SECRET || 'cqa-dev-secret-change-in-prod'
-    )
+    .createHmac('sha256', process.env.LICENSE_SIGNING_SECRET)
     .update(JSON.stringify(payload))
     .digest('hex')
 
