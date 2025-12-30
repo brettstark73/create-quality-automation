@@ -6,7 +6,7 @@ This repo packages the `create-qa-architect` CLI and supporting assets for quali
 
 ## Project Structure & Module Organization
 
-- `setup.js`, `create-saas-monetization.js`, and `scripts/` orchestrate CLI commands, template validation, and end-to-end helpers (e.g., `scripts/test-e2e-package.sh`).
+- `setup.js` and `scripts/` orchestrate CLI commands, template validation, and end-to-end helpers (e.g., `scripts/test-e2e-package.sh`).
 - `lib/` holds reusable modules (validation, dependency monitoring, licensing) consumed by the CLI.
 - `config/` carries defaults, command patterns, and security specs that get merged into generated projects.
 - `tests/` keeps the exhaustive suite of `*.test.js` files that execute in Node (integration, CLI, security, telemetry, etc.).

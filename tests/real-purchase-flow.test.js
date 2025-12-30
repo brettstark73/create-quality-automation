@@ -16,6 +16,12 @@ const fs = require('fs')
 const path = require('path')
 const os = require('os')
 const http = require('http')
+const {
+  createTestKeyPair,
+  setTestPublicKeyEnv,
+  buildSignedLicenseEntry,
+  buildSignedRegistry,
+} = require('./license-test-helpers')
 
 // Use temp license directory to avoid writing to real home during tests
 const TEST_LICENSE_DIR = path.join(
@@ -24,8 +30,8 @@ const TEST_LICENSE_DIR = path.join(
 )
 process.env.QAA_LICENSE_DIR = TEST_LICENSE_DIR
 
-// Set test secret for license signing/verification (required after security fix)
-process.env.LICENSE_SIGNING_SECRET = 'cqa-test-secret-for-unit-tests'
+const { publicKey, privateKey } = createTestKeyPair()
+setTestPublicKeyEnv(publicKey)
 
 // Disable developer mode for purchase flow tests
 delete process.env.QAA_DEVELOPER
@@ -83,31 +89,42 @@ async function testWebhookLicensePopulation() {
 
   try {
     // Simulate a legitimate license database as webhook would create
-    const mockDatabase = {
-      _metadata: {
-        version: '1.0',
-        created: new Date().toISOString(),
-        description: 'License database from webhook handler',
+    const proEntry = buildSignedLicenseEntry({
+      licenseKey: 'QAA-1234-5678-ABCD-EF90',
+      tier: 'PRO',
+      isFounder: true,
+      email: 'customer@example.com',
+      privateKey,
+    })
+    const enterpriseEntry = buildSignedLicenseEntry({
+      licenseKey: 'QAA-9999-8888-EFGH-1234',
+      tier: 'ENTERPRISE',
+      isFounder: false,
+      email: 'enterprise@company.com',
+      privateKey,
+    })
+
+    const mockDatabase = buildSignedRegistry(
+      {
+        [proEntry.licenseKey]: {
+          tier: proEntry.tier,
+          isFounder: proEntry.isFounder,
+          issued: proEntry.issued,
+          emailHash: proEntry.emailHash,
+          signature: proEntry.signature,
+          keyId: 'test-key',
+        },
+        [enterpriseEntry.licenseKey]: {
+          tier: enterpriseEntry.tier,
+          isFounder: enterpriseEntry.isFounder,
+          issued: enterpriseEntry.issued,
+          emailHash: enterpriseEntry.emailHash,
+          signature: enterpriseEntry.signature,
+          keyId: 'test-key',
+        },
       },
-      'QAA-1234-5678-ABCD-EF90': {
-        customerId: 'cus_real_customer_123',
-        tier: 'PRO',
-        isFounder: true,
-        email: 'customer@example.com',
-        subscriptionId: 'sub_12345',
-        addedDate: new Date().toISOString(),
-        addedBy: 'stripe_webhook',
-      },
-      'QAA-9999-8888-EFGH-1234': {
-        customerId: 'cus_enterprise_456',
-        tier: 'ENTERPRISE',
-        isFounder: false,
-        email: 'enterprise@company.com',
-        subscriptionId: 'sub_67890',
-        addedDate: new Date().toISOString(),
-        addedBy: 'stripe_webhook',
-      },
-    }
+      privateKey
+    )
 
     console.log('  ✅ Webhook database created with 2 legitimate licenses')
     return { mockDatabase }
@@ -127,15 +144,6 @@ async function testNetworkLicenseValidation() {
     const { mockDatabase } = await testWebhookLicensePopulation()
     if (!mockDatabase) throw new Error('Mock database creation failed')
 
-    // Add mandatory sha256 checksum
-    const crypto = require('crypto')
-    const { _metadata, ...licensesOnly } = mockDatabase
-    const sha = crypto
-      .createHash('sha256')
-      .update(JSON.stringify(licensesOnly))
-      .digest('hex')
-    mockDatabase._metadata.sha256 = sha
-
     // Start mock server
     const { server, port, url } = await createMockServer(mockDatabase)
     console.log(`  🌐 Mock server running at ${url}`)
@@ -144,6 +152,7 @@ async function testNetworkLicenseValidation() {
       // Override license DB URL via environment variable (cleaner than mocking fetch)
       const originalUrl = process.env.QAA_LICENSE_DB_URL
       process.env.QAA_LICENSE_DB_URL = `http://localhost:${port}/legitimate-licenses.json`
+      process.env.QAA_ALLOW_INSECURE_LICENSE_DB = '1'
 
       // Test license activation with network fetch
       const validator = new LicenseValidator()
@@ -170,12 +179,14 @@ async function testNetworkLicenseValidation() {
         } else {
           delete process.env.QAA_LICENSE_DB_URL
         }
+        delete process.env.QAA_ALLOW_INSECURE_LICENSE_DB
         server.close()
         return true
       } else {
         throw new Error(`Activation failed: ${JSON.stringify(result)}`)
       }
     } catch (error) {
+      delete process.env.QAA_ALLOW_INSECURE_LICENSE_DB
       server.close()
       throw error
     }
@@ -228,14 +239,7 @@ async function testUnknownLicenseRejection() {
   console.log('Test 4: Unknown license rejected by network database')
 
   try {
-    const mockDatabase = {
-      _metadata: {
-        version: '1.0',
-        created: new Date().toISOString(),
-        description: 'Limited license database',
-      },
-      // No licenses - should reject everything
-    }
+    const mockDatabase = buildSignedRegistry({}, privateKey)
 
     const { server, port } = await createMockServer(mockDatabase)
 
@@ -243,6 +247,7 @@ async function testUnknownLicenseRejection() {
       // Override license DB URL via environment variable
       const originalUrl = process.env.QAA_LICENSE_DB_URL
       process.env.QAA_LICENSE_DB_URL = `http://localhost:${port}/legitimate-licenses.json`
+      process.env.QAA_ALLOW_INSECURE_LICENSE_DB = '1'
 
       const validator = new LicenseValidator()
       const result = await validator.activateLicense(
@@ -266,12 +271,14 @@ async function testUnknownLicenseRejection() {
         } else {
           delete process.env.QAA_LICENSE_DB_URL
         }
+        delete process.env.QAA_ALLOW_INSECURE_LICENSE_DB
         server.close()
         return true
       } else {
         throw new Error(`Expected rejection, got: ${JSON.stringify(result)}`)
       }
     } catch (error) {
+      delete process.env.QAA_ALLOW_INSECURE_LICENSE_DB
       server.close()
       throw error
     }
@@ -289,6 +296,7 @@ async function testNetworkFallback() {
 
   try {
     // First add a license to local database
+    process.env.LICENSE_REGISTRY_PRIVATE_KEY = privateKey
     await addLegitimateKey(
       'QAA-FALL-1234-5678-BACK',
       'cus_fallback',
@@ -314,6 +322,7 @@ async function testNetworkFallback() {
         '  ✅ Fallback to local database successful when network unavailable'
       )
       global.fetch = originalFetch
+      delete process.env.LICENSE_REGISTRY_PRIVATE_KEY
       return true
     } else {
       throw new Error(`Fallback failed: ${JSON.stringify(result)}`)
@@ -334,33 +343,26 @@ async function testEndToEndRealPurchase() {
     cleanup() // Start fresh
 
     // Step 1: Customer buys license → webhook populates server database
-    const purchaseDatabase = {
-      _metadata: {
-        version: '1.0',
-        created: new Date().toISOString(),
-        description: 'Production license database',
+    const purchaseEntry = buildSignedLicenseEntry({
+      licenseKey: 'QAA-E2E5-1234-5678-AB12',
+      tier: 'PRO',
+      isFounder: false,
+      email: 'realpurchase@example.com',
+      privateKey,
+    })
+    const purchaseDatabase = buildSignedRegistry(
+      {
+        [purchaseEntry.licenseKey]: {
+          tier: purchaseEntry.tier,
+          isFounder: purchaseEntry.isFounder,
+          issued: purchaseEntry.issued,
+          emailHash: purchaseEntry.emailHash,
+          signature: purchaseEntry.signature,
+          keyId: 'test-key',
+        },
       },
-      'QAA-E2E5-1234-5678-AB12': {
-        customerId: 'cus_real_purchase_789',
-        tier: 'PRO',
-        isFounder: false,
-        email: 'realpurchase@example.com',
-        subscriptionId: 'sub_e2e_test',
-        addedDate: new Date().toISOString(),
-        addedBy: 'stripe_webhook',
-      },
-    }
-
-    // Add required sha256 checksum
-    {
-      const crypto = require('crypto')
-      const { _metadata, ...licensesOnly } = purchaseDatabase
-      const sha = crypto
-        .createHash('sha256')
-        .update(JSON.stringify(licensesOnly))
-        .digest('hex')
-      purchaseDatabase._metadata.sha256 = sha
-    }
+      privateKey
+    )
 
     // Step 2: Start server serving the database
     const { server, port } = await createMockServer(purchaseDatabase)
@@ -370,6 +372,7 @@ async function testEndToEndRealPurchase() {
       // Override license DB URL via environment variable
       const originalUrl = process.env.QAA_LICENSE_DB_URL
       process.env.QAA_LICENSE_DB_URL = `http://localhost:${port}/legitimate-licenses.json`
+      process.env.QAA_ALLOW_INSECURE_LICENSE_DB = '1'
 
       // Step 4: CLI activation (simulating user running npx create-qa-architect@latest --activate-license)
       const activationResult = await activateLicense(
@@ -399,6 +402,7 @@ async function testEndToEndRealPurchase() {
           } else {
             delete process.env.QAA_LICENSE_DB_URL
           }
+          delete process.env.QAA_ALLOW_INSECURE_LICENSE_DB
           server.close()
           return true
         } else {
@@ -410,6 +414,7 @@ async function testEndToEndRealPurchase() {
         )
       }
     } catch (error) {
+      delete process.env.QAA_ALLOW_INSECURE_LICENSE_DB
       server.close()
       throw error
     }

@@ -10,13 +10,19 @@
 const fs = require('fs')
 const path = require('path')
 const os = require('os')
+const {
+  createTestKeyPair,
+  setTestPublicKeyEnv,
+} = require('./license-test-helpers')
 
 // Test directory for isolated license testing
 const TEST_LICENSE_DIR = path.join(os.tmpdir(), `cqa-tier-test-${Date.now()}`)
 
 // Set environment before requiring licensing module
 process.env.QAA_LICENSE_DIR = TEST_LICENSE_DIR
-process.env.LICENSE_SIGNING_SECRET = 'cqa-test-secret-for-unit-tests'
+const { publicKey, privateKey } = createTestKeyPair()
+setTestPublicKeyEnv(publicKey)
+process.env.LICENSE_REGISTRY_PRIVATE_KEY = privateKey
 process.env.QAA_DEVELOPER = 'false'
 
 // Now require the module

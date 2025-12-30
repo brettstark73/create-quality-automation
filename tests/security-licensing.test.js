@@ -8,6 +8,11 @@
 const fs = require('fs')
 const path = require('path')
 const os = require('os')
+const {
+  createTestKeyPair,
+  setTestPublicKeyEnv,
+  buildSignedLicenseEntry,
+} = require('./license-test-helpers')
 
 // Set up temporary license directory for tests (before requiring licensing.js)
 const TEST_LICENSE_DIR = path.join(
@@ -18,6 +23,9 @@ process.env.QAA_LICENSE_DIR = TEST_LICENSE_DIR
 
 // Disable developer mode for licensing tests
 delete process.env.QAA_DEVELOPER
+
+const { publicKey, privateKey } = createTestKeyPair()
+setTestPublicKeyEnv(publicKey)
 
 // Now require licensing.js (will use QAA_LICENSE_DIR environment variable)
 const {
@@ -47,7 +55,8 @@ function setupSecurityTest() {
   // Reset environment
   process.env = { ...originalEnv }
   delete process.env.STRIPE_SECRET_KEY
-  delete process.env.LICENSE_SIGNING_SECRET
+  delete process.env.QAA_LICENSE_PUBLIC_KEY
+  setTestPublicKeyEnv(publicKey)
 }
 
 function teardownSecurityTest() {
@@ -193,22 +202,19 @@ function testLicenseSignatureValidation() {
 
   // Test valid signature
   const validPayload = {
-    customerId: 'test_customer',
+    licenseKey: 'QAA-AAAA-BBBB-CCCC-DDDD',
     tier: 'PRO',
     isFounder: false,
-    issued: Date.now(),
-    version: '1.0',
+    issued: new Date().toISOString(),
   }
 
-  // Set a known secret for testing
-  process.env.LICENSE_SIGNING_SECRET = 'test-secret-for-validation'
-
-  // Generate valid signature
-  const crypto = require('crypto')
-  const validSignature = crypto
-    .createHmac('sha256', 'test-secret-for-validation')
-    .update(JSON.stringify(validPayload))
-    .digest('hex')
+  const validSignature = buildSignedLicenseEntry({
+    licenseKey: validPayload.licenseKey,
+    tier: validPayload.tier,
+    isFounder: validPayload.isFounder,
+    issued: validPayload.issued,
+    privateKey,
+  }).signature
 
   // Test valid signature
   if (!verifyLicenseSignature(validPayload, validSignature)) {
@@ -255,32 +261,25 @@ function testLocalLicenseFileTamperingDetection() {
     fs.mkdirSync(licenseDir, { recursive: true })
   }
 
-  // Set test secret
-  process.env.LICENSE_SIGNING_SECRET = 'test-secret-for-validation'
-
-  // Create a valid license payload and signature
-  const validPayload = {
-    customerId: 'test_customer',
+  const licenseKey = 'QAA-1234-ABCD-5678-EF12'
+  const issued = new Date().toISOString()
+  const entry = buildSignedLicenseEntry({
+    licenseKey,
     tier: 'PRO',
     isFounder: false,
-    issued: Date.now(),
-    version: '1.0',
-  }
-
-  const crypto = require('crypto')
-  const validSignature = crypto
-    .createHmac('sha256', 'test-secret-for-validation')
-    .update(JSON.stringify(validPayload))
-    .digest('hex')
+    email: 'test@example.com',
+    issued,
+    privateKey,
+  })
 
   // Test 1: Valid license file
   const validLicenseData = {
     tier: 'PRO',
-    licenseKey: 'QAA-1234-ABCD-5678-EF12',
+    licenseKey,
     email: 'test@example.com',
     activated: new Date().toISOString(),
-    payload: validPayload,
-    signature: validSignature,
+    payload: entry.payload,
+    signature: entry.signature,
   }
 
   fs.writeFileSync(licenseFile, JSON.stringify(validLicenseData, null, 2))
@@ -296,8 +295,8 @@ function testLocalLicenseFileTamperingDetection() {
 
   // Test 2: Tampered payload in license file (signature should detect this)
   const tamperedPayload = {
-    ...validPayload,
-    tier: 'ENTERPRISE', // Changed tier in payload - signature should fail
+    ...entry.payload,
+    tier: 'ENTERPRISE',
   }
 
   const tamperedLicenseData = {
@@ -356,8 +355,8 @@ function testEnvironmentVariableSecurity() {
   setupSecurityTest()
   console.log('Security Test 5: Environment variable security')
 
-  // Test with missing LICENSE_SIGNING_SECRET
-  delete process.env.LICENSE_SIGNING_SECRET
+  // Test with missing public key
+  delete process.env.QAA_LICENSE_PUBLIC_KEY
 
   const testPayload = { test: 'payload' }
   const testSignature = 'test_signature'

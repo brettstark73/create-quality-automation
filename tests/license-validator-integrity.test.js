@@ -3,7 +3,12 @@
 const fs = require('fs')
 const path = require('path')
 const os = require('os')
-const crypto = require('crypto')
+const {
+  createTestKeyPair,
+  setTestPublicKeyEnv,
+  buildSignedLicenseEntry,
+  buildSignedRegistry,
+} = require('./license-test-helpers')
 const { LicenseValidator } = require('../lib/license-validator')
 
 console.log('🧪 Testing license database integrity checks...\n')
@@ -13,19 +18,14 @@ const TEST_LICENSE_DIR = path.join(
   `cqa-license-integrity-${Date.now()}`
 )
 process.env.QAA_LICENSE_DIR = TEST_LICENSE_DIR
+const { publicKey, privateKey } = createTestKeyPair()
+setTestPublicKeyEnv(publicKey)
 
 const legitimateDBFile = path.join(TEST_LICENSE_DIR, 'legitimate-licenses.json')
 
 function writeDatabase(database) {
   fs.mkdirSync(TEST_LICENSE_DIR, { recursive: true })
   fs.writeFileSync(legitimateDBFile, JSON.stringify(database, null, 2))
-}
-
-function computeSha(licenses) {
-  return crypto
-    .createHash('sha256')
-    .update(JSON.stringify(licenses))
-    .digest('hex')
 }
 
 function cleanup() {
@@ -37,19 +37,19 @@ function cleanup() {
 try {
   const validator = new LicenseValidator()
 
-  console.log('Test 1: Reject cached database with invalid checksum')
+  console.log('Test 1: Reject cached database with invalid signature')
   const badDb = {
     _metadata: {
       version: '1.0',
       created: new Date().toISOString(),
       description: 'Corrupted database',
-      sha256: 'invalid',
+      registrySignature: 'invalid',
     },
     'QAA-1234-5678-ABCD-EF90': {
-      customerId: 'cus_bad',
       tier: 'PRO',
       isFounder: false,
-      email: 'bad@example.com',
+      issued: new Date().toISOString(),
+      signature: 'invalid',
     },
   }
 
@@ -61,24 +61,25 @@ try {
   }
   console.log('✅ Invalid checksum correctly rejected')
 
-  console.log('\nTest 2: Accept cached database with valid checksum')
+  console.log('\nTest 2: Accept cached database with valid signature')
+  const entry = buildSignedLicenseEntry({
+    licenseKey: 'QAA-9999-8888-EFGH-1234',
+    tier: 'PRO',
+    isFounder: true,
+    email: 'good@example.com',
+    privateKey,
+  })
   const goodLicenses = {
-    'QAA-9999-8888-EFGH-1234': {
-      customerId: 'cus_good',
-      tier: 'PRO',
-      isFounder: true,
-      email: 'good@example.com',
+    [entry.licenseKey]: {
+      tier: entry.tier,
+      isFounder: entry.isFounder,
+      issued: entry.issued,
+      emailHash: entry.emailHash,
+      signature: entry.signature,
+      keyId: 'test-key',
     },
   }
-  const goodDb = {
-    _metadata: {
-      version: '1.0',
-      created: new Date().toISOString(),
-      description: 'Valid database',
-      sha256: computeSha(goodLicenses),
-    },
-    ...goodLicenses,
-  }
+  const goodDb = buildSignedRegistry(goodLicenses, privateKey)
 
   writeDatabase(goodDb)
   const goodLoad = validator.loadLegitimateDatabase()
@@ -86,7 +87,7 @@ try {
     console.error('❌ Expected valid database to load')
     process.exit(1)
   }
-  console.log('✅ Valid checksum loaded successfully')
+  console.log('✅ Valid signature loaded successfully')
 } catch (error) {
   console.error('❌ License integrity test failed:', error.message)
   process.exit(1)

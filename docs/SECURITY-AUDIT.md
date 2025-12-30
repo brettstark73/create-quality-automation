@@ -1,20 +1,18 @@
 # Security Audit Report
 
 **Status:** ❌ FAILED
-**Total Issues:** 20
-**Critical Issues:** 20
+**Total Issues:** 18
+**Critical Issues:** 18
 **Session ID:** sess_mjqeacse_34vjaa
 
 ## Secrets Scan
 
 **Status:** ❌ Failed
-**Secrets Found:** 20
+**Secrets Found:** 18
 **ESLint Security Issues:** 0
 
 ### Issues
 
-- 🔴 **CRITICAL**: Potential Stripe test keys found (create-saas-monetization.js:328)
-- 🔴 **CRITICAL**: Potential Stripe live keys found (create-saas-monetization.js:347)
 - 🔴 **CRITICAL**: Potential Long base64 strings found (lib/validation/config-security.js:17)
 - 🔴 **CRITICAL**: Potential Long base64 strings found (lib/validation/config-security.js:19)
 - 🔴 **CRITICAL**: Potential Long base64 strings found (lib/validation/config-security.js:21)
