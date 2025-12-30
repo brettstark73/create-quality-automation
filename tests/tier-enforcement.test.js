@@ -16,6 +16,7 @@ const TEST_LICENSE_DIR = path.join(os.tmpdir(), `cqa-tier-test-${Date.now()}`)
 
 // Set environment before requiring licensing module
 process.env.QAA_LICENSE_DIR = TEST_LICENSE_DIR
+process.env.LICENSE_SIGNING_SECRET = 'cqa-test-secret-for-unit-tests'
 process.env.QAA_DEVELOPER = 'false'
 
 // Now require the module

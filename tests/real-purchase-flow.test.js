@@ -24,6 +24,9 @@ const TEST_LICENSE_DIR = path.join(
 )
 process.env.QAA_LICENSE_DIR = TEST_LICENSE_DIR
 
+// Set test secret for license signing/verification (required after security fix)
+process.env.LICENSE_SIGNING_SECRET = 'cqa-test-secret-for-unit-tests'
+
 // Disable developer mode for purchase flow tests
 delete process.env.QAA_DEVELOPER
 
