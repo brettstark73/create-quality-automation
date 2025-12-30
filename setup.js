@@ -91,6 +91,26 @@ const {
   getTestTierScripts,
 } = require('./lib/smart-strategy-generator')
 
+// Quality Tools Generator (Lighthouse, size-limit, axe-core, commitlint, coverage)
+const {
+  writeLighthouseConfig,
+  writeSizeLimitConfig,
+  writeCommitlintConfig,
+  writeCommitMsgHook,
+  writeAxeTestSetup,
+  getQualityToolsDependencies,
+  getQualityToolsScripts,
+} = require('./lib/quality-tools-generator')
+
+// Pre-Launch Validation (SEO, links, a11y, docs, env)
+const {
+  writeValidationScripts,
+  writeEnvValidator,
+  writePa11yConfig,
+  getPrelaunchScripts,
+  getPrelaunchDependencies,
+} = require('./lib/prelaunch-validator')
+
 // Telemetry (opt-in usage tracking)
 const { TelemetrySession, showTelemetryStatus } = require('./lib/telemetry')
 
@@ -332,6 +352,7 @@ function parseArguments(rawArgs) {
   const isCheckMaturityMode = sanitizedArgs.includes('--check-maturity')
   const isValidateConfigMode = sanitizedArgs.includes('--validate-config')
   const isActivateLicenseMode = sanitizedArgs.includes('--activate-license')
+  const isPrelaunchMode = sanitizedArgs.includes('--prelaunch')
   const isDryRun = sanitizedArgs.includes('--dry-run')
   const ciProviderIndex = sanitizedArgs.findIndex(arg => arg === '--ci')
   const ciProvider =
@@ -372,6 +393,7 @@ function parseArguments(rawArgs) {
     isCheckMaturityMode,
     isValidateConfigMode,
     isActivateLicenseMode,
+    isPrelaunchMode,
     isDryRun,
     ciProvider,
     enableSlackAlerts,
@@ -410,6 +432,7 @@ function parseArguments(rawArgs) {
     isCheckMaturityMode,
     isValidateConfigMode,
     isActivateLicenseMode,
+    isPrelaunchMode,
     isDryRun,
     ciProvider,
     enableSlackAlerts,
@@ -535,6 +558,7 @@ VALIDATION OPTIONS:
   --validate-docs   Run documentation validation only
   --validate-config Validate .qualityrc.json configuration file
   --check-maturity  Detect and display project maturity level
+  --prelaunch       Add pre-launch validation suite (SEO, links, a11y, docs)
 
 LICENSE, TELEMETRY & ERROR REPORTING:
   --license-status          Show current license tier and available features
@@ -575,6 +599,9 @@ EXAMPLES:
 
   npx create-qa-architect@latest --check-maturity
     → Detect project maturity level (minimal, bootstrap, development, production-ready)
+
+  npx create-qa-architect@latest --prelaunch
+    → Add pre-launch validation: SEO (sitemap, robots, meta), links, a11y, docs
 
   npx create-qa-architect@latest --validate-config
     → Validate .qualityrc.json configuration file against JSON Schema
@@ -969,6 +996,83 @@ HELP:
     })()
   }
 
+  // Handle pre-launch validation setup command
+  if (isPrelaunchMode) {
+    return (async () => {
+      try {
+        const projectPath = process.cwd()
+        const PackageJson = checkNodeVersionAndLoadPackageJson()
+        const pkgJson = await PackageJson.load(projectPath)
+        const license = getLicenseInfo()
+        const isPro =
+          license.tier === 'PRO' ||
+          license.tier === 'TEAM' ||
+          license.tier === 'ENTERPRISE'
+
+        console.log('\n📋 Setting up pre-launch validation suite...\n')
+        console.log(`   License tier: ${license.tier.toUpperCase()}`)
+
+        // Check feature availability
+        if (!hasFeature('prelaunchValidation')) {
+          console.error('❌ Pre-launch validation requires a valid license.')
+          showUpgradeMessage('Pre-launch validation')
+          process.exit(1)
+        }
+
+        // Write validation scripts
+        const scriptsWritten = writeValidationScripts(projectPath)
+        console.log(`   ✅ Created ${scriptsWritten.length} validation scripts`)
+
+        // Write pa11y config
+        writePa11yConfig(projectPath)
+        console.log('   ✅ Created .pa11yci config')
+
+        // Write env validator for Pro+
+        if (isPro && hasFeature('envValidation')) {
+          writeEnvValidator(projectPath)
+          console.log('   ✅ Created env vars validator (Pro)')
+        }
+
+        // Add scripts to package.json
+        const prelaunchScripts = getPrelaunchScripts(isPro)
+        const prelaunchDeps = getPrelaunchDependencies(isPro)
+
+        // Merge scripts
+        const existingScripts = pkgJson.content.scripts || {}
+        pkgJson.update({
+          scripts: { ...existingScripts, ...prelaunchScripts },
+        })
+
+        // Merge devDependencies
+        const existingDevDeps = pkgJson.content.devDependencies || {}
+        pkgJson.update({
+          devDependencies: { ...existingDevDeps, ...prelaunchDeps },
+        })
+
+        await pkgJson.save()
+
+        console.log('\n✅ Pre-launch validation setup complete!\n')
+        console.log('Available scripts:')
+        console.log('  npm run validate:sitemap   - Check sitemap.xml')
+        console.log('  npm run validate:robots    - Check robots.txt')
+        console.log('  npm run validate:meta      - Check meta tags')
+        console.log('  npm run validate:links     - Check for broken links')
+        console.log('  npm run validate:a11y      - Run accessibility audit')
+        console.log('  npm run validate:docs      - Check documentation')
+        if (isPro) {
+          console.log('  npm run validate:env       - Audit env vars (Pro)')
+        }
+        console.log('  npm run validate:prelaunch - Run all checks')
+        console.log('\n💡 Run: npm install && npm run validate:prelaunch')
+
+        process.exit(0)
+      } catch (error) {
+        console.error('Pre-launch validation setup error:', error.message)
+        process.exit(1)
+      }
+    })()
+  }
+
   // Run validation commands if requested
   if (
     isValidationMode ||
@@ -986,6 +1090,134 @@ HELP:
       }
     })()
   } else {
+    /**
+     * Setup quality tools based on license tier
+     * - Lighthouse CI (Free: basic, Pro: with thresholds)
+     * - Bundle size limits (Pro only)
+     * - axe-core accessibility (Free)
+     * - Conventional commits (Free)
+     * - Coverage thresholds (Pro only)
+     */
+    async function setupQualityTools(_usesTypeScript, _packageJson) {
+      const qualitySpinner = showProgress('Setting up quality tools...')
+
+      try {
+        const projectPath = process.cwd()
+        const PackageJson = checkNodeVersionAndLoadPackageJson()
+        const pkgJson = await PackageJson.load(projectPath)
+        const addedTools = []
+
+        // Determine which features are available
+        const hasLighthouse = hasFeature('lighthouseCI')
+        const hasLighthouseThresholds = hasFeature('lighthouseThresholds')
+        const hasBundleSizeLimits = hasFeature('bundleSizeLimits')
+        const hasAxeAccessibility = hasFeature('axeAccessibility')
+        const hasConventionalCommits = hasFeature('conventionalCommits')
+        const hasCoverageThresholds = hasFeature('coverageThresholds')
+
+        // 1. Lighthouse CI - available to all, thresholds for Pro+
+        if (hasLighthouse) {
+          const lighthousePath = path.join(projectPath, 'lighthouserc.js')
+          if (!fs.existsSync(lighthousePath)) {
+            writeLighthouseConfig(projectPath, {
+              hasThresholds: hasLighthouseThresholds,
+            })
+            addedTools.push(
+              hasLighthouseThresholds
+                ? 'Lighthouse CI (with thresholds)'
+                : 'Lighthouse CI (basic)'
+            )
+          }
+        }
+
+        // 2. Bundle size limits - Pro only
+        if (hasBundleSizeLimits) {
+          if (!pkgJson.content['size-limit']) {
+            writeSizeLimitConfig(projectPath)
+            addedTools.push('Bundle size limits (size-limit)')
+          }
+        }
+
+        // 3. axe-core accessibility testing - available to all
+        if (hasAxeAccessibility) {
+          const axeTestPath = path.join(
+            projectPath,
+            'tests',
+            'accessibility.test.js'
+          )
+          if (!fs.existsSync(axeTestPath)) {
+            writeAxeTestSetup(projectPath)
+            addedTools.push('axe-core accessibility tests')
+          }
+        }
+
+        // 4. Conventional commits (commitlint) - available to all
+        if (hasConventionalCommits) {
+          const commitlintPath = path.join(projectPath, 'commitlint.config.js')
+          if (!fs.existsSync(commitlintPath)) {
+            writeCommitlintConfig(projectPath)
+            writeCommitMsgHook(projectPath)
+            addedTools.push('Conventional commits (commitlint)')
+          }
+        }
+
+        // 5. Coverage thresholds - Pro only (info message handled elsewhere)
+        if (hasCoverageThresholds) {
+          addedTools.push('Coverage thresholds (70% lines, 70% functions)')
+        }
+
+        // Add dependencies for enabled features
+        const deps = getQualityToolsDependencies({
+          lighthouse: hasLighthouse,
+          sizeLimit: hasBundleSizeLimits,
+          commitlint: hasConventionalCommits,
+          axeCore: hasAxeAccessibility,
+        })
+
+        // Add scripts for enabled features
+        const scripts = getQualityToolsScripts({
+          lighthouse: hasLighthouse,
+          sizeLimit: hasBundleSizeLimits,
+          axeCore: hasAxeAccessibility,
+          coverage: hasCoverageThresholds,
+        })
+
+        // Merge dependencies and scripts
+        pkgJson.content.devDependencies = mergeDevDependencies(
+          pkgJson.content.devDependencies || {},
+          deps
+        )
+        pkgJson.content.scripts = mergeScripts(
+          pkgJson.content.scripts || {},
+          scripts
+        )
+        await pkgJson.save()
+
+        if (addedTools.length > 0) {
+          qualitySpinner.succeed(
+            `Quality tools configured: ${addedTools.length} tools`
+          )
+          addedTools.forEach(tool => console.log(`   ✅ ${tool}`))
+
+          // Show Pro upsell for missing features
+          if (!hasBundleSizeLimits || !hasCoverageThresholds) {
+            console.log('\n💎 Upgrade to Pro for additional quality tools:')
+            if (!hasBundleSizeLimits) {
+              console.log('   • Bundle size limits (size-limit)')
+            }
+            if (!hasCoverageThresholds) {
+              console.log('   • Coverage threshold enforcement')
+            }
+          }
+        } else {
+          qualitySpinner.succeed('Quality tools already configured')
+        }
+      } catch (error) {
+        qualitySpinner.warn('Could not set up some quality tools')
+        console.warn('⚠️ Quality tools setup error:', error.message)
+      }
+    }
+
     // Normal setup flow
     async function runMainSetup() {
       // Record telemetry start event (opt-in only, fails silently)
@@ -2006,6 +2238,9 @@ echo "✅ Pre-push validation passed!"
         console.log('   • Saves 10-20 hours/month per developer')
         showUpgradeMessage('Smart Test Strategy')
       }
+
+      // Quality Tools Integration
+      await setupQualityTools(usesTypeScript, packageJson)
 
       // Generate placeholder test file with helpful documentation
       const testsDir = path.join(process.cwd(), 'tests')

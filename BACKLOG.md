@@ -1,55 +1,72 @@
 # qa-architect - Backlog
 
-**Last Updated**: 2025-12-23
-**Priority System**: P0 (Critical) → P1 (Important) → P2 (Nice-to-have) → P3 (Future)
+**Last Updated**: 2025-12-29
+**Priority**: Value-based (Revenue + Retention + Differentiation) ÷ Effort
 
-## P0 - Critical (Blocking Revenue)
+---
 
-- [x] ~~**Deploy Stripe payment flow**~~ - ✅ DONE (test mode)
-  - [x] Create Stripe products (Pro Monthly $19, Pro Annual $190)
-  - [x] Deploy webhook handler to Vercel
-  - [x] Add checkout to vibebuildlab.com/qa-architect
-  - [x] Test end-to-end purchase flow
-  - [ ] **Copy test products to live mode** (final step!)
+## 🔥 High Value - Next Up
 
-## P1 - Important (Should Do Soon)
+| ID  | Feature                    | Value Drivers      | Effort | Tier                            | Status         |
+| --- | -------------------------- | ------------------ | ------ | ------------------------------- | -------------- |
+| Q1  | **Lighthouse CI**          | Diff:5 Ret:4 Rev:3 | S      | Free (basic) / Pro (thresholds) | 🔄 In Progress |
+| Q2  | **Bundle size limits**     | Diff:4 Ret:4 Rev:3 | S      | Pro                             | Pending        |
+| Q3  | **axe-core accessibility** | Diff:4 Ret:3 Rev:2 | S      | Free                            | Pending        |
+| Q4  | **Conventional commits**   | Diff:3 Ret:4 Rev:2 | S      | Free                            | Pending        |
+| Q5  | **Coverage thresholds**    | Diff:3 Ret:4 Rev:3 | S      | Pro                             | Pending        |
 
-- [x] **Landing page improvements** - Better conversion
-  - [ ] Add live demo / playground
-  - [ ] Customer testimonials (when available)
-  - [x] Comparison table vs manual setup
+## 📊 Medium Value - Worth Doing
 
-- [ ] **Usage analytics** - Understand adoption
-  - Anonymous telemetry opt-in
-  - Track which features used most
-  - Identify upgrade triggers
+| ID  | Feature                        | Value Drivers      | Effort | Tier | Status  |
+| --- | ------------------------------ | ------------------ | ------ | ---- | ------- |
+| Q6  | **Semgrep integration**        | Diff:4 Ret:3 Rev:3 | M      | Pro  | Pending |
+| Q7  | **Dead code detection (knip)** | Diff:3 Ret:3 Rev:2 | S      | Free | Pending |
+| Q8  | **License checker**            | Diff:3 Ret:2 Rev:2 | S      | Pro  | Pending |
+| Q9  | **Changelog generation**       | Diff:2 Ret:3 Rev:2 | S      | Free | Pending |
+| Q10 | **E2E test scaffolding**       | Diff:3 Ret:3 Rev:2 | M      | Pro  | Pending |
 
-## P2 - Recommended (Post-Launch)
+## 📚 Business & Infrastructure
 
-- [ ] **Team tier implementation** - Per-seat licensing
-  - Org management dashboard
-  - Shared quota tracking
-  - Team policy enforcement
-  - Slack/email alerts
+| ID  | Feature                      | Value Drivers | Effort | Status   |
+| --- | ---------------------------- | ------------- | ------ | -------- |
+| B1  | **Copy Stripe to live mode** | Rev:5         | S      | 🔜 Ready |
+| B2  | **Usage analytics**          | Rev:3 Ret:3   | M      | Pending  |
+| B3  | **Team tier implementation** | Rev:4 Diff:3  | L      | Pending  |
+| B4  | **Enterprise tier**          | Rev:5 Diff:4  | XL     | Future   |
 
-- [ ] **Performance budgets** - Q1 2026 roadmap item
-  - Bundle size limits
-  - Lighthouse score thresholds
-  - Build time budgets
+## Completed ✅
 
-## P3 - Future Enhancements
+| ID  | Feature                         | Completed  |
+| --- | ------------------------------- | ---------- |
+| ✓   | Stripe payment flow (test mode) | 2025-12-23 |
+| ✓   | Landing page comparison table   | 2025-12-23 |
+| ✓   | Terminal demo animation         | 2025-12-26 |
+| ✓   | Expanded FAQs                   | 2025-12-26 |
 
-- [ ] **Enterprise tier** - Large org features
-  - SSO/SAML integration
-  - Custom risk patterns
-  - Audit log export
-  - Compliance pack (SOC2, GDPR)
-  - Dedicated TAM + SLA
+---
 
-- [ ] **On-prem license server** - Air-gapped environments
-  - Self-hosted validation
-  - Offline activation
+## Tier Assignment Rationale
 
-- [ ] **Additional languages** - Go, Java support
-  - Go module dependency monitoring
-  - Maven/Gradle integration
+**Free Tier** - Accessible quality essentials:
+
+- Lighthouse CI (basic scores without thresholds)
+- axe-core accessibility (basic WCAG checks)
+- Conventional commits (commitlint)
+- Dead code detection (knip)
+- Changelog generation
+
+**Pro Tier** ($19/mo) - Advanced quality controls:
+
+- Lighthouse CI with custom thresholds & budgets
+- Bundle size limits (size-limit)
+- Coverage thresholds enforcement
+- Semgrep advanced static analysis
+- License compliance checking
+- E2E test scaffolding (Playwright/Cypress)
+
+**Team/Enterprise** - Org-level features:
+
+- Dashboard & reporting
+- Slack/email alerts
+- Custom policies
+- SSO/SAML
