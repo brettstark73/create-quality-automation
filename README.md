@@ -25,6 +25,22 @@ Quality automation CLI for JavaScript/TypeScript and Python projects. One comman
 - **Progressive Quality** - Adaptive checks based on project maturity
 - **Smart Test Strategy** - Risk-based pre-push validation (Pro feature)
 
+### Quality Tools (v5.2.0+)
+
+- **Lighthouse CI** - Performance, accessibility, SEO audits (Free: basic, Pro: thresholds)
+- **Bundle Size Limits** - Enforce bundle budgets with size-limit (Pro)
+- **axe-core Accessibility** - WCAG compliance testing scaffolding (Free)
+- **Conventional Commits** - commitlint with commit-msg hook (Free)
+- **Coverage Thresholds** - Enforce code coverage minimums (Pro)
+
+### Pre-Launch Validation (v5.3.0+)
+
+- **SEO Validation** - Sitemap, robots.txt, meta tags validation (Free)
+- **Link Validation** - Broken link detection with linkinator (Free)
+- **Accessibility Audit** - WCAG 2.1 AA compliance with pa11y-ci (Free)
+- **Documentation Check** - README completeness, required sections (Free)
+- **Env Vars Audit** - Validate .env.example against code usage (Pro)
+
 ## Target Users
 
 - **Developers** who want quality automation without manual setup
@@ -57,6 +73,27 @@ npx create-qa-architect@latest
 | npm audit (basic)           | ✅   | ✅   |
 | Gitleaks (secrets scanning) | ❌   | ✅   |
 | ESLint security rules       | ❌   | ✅   |
+
+### Quality Tools by Tier
+
+| Feature                      | Free | Pro+ |
+| ---------------------------- | ---- | ---- |
+| Lighthouse CI (basic scores) | ✅   | ✅   |
+| Lighthouse thresholds        | ❌   | ✅   |
+| axe-core accessibility       | ✅   | ✅   |
+| Conventional commits         | ✅   | ✅   |
+| Bundle size limits           | ❌   | ✅   |
+| Coverage thresholds          | ❌   | ✅   |
+
+### Pre-Launch Validation by Tier
+
+| Feature             | Free | Pro+ |
+| ------------------- | ---- | ---- |
+| SEO validation      | ✅   | ✅   |
+| Link validation     | ✅   | ✅   |
+| Accessibility audit | ✅   | ✅   |
+| Documentation check | ✅   | ✅   |
+| Env vars audit      | ❌   | ✅   |
 
 ### License
 
@@ -111,6 +148,14 @@ npm run lint
 
 ```bash
 npx create-qa-architect@latest --deps
+```
+
+### Pre-Launch Validation (Free)
+
+```bash
+npx create-qa-architect@latest --prelaunch
+npm install
+npm run validate:prelaunch
 ```
 
 ## Usage Examples

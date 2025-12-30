@@ -7,6 +7,72 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.3.0] - 2025-12-29
+
+### Added
+
+- **Pre-Launch Validation Suite** - Automated SOTA checks for web applications:
+  - **SEO Validation** (Free) - Sitemap, robots.txt, meta tags validation
+  - **Link Validation** (Free) - Broken link detection with linkinator
+  - **Accessibility Validation** (Free) - WCAG 2.1 AA compliance with pa11y-ci
+  - **Documentation Validation** (Free) - README completeness, required sections
+  - **Env Vars Audit** (Pro) - Validate .env.example against code usage
+
+- New `--prelaunch` CLI flag to add pre-launch validation to any project
+
+- New feature flags in licensing: `prelaunchValidation`, `seoValidation`, `linkValidation`, `docsValidation`, `envValidation`
+
+- New npm scripts added automatically:
+  - `validate:sitemap` - Check sitemap.xml validity
+  - `validate:robots` - Check robots.txt validity
+  - `validate:meta` - Check meta tags completeness
+  - `validate:links` - Detect broken links
+  - `validate:a11y` - Run WCAG 2.1 AA accessibility audit
+  - `validate:docs` - Check documentation completeness
+  - `validate:env` - Audit env vars (Pro only)
+  - `validate:prelaunch` - Run all pre-launch checks
+
+- New validation scripts generated in `scripts/validate/`:
+  - `sitemap.js`, `robots.js`, `meta-tags.js`, `links.js`, `a11y.js`, `docs.js`, `env.js`, `prelaunch.js`
+
+- New config file: `.pa11yci` for accessibility configuration
+
+- New devDependencies added: `linkinator`, `pa11y-ci`
+
+### Changed
+
+- Updated tier features to include pre-launch validation tools
+
+## [5.2.0] - 2025-12-29
+
+### Added
+
+- **Quality Tools Integration** - New quality automation tools for all users:
+  - **Lighthouse CI** (Free: basic scores, Pro: custom thresholds) - Performance, accessibility, SEO, best practices audits
+  - **Bundle size limits** (Pro) - Enforce bundle size budgets with size-limit
+  - **axe-core accessibility** (Free) - WCAG compliance testing scaffolding
+  - **Conventional commits** (Free) - commitlint with commit-msg hook for consistent commit messages
+  - **Coverage thresholds** (Pro) - Enforce code coverage minimums (70% lines, 70% functions)
+
+- New feature flags in licensing: `lighthouseCI`, `lighthouseThresholds`, `bundleSizeLimits`, `axeAccessibility`, `conventionalCommits`, `coverageThresholds`
+
+- New npm scripts added automatically:
+  - `lighthouse:ci` - Run Lighthouse CI audits
+  - `size` / `size:why` - Check bundle sizes (Pro)
+  - `test:a11y` - Run accessibility tests
+  - `test:coverage:check` - Check coverage thresholds (Pro)
+
+- New config files generated:
+  - `lighthouserc.js` - Lighthouse CI configuration
+  - `commitlint.config.js` - Conventional commits rules
+  - `.husky/commit-msg` - Commit message validation hook
+  - `tests/accessibility.test.js` - axe-core test scaffolding
+
+### Changed
+
+- Updated tier features to include quality tools
+- BACKLOG.md restructured with value-based prioritization
+
 ## [5.1.0] - 2025-12-26
 
 ### Added

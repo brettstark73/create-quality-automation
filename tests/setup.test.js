@@ -23,6 +23,10 @@ const {
 //   getSecurityScripts
 // } = require('../lib/security-enhancements')
 const { getTestTierScripts } = require('../lib/smart-strategy-generator')
+const {
+  getQualityToolsScripts,
+  getQualityToolsDependencies,
+} = require('../lib/quality-tools-generator')
 
 const createTempProject = initialPackageJson => {
   const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'qa-template-'))
@@ -209,16 +213,34 @@ try {
   const defaultScripts = getDefaultScripts({ typescript: false })
   const enhancedScripts = getEnhancedTypeScriptScripts()
   const smartStrategyScripts = getTestTierScripts()
+  // Quality tools scripts (added by setupQualityTools based on license tier)
+  const qualityToolsScripts = getQualityToolsScripts({
+    lighthouse: true,
+    sizeLimit: true,
+    axeCore: true,
+    coverage: true,
+  })
 
   // Include all scripts that setup.js actually adds
   const expectedScripts = mergeScripts(jsInitial.scripts, {
     ...defaultScripts,
     ...enhancedScripts,
     ...smartStrategyScripts,
+    ...qualityToolsScripts,
+  })
+  // Quality tools dependencies
+  const qualityToolsDeps = getQualityToolsDependencies({
+    lighthouse: true,
+    sizeLimit: true,
+    commitlint: true,
+    axeCore: true,
   })
   const expectedDevDependencies = mergeDevDependencies(
     jsInitial.devDependencies,
-    getDefaultDevDependencies({ typescript: false })
+    {
+      ...getDefaultDevDependencies({ typescript: false }),
+      ...qualityToolsDeps,
+    }
   )
   const expectedLintStaged = mergeLintStaged(
     jsInitial['lint-staged'],
@@ -290,9 +312,19 @@ try {
     tsInitial.scripts,
     getDefaultScripts({ typescript: true })
   )
+  // Quality tools dependencies for TS project
+  const tsQualityToolsDeps = getQualityToolsDependencies({
+    lighthouse: true,
+    sizeLimit: true,
+    commitlint: true,
+    axeCore: true,
+  })
   const expectedDevDependencies = mergeDevDependencies(
     tsInitial.devDependencies,
-    getDefaultDevDependencies({ typescript: true })
+    {
+      ...getDefaultDevDependencies({ typescript: true }),
+      ...tsQualityToolsDeps,
+    }
   )
   const _expectedLintStaged = mergeLintStaged(
     tsInitial['lint-staged'],
