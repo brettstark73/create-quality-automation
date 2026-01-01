@@ -11,7 +11,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Security**: Removed hardcoded dev secret fallback in license verification (TD1)
 - **Security**: Fixed command injection vulnerability in linkinator integration (TD3)
+- **Security**: Added path traversal validation for QAA_LICENSE_DIR and LICENSE_DATABASE_PATH
+- **Security**: Fixed writeQueue promise chain to properly propagate errors
+- **Security**: Added production safety checks to isDeveloperMode() and verifyLicenseSignature()
 - **Code Quality**: Removed underscore-prefixed unused variables across codebase (TD4)
+- **Code Quality**: Added DEBUG-gated logging to empty catches across codebase
+- **Code Quality**: Added error differentiation in loadLegitimateDatabase (EACCES vs SyntaxError)
+- **Code Quality**: Added backup before overwrite in addLegitimateKey for corrupt databases
 
 ### Removed
 
