@@ -117,7 +117,6 @@ const {
 // Critical setup enhancements (fixes production quality gaps)
 const {
   applyProductionQualityFixes,
-  // generateEnhancedPreCommitHook,
   validateProjectSetup,
 } = require('./lib/setup-enhancements')
 
@@ -165,7 +164,12 @@ function injectCollaborationSteps(workflowContent, options = {}) {
 const safeReadDir = dir => {
   try {
     return fs.readdirSync(dir, { withFileTypes: true })
-  } catch {
+  } catch (error) {
+    // Silent failure fix: Log non-ENOENT errors in DEBUG mode
+    // ENOENT is expected (dir doesn't exist), other errors may indicate issues
+    if (process.env.DEBUG && error?.code !== 'ENOENT') {
+      console.warn(`⚠️  Could not read directory ${dir}: ${error.message}`)
+    }
     return []
   }
 }
@@ -1120,7 +1124,7 @@ HELP:
       const hasTypeScriptDependency = Boolean(
         (packageJson.devDependencies &&
           packageJson.devDependencies.typescript) ||
-          (packageJson.dependencies && packageJson.dependencies.typescript)
+        (packageJson.dependencies && packageJson.dependencies.typescript)
       )
 
       const tsconfigCandidates = ['tsconfig.json', 'tsconfig.base.json']
@@ -1191,7 +1195,17 @@ HELP:
           }
 
           return false
-        } catch {
+        } catch (error) {
+          // Silent failure fix: Log unexpected errors in debug mode
+          if (
+            process.env.DEBUG &&
+            error.code !== 'ENOENT' &&
+            error.code !== 'EACCES'
+          ) {
+            console.warn(
+              `⚠️  Could not scan ${dir} for Python files: ${error.message}`
+            )
+          }
           return false
         }
       }
@@ -1366,20 +1380,19 @@ HELP:
           })
         }
       } else {
-        // Config exists, validate it
-        // Temporarily disabled - debugging
-        // const validationResult = validateQualityConfig(qualityrcPath)
-        // if (!validationResult.valid) {
-        //   console.warn(
-        //     '⚠️  Warning: Existing .qualityrc.json has validation issues:'
-        //   )
-        //   validationResult.errors.forEach(error => {
-        //     console.warn(`   - ${error}`)
-        //   })
-        //   console.warn(
-        //     '   Setup will continue, but you may want to fix these issues.\n'
-        //   )
-        // }
+        // TD8 fix: Re-enabled validation (was disabled for debugging)
+        const validationResult = validateQualityConfig(qualityrcPath)
+        if (!validationResult.valid) {
+          console.warn(
+            '⚠️  Warning: Existing .qualityrc.json has validation issues:'
+          )
+          validationResult.errors.forEach(error => {
+            console.warn(`   - ${error}`)
+          })
+          console.warn(
+            '   Setup will continue, but you may want to fix these issues.\n'
+          )
+        }
       }
 
       // Load and merge templates (custom + defaults)

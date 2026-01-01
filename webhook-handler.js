@@ -18,9 +18,11 @@
 
 const crypto = require('crypto')
 const fs = require('fs')
+const os = require('os')
 const path = require('path')
 const express = require('express')
 const {
+  LICENSE_KEY_PATTERN,
   buildLicensePayload,
   hashEmail,
   signPayload,
@@ -28,17 +30,41 @@ const {
   loadKeyFromEnv,
 } = require('./lib/license-signing')
 
+/**
+ * Validate that a database path is within allowed directories (cwd or home)
+ * Security: Prevents path traversal attacks via environment variables
+ */
+function validateDatabasePath(envPath, defaultPath) {
+  const cwd = process.cwd()
+  const home = os.homedir()
+  const resolved = path.resolve(cwd, envPath || defaultPath)
+
+  // Must be within cwd or home directory
+  const isInCwd = resolved.startsWith(cwd + path.sep) || resolved === cwd
+  const isInHome = resolved.startsWith(home + path.sep) || resolved === home
+
+  if (!isInCwd && !isInHome) {
+    console.error(
+      `❌ Database path must be within cwd or home directory: ${envPath}`
+    )
+    console.error(`   Using default: ${defaultPath}`)
+    return path.resolve(cwd, defaultPath)
+  }
+
+  return resolved
+}
+
 // Environment variables required
 const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY
 const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET
-const LICENSE_DATABASE_PATH = path.resolve(
-  process.cwd(),
-  process.env.LICENSE_DATABASE_PATH || './legitimate-licenses.json'
+// Security: Validate paths to prevent traversal attacks
+const LICENSE_DATABASE_PATH = validateDatabasePath(
+  process.env.LICENSE_DATABASE_PATH,
+  './legitimate-licenses.json'
 )
-const LICENSE_PUBLIC_DATABASE_PATH = path.resolve(
-  process.cwd(),
-  process.env.LICENSE_PUBLIC_DATABASE_PATH ||
-    './legitimate-licenses.public.json'
+const LICENSE_PUBLIC_DATABASE_PATH = validateDatabasePath(
+  process.env.LICENSE_PUBLIC_DATABASE_PATH,
+  './legitimate-licenses.public.json'
 )
 const LICENSE_REGISTRY_KEY_ID = process.env.LICENSE_REGISTRY_KEY_ID || 'default'
 const LICENSE_REGISTRY_PRIVATE_KEY = loadKeyFromEnv(
@@ -63,6 +89,36 @@ if (!LICENSE_REGISTRY_PRIVATE_KEY) {
 }
 
 const app = express()
+
+// TD6 fix: Security headers middleware
+app.use((req, res, next) => {
+  // Prevent clickjacking attacks
+  res.setHeader('X-Frame-Options', 'DENY')
+  // Prevent MIME type sniffing
+  res.setHeader('X-Content-Type-Options', 'nosniff')
+  // XSS protection (legacy browsers)
+  res.setHeader('X-XSS-Protection', '1; mode=block')
+  // Strict Content Security Policy for API endpoints
+  res.setHeader(
+    'Content-Security-Policy',
+    "default-src 'none'; frame-ancestors 'none'"
+  )
+  // Referrer policy
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin')
+  // Permissions policy - disable unnecessary browser features
+  res.setHeader(
+    'Permissions-Policy',
+    'geolocation=(), microphone=(), camera=()'
+  )
+  // HSTS - only set in production (when HTTPS is guaranteed)
+  if (process.env.NODE_ENV === 'production') {
+    res.setHeader(
+      'Strict-Transport-Security',
+      'max-age=31536000; includeSubDomains'
+    )
+  }
+  next()
+})
 
 // Raw body parser for Stripe webhooks
 app.use('/webhook', express.raw({ type: 'application/json' }))
@@ -96,8 +152,13 @@ let writeQueue = Promise.resolve()
 
 function queueDatabaseWrite(task) {
   const next = writeQueue.then(task, task)
-  writeQueue = next.catch(() => {})
-  return next
+  // Chain error handling but re-throw so callers can handle
+  writeQueue = next.catch(error => {
+    // Silent failure fix: Log write queue errors
+    console.error(`⚠️  Database write queue error: ${error.message}`)
+    throw error // Re-throw to propagate to caller
+  })
+  return writeQueue
 }
 
 /**
@@ -156,6 +217,12 @@ function buildPublicRegistry(database) {
 
   Object.entries(database).forEach(([licenseKey, entry]) => {
     if (licenseKey === '_metadata') return
+    // TD11 fix: Validate license key format to prevent object injection
+    // and silence ESLint security/detect-object-injection warning
+    if (!LICENSE_KEY_PATTERN.test(licenseKey)) {
+      console.warn(`Skipping invalid license key format: ${licenseKey}`)
+      return
+    }
     const issued = entry.issued || entry.addedDate || issuedAt
     const emailHash = hashEmail(entry.email)
     const payload = buildLicensePayload({
@@ -166,6 +233,8 @@ function buildPublicRegistry(database) {
       issued,
     })
     const signature = signPayload(payload, LICENSE_REGISTRY_PRIVATE_KEY)
+    // TD11: Safe - licenseKey is validated against LICENSE_KEY_PATTERN above
+    // eslint-disable-next-line security/detect-object-injection
     publicLicenses[licenseKey] = {
       tier: entry.tier,
       isFounder: entry.isFounder,
@@ -265,11 +334,10 @@ function addLicenseToDatabase(licenseKey, customerInfo) {
   return queueDatabaseWrite(() => {
     try {
       // Validate license key format to prevent object injection
+      // TD15 fix: Use shared constant for license key pattern
       if (
         typeof licenseKey !== 'string' ||
-        !/^QAA-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(
-          licenseKey
-        )
+        !LICENSE_KEY_PATTERN.test(licenseKey)
       ) {
         console.error('Invalid license key format:', licenseKey)
         return false
@@ -483,11 +551,19 @@ app.get('/status', (req, res) => {
     const database = loadLicenseDatabase()
     const licenses = Object.keys(database).filter(key => key !== '_metadata')
 
+    // TD9 fix: Don't expose actual license keys - show masked versions for debugging
+    const maskedRecent = licenses.slice(-5).map(key => {
+      const parts = key.split('-')
+      return parts.length === 5
+        ? `${parts[0]}-****-****-****-${parts[4]}`
+        : '****'
+    })
+
     res.json({
       status: 'ok',
       metadata: database._metadata,
       licenseCount: licenses.length,
-      recentLicenses: licenses.slice(-5), // Last 5 licenses (keys only)
+      recentLicenses: maskedRecent,
     })
   } catch (error) {
     res.status(500).json({ error: error.message })
