@@ -12,6 +12,7 @@
  */
 
 const { addLegitimateKey } = require('./lib/licensing')
+const { LICENSE_KEY_PATTERN } = require('./lib/license-signing')
 const crypto = require('crypto')
 const fs = require('fs')
 const path = require('path')
@@ -69,10 +70,8 @@ async function main() {
     process.exit(1)
   }
 
-  // Validate license key format (allow alphanumeric for admin flexibility)
-  if (
-    !licenseKey.match(/^QAA-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/)
-  ) {
+  // Validate license key format (TD15 fix: use shared constant)
+  if (!LICENSE_KEY_PATTERN.test(licenseKey)) {
     console.error(
       '❌ Error: Invalid license key format. Must be QAA-XXXX-XXXX-XXXX-XXXX (alphanumeric)'
     )

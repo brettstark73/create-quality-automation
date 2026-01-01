@@ -1,22 +1,29 @@
 # qa-architect - Backlog
 
-**Last Updated**: 2025-12-30
+**Last Updated**: 2025-12-31
 **Priority**: Value-based (Revenue + Retention + Differentiation) ÷ Effort
 
 ---
 
-## 🚨 Technical Debt (SOTA Audit 2025-12-30)
+## 🚨 Technical Debt (Deep Review 2025-12-31)
 
-| ID  | Issue                                | Severity | Location                      | Status   |
-| --- | ------------------------------------ | -------- | ----------------------------- | -------- |
-| TD1 | Hardcoded dev secret fallback        | Critical | `licensing.js:396`            | ✅ Fixed |
-| TD2 | `setup.js` 2100+ lines needs split   | P0       | `setup.js` → `/lib/commands/` | ✅ Fixed |
-| TD3 | Command injection in linkinator call | Medium   | `prelaunch-validator.js:281`  | ✅ Fixed |
-| TD4 | Unused `_vars` bypass ESLint         | Medium   | Multiple files                | ✅ Fixed |
-| TD5 | No rate limiting on GitHub API       | Medium   | `lib/github-api.js`           | Backlog  |
-| TD6 | Missing security headers on webhook  | Low      | `webhook-handler.js`          | Backlog  |
-| TD7 | Inconsistent async patterns          | Low      | `lib/validation/index.js`     | Backlog  |
-| TD8 | Commented-out validation code        | Low      | `setup.js:1613`               | Backlog  |
+| ID   | Issue                                       | Severity | Location                       | Status   |
+| ---- | ------------------------------------------- | -------- | ------------------------------ | -------- |
+| TD9  | `/status` exposes license keys without auth | High     | `webhook-handler.js:481-494`   | ✅ Fixed |
+| TD10 | Timing attacks on hash comparisons          | High     | `license-validator.js:225,385` | ✅ Fixed |
+| TD11 | ESLint object injection warning             | Medium   | `webhook-handler.js:169`       | ✅ Fixed |
+| TD12 | Silent catch in verifySignature()           | Medium   | `license-validator.js:355-362` | ✅ Fixed |
+| TD13 | stableStringify no circular ref protection  | Medium   | `license-signing.js:5-17`      | ✅ Fixed |
+| TD14 | buildLicensePayload no input validation     | Medium   | `license-signing.js:31-48`     | ✅ Fixed |
+| TD15 | License key regex duplicated 3x             | Low      | Multiple files                 | ✅ Fixed |
+| TD1  | Hardcoded dev secret fallback               | Critical | `licensing.js:396`             | ✅ Fixed |
+| TD2  | `setup.js` 2100+ lines needs split          | P0       | `setup.js` → `/lib/commands/`  | ✅ Fixed |
+| TD3  | Command injection in linkinator call        | Medium   | `prelaunch-validator.js:281`   | ✅ Fixed |
+| TD4  | Unused `_vars` bypass ESLint                | Medium   | Multiple files                 | ✅ Fixed |
+| TD5  | No rate limiting on GitHub API              | Medium   | `lib/github-api.js`            | ✅ Fixed |
+| TD6  | Missing security headers on webhook         | Low      | `webhook-handler.js`           | ✅ Fixed |
+| TD7  | Inconsistent async patterns                 | Low      | `lib/validation/index.js`      | N/A      |
+| TD8  | Commented-out validation code               | Low      | `setup.js:1371`                | ✅ Fixed |
 
 ---
 
