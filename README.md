@@ -8,7 +8,7 @@ Quality automation CLI for JavaScript/TypeScript and Python projects. One comman
 
 > **Maintainer & Ownership**
 > This project is maintained by **Vibe Build Lab LLC**, a studio focused on AI-assisted product development, micro-SaaS, and "vibe coding" workflows for solo founders and small teams.
-> Learn more at **https://www.vibebuildlab.com**.
+> Learn more at **https://vibebuildlab.com**.
 
 ---
 
