@@ -65,6 +65,7 @@
 
 const fs = require('fs')
 const path = require('path')
+const crypto = require('crypto')
 const { execSync } = require('child_process')
 const {
   mergeScripts,
@@ -188,6 +189,31 @@ const STYLELINT_DEFAULT_TARGET = `**/*.{${STYLELINT_EXTENSIONS.join(',')}}`
 const STYLELINT_EXTENSION_GLOB = `*.{${STYLELINT_EXTENSIONS.join(',')}}`
 const STYLELINT_SCAN_EXCLUDES = new Set(EXCLUDE_DIRECTORIES.STYLELINT)
 const MAX_STYLELINT_SCAN_DEPTH = SCAN_LIMITS.STYLELINT_MAX_DEPTH
+
+function normalizeRepoIdentifier(remoteUrl) {
+  if (!remoteUrl || typeof remoteUrl !== 'string') return null
+
+  const scpMatch = remoteUrl.match(/^[^@]+@([^:]+):(.+?)(\.git)?$/)
+  if (scpMatch) {
+    const host = scpMatch[1]
+    const repoPath = scpMatch[2].replace(/^\/+/, '').replace(/\.git$/, '')
+    return `${host}/${repoPath}`
+  }
+
+  try {
+    const parsed = new URL(remoteUrl)
+    const host = parsed.hostname
+    const repoPath = parsed.pathname.replace(/^\/+/, '').replace(/\.git$/, '')
+    if (!host || !repoPath) return null
+    return `${host}/${repoPath}`
+  } catch {
+    return null
+  }
+}
+
+function hashRepoIdentifier(value) {
+  return crypto.createHash('sha256').update(value).digest('hex')
+}
 
 function injectCollaborationSteps(workflowContent, options = {}) {
   const { enableSlackAlerts = false, enablePrComments = false } = options
@@ -1064,6 +1090,8 @@ HELP:
       // Enforce FREE tier repo limit (1 private repo)
       // Must happen before any file modifications
       const license = getLicenseInfo()
+      let pendingRepoRegistration = null
+      let pendingRepoUsageSnapshot = null
       if (license.tier === 'FREE') {
         // Generate unique repo ID from git remote or directory name
         let repoId
@@ -1072,10 +1100,11 @@ HELP:
             encoding: 'utf8',
             stdio: ['pipe', 'pipe', 'ignore'],
           }).trim()
-          repoId = remoteUrl
+          const normalized = normalizeRepoIdentifier(remoteUrl)
+          repoId = hashRepoIdentifier(normalized || remoteUrl)
         } catch {
           // No remote - use absolute path as fallback
-          repoId = process.cwd()
+          repoId = hashRepoIdentifier(process.cwd())
         }
 
         const repoCheck = checkUsageCaps('repo')
@@ -1091,11 +1120,8 @@ HELP:
             process.exit(1)
           }
 
-          // Register this repo
-          incrementUsage('repo', 1, repoId)
-          console.log(
-            `✅ Registered repo (FREE tier: ${(repoCheck.usage?.repoCount || 0) + 1}/1 repos used)`
-          )
+          pendingRepoRegistration = repoId
+          pendingRepoUsageSnapshot = repoCheck.usage
         }
       }
 
@@ -2171,6 +2197,12 @@ describe('Test framework validation', () => {
       }
 
       console.log('\n🎉 Quality automation setup complete!')
+
+      if (pendingRepoRegistration) {
+        incrementUsage('repo', 1, pendingRepoRegistration)
+        const repoCount = (pendingRepoUsageSnapshot?.repoCount || 0) + 1
+        console.log(`✅ Registered repo (FREE tier: ${repoCount}/1 repos used)`)
+      }
 
       // Record telemetry completion event (opt-in only, fails silently)
       telemetry.recordComplete({

@@ -40,8 +40,24 @@ const createTempProject = initialPackageJson => {
   return { tempDir, initialPackageJson }
 }
 
-const runSetup = cwd => {
-  execFileSync(process.execPath, [setupScript], { cwd, stdio: 'ignore' })
+const runSetup = (cwd, envOverrides = {}) => {
+  execFileSync(process.execPath, [setupScript], {
+    cwd,
+    stdio: 'ignore',
+    env: { ...process.env, ...envOverrides },
+  })
+}
+
+const createLicenseEnv = ({ developer = false } = {}) => {
+  const licenseDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cqa-license-test-'))
+  return {
+    env: {
+      QAA_LICENSE_DIR: licenseDir,
+      QAA_DEVELOPER: developer ? 'true' : 'false',
+      NODE_ENV: 'test',
+    },
+    cleanup: () => fs.rmSync(licenseDir, { recursive: true, force: true }),
+  }
 }
 
 const readJson = filePath =>
@@ -201,28 +217,29 @@ const jsInitialPackageJson = {
   },
 }
 
-const { tempDir: jsProjectDir, initialPackageJson: jsInitial } =
+const { tempDir: jsProjectDirFree, initialPackageJson: jsInitialFree } =
   createTempProject(jsInitialPackageJson)
+const jsFreeLicense = createLicenseEnv()
 
 try {
-  runSetup(jsProjectDir)
+  runSetup(jsProjectDirFree, jsFreeLicense.env)
 
-  const pkg = readJson(path.join(jsProjectDir, 'package.json'))
+  const pkg = readJson(path.join(jsProjectDirFree, 'package.json'))
 
   // Include enhanced scripts in expected results (matching setup.js behavior)
   const defaultScripts = getDefaultScripts({ typescript: false })
   const enhancedScripts = getEnhancedTypeScriptScripts()
-  const smartStrategyScripts = getTestTierScripts()
+  const smartStrategyScripts = {}
   // Quality tools scripts (added by setupQualityTools based on license tier)
   const qualityToolsScripts = getQualityToolsScripts({
     lighthouse: true,
-    sizeLimit: true,
+    sizeLimit: false,
     axeCore: true,
-    coverage: true,
+    coverage: false,
   })
 
   // Include all scripts that setup.js actually adds
-  const expectedScripts = mergeScripts(jsInitial.scripts, {
+  const expectedScripts = mergeScripts(jsInitialFree.scripts, {
     ...defaultScripts,
     ...enhancedScripts,
     ...smartStrategyScripts,
@@ -231,19 +248,19 @@ try {
   // Quality tools dependencies
   const qualityToolsDeps = getQualityToolsDependencies({
     lighthouse: true,
-    sizeLimit: true,
+    sizeLimit: false,
     commitlint: true,
     axeCore: true,
   })
   const expectedDevDependencies = mergeDevDependencies(
-    jsInitial.devDependencies,
+    jsInitialFree.devDependencies,
     {
       ...getDefaultDevDependencies({ typescript: false }),
       ...qualityToolsDeps,
     }
   )
   const expectedLintStaged = mergeLintStaged(
-    jsInitial['lint-staged'],
+    jsInitialFree['lint-staged'],
     getDefaultLintStaged({ typescript: false })
   )
 
@@ -251,21 +268,21 @@ try {
   assert.deepStrictEqual(pkg.devDependencies, expectedDevDependencies)
   assertLintStagedEqual(pkg['lint-staged'], expectedLintStaged)
 
-  expectFile(jsProjectDir, '.prettierrc')
-  const eslintConfigPathJs = expectFile(jsProjectDir, 'eslint.config.cjs')
-  expectFile(jsProjectDir, '.stylelintrc.json')
-  expectFile(jsProjectDir, '.prettierignore')
+  expectFile(jsProjectDirFree, '.prettierrc')
+  const eslintConfigPathJs = expectFile(jsProjectDirFree, 'eslint.config.cjs')
+  expectFile(jsProjectDirFree, '.stylelintrc.json')
+  expectFile(jsProjectDirFree, '.prettierignore')
   // .eslintignore is optional (ignores are in eslint.config.cjs)
-  expectFile(jsProjectDir, '.editorconfig')
-  expectFile(jsProjectDir, '.github/workflows/quality.yml')
+  expectFile(jsProjectDirFree, '.editorconfig')
+  expectFile(jsProjectDirFree, '.github/workflows/quality.yml')
 
-  const huskyHookPath = expectFile(jsProjectDir, '.husky/pre-commit')
+  const huskyHookPath = expectFile(jsProjectDirFree, '.husky/pre-commit')
   const huskyHookContents = fs.readFileSync(huskyHookPath, 'utf8')
   const eslintConfigContentsJs = fs.readFileSync(eslintConfigPathJs, 'utf8')
 
   // Idempotency check
-  runSetup(jsProjectDir)
-  const pkgSecond = readJson(path.join(jsProjectDir, 'package.json'))
+  runSetup(jsProjectDirFree, jsFreeLicense.env)
+  const pkgSecond = readJson(path.join(jsProjectDirFree, 'package.json'))
   const lintStagedSecond = pkgSecond['lint-staged']
   const huskyHookContentsSecond = fs.readFileSync(huskyHookPath, 'utf8')
   const eslintConfigContentsJsSecond = fs.readFileSync(
@@ -279,7 +296,85 @@ try {
   assert.strictEqual(huskyHookContentsSecond, huskyHookContents)
   assert.strictEqual(eslintConfigContentsJsSecond, eslintConfigContentsJs)
 } finally {
-  cleanup(jsProjectDir)
+  cleanup(jsProjectDirFree)
+  jsFreeLicense.cleanup()
+}
+
+const { tempDir: jsProjectDirPro, initialPackageJson: jsInitialPro } =
+  createTempProject(jsInitialPackageJson)
+const jsProLicense = createLicenseEnv({ developer: true })
+
+try {
+  runSetup(jsProjectDirPro, jsProLicense.env)
+
+  const pkg = readJson(path.join(jsProjectDirPro, 'package.json'))
+
+  const defaultScripts = getDefaultScripts({ typescript: false })
+  const enhancedScripts = getEnhancedTypeScriptScripts()
+  const smartStrategyScripts = getTestTierScripts()
+  const qualityToolsScripts = getQualityToolsScripts({
+    lighthouse: true,
+    sizeLimit: true,
+    axeCore: true,
+    coverage: true,
+  })
+
+  const expectedScripts = mergeScripts(jsInitialPro.scripts, {
+    ...defaultScripts,
+    ...enhancedScripts,
+    ...smartStrategyScripts,
+    ...qualityToolsScripts,
+  })
+  const qualityToolsDeps = getQualityToolsDependencies({
+    lighthouse: true,
+    sizeLimit: true,
+    commitlint: true,
+    axeCore: true,
+  })
+  const expectedDevDependencies = mergeDevDependencies(
+    jsInitialPro.devDependencies,
+    {
+      ...getDefaultDevDependencies({ typescript: false }),
+      ...qualityToolsDeps,
+    }
+  )
+  const expectedLintStaged = mergeLintStaged(
+    jsInitialPro['lint-staged'],
+    getDefaultLintStaged({ typescript: false })
+  )
+
+  assert.deepStrictEqual(pkg.scripts, expectedScripts)
+  assert.deepStrictEqual(pkg.devDependencies, expectedDevDependencies)
+  assertLintStagedEqual(pkg['lint-staged'], expectedLintStaged)
+
+  expectFile(jsProjectDirPro, '.prettierrc')
+  const eslintConfigPathJs = expectFile(jsProjectDirPro, 'eslint.config.cjs')
+  expectFile(jsProjectDirPro, '.stylelintrc.json')
+  expectFile(jsProjectDirPro, '.prettierignore')
+  expectFile(jsProjectDirPro, '.editorconfig')
+  expectFile(jsProjectDirPro, '.github/workflows/quality.yml')
+
+  const huskyHookPath = expectFile(jsProjectDirPro, '.husky/pre-commit')
+  const huskyHookContents = fs.readFileSync(huskyHookPath, 'utf8')
+  const eslintConfigContentsJs = fs.readFileSync(eslintConfigPathJs, 'utf8')
+
+  runSetup(jsProjectDirPro, jsProLicense.env)
+  const pkgSecond = readJson(path.join(jsProjectDirPro, 'package.json'))
+  const lintStagedSecond = pkgSecond['lint-staged']
+  const huskyHookContentsSecond = fs.readFileSync(huskyHookPath, 'utf8')
+  const eslintConfigContentsJsSecond = fs.readFileSync(
+    eslintConfigPathJs,
+    'utf8'
+  )
+
+  assert.deepStrictEqual(pkgSecond.scripts, expectedScripts)
+  assert.deepStrictEqual(pkgSecond.devDependencies, expectedDevDependencies)
+  assertLintStagedEqual(lintStagedSecond, expectedLintStaged)
+  assert.strictEqual(huskyHookContentsSecond, huskyHookContents)
+  assert.strictEqual(eslintConfigContentsJsSecond, eslintConfigContentsJs)
+} finally {
+  cleanup(jsProjectDirPro)
+  jsProLicense.cleanup()
 }
 
 // TypeScript project baseline
@@ -304,8 +399,10 @@ fs.writeFileSync(
   JSON.stringify({ extends: './tsconfig.base.json' }, null, 2)
 )
 
+const tsProLicense = createLicenseEnv({ developer: true })
+
 try {
-  runSetup(tsProjectDir)
+  runSetup(tsProjectDir, tsProLicense.env)
 
   const pkg = readJson(path.join(tsProjectDir, 'package.json'))
   const _expectedScripts = mergeScripts(
@@ -344,7 +441,7 @@ try {
   expectFile(tsProjectDir, '.editorconfig')
 
   // Idempotency check (also validates TypeScript paths stay stable)
-  runSetup(tsProjectDir)
+  runSetup(tsProjectDir, tsProLicense.env)
   const pkgSecond = readJson(path.join(tsProjectDir, 'package.json'))
   const _lintStagedSecond = pkgSecond['lint-staged']
   const eslintConfigContentsTsSecond = fs.readFileSync(
@@ -359,6 +456,7 @@ try {
   assert.strictEqual(eslintConfigContentsTsSecond, eslintConfigContentsTs)
 } finally {
   cleanup(tsProjectDir)
+  tsProLicense.cleanup()
 }
 
 // Preserve existing CSS lint-staged globs without adding conflicting defaults
@@ -380,8 +478,10 @@ fs.writeFileSync(
   'body { color: #c00; }\n'
 )
 
+const cssFreeLicense = createLicenseEnv()
+
 try {
-  runSetup(cssProjectDir)
+  runSetup(cssProjectDir, cssFreeLicense.env)
 
   const pkg = readJson(path.join(cssProjectDir, 'package.json'))
   const publicStylelintTarget = makeStylelintTarget('public')
@@ -399,6 +499,7 @@ try {
   ])
 } finally {
   cleanup(cssProjectDir)
+  cssFreeLicense.cleanup()
 }
 
 // Test Python project setup
@@ -418,10 +519,12 @@ try {
   execSync('git init', { cwd: pythonProjectDir, stdio: 'ignore' })
 
   // Run setup script
-  execFileSync('node', [setupScript], {
-    cwd: pythonProjectDir,
-    stdio: 'ignore',
-  })
+  const pythonFreeLicense = createLicenseEnv()
+  try {
+    runSetup(pythonProjectDir, pythonFreeLicense.env)
+  } finally {
+    pythonFreeLicense.cleanup()
+  }
 
   // Check Python-specific files were created
   expectFile(pythonProjectDir, 'pyproject.toml')
