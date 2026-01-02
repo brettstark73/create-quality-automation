@@ -1,6 +1,6 @@
 # qa-architect - Backlog
 
-**Last Updated**: 2026-01-01
+**Last Updated**: 2026-01-02
 **Priority**: Value-based (Revenue + Retention + Differentiation) ÷ Effort
 
 ---

@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Testing**: Isolated Free/Pro tier test flows with environment overrides
+  - Added isolated license directories per test to prevent state pollution
+  - Wired env overrides (QAA_LICENSE_DIR, QAA_DEVELOPER, NODE_ENV) into setup runs
+  - Made license gating deterministic for JS/TS/CSS/Python test scenarios
+  - Fixed script output mismatches between expected Free tier scripts and actual output
+  - Each test now creates its own license environment for reliable isolation
+
 ## [5.3.1] - 2026-01-01
 
 ### Fixed
