@@ -1,6 +1,6 @@
 # qa-architect - Backlog
 
-**Last Updated**: 2025-12-31
+**Last Updated**: 2026-01-01
 **Priority**: Value-based (Revenue + Retention + Differentiation) ÷ Effort
 
 ---
@@ -24,6 +24,61 @@
 | TD6  | Missing security headers on webhook         | Low      | `webhook-handler.js`           | ✅ Fixed |
 | TD7  | Inconsistent async patterns                 | Low      | `lib/validation/index.js`      | N/A      |
 | TD8  | Commented-out validation code               | Low      | `setup.js:1371`                | ✅ Fixed |
+
+---
+
+## 🚨 Deep Review Findings (2026-01-01)
+
+### Critical Issues (Fix Immediately)
+
+| ID  | Issue                                        | Severity | Location                         | Status   |
+| --- | -------------------------------------------- | -------- | -------------------------------- | -------- |
+| DR1 | Webhook database write failures lose revenue | Critical | `webhook-handler.js:156-162`     | ✅ Fixed |
+| DR2 | Network failures reject valid licenses       | Critical | `license-validator.js:236-241`   | ✅ Fixed |
+| DR3 | Corrupted license crashes CLI                | Critical | `license-validator.js:355-381`   | ✅ Fixed |
+| DR4 | Subscription cancellation errors swallowed   | Critical | `webhook-handler.js:483-502`     | ✅ Fixed |
+| DR5 | Rate limiter failures silently consumed      | Critical | `lib/github-api.js:18-41`        | ✅ Fixed |
+| DR6 | Template loader skips failed files           | Critical | `lib/template-loader.js:172-178` | ✅ Fixed |
+
+### High Priority Issues (Fix This Sprint)
+
+| ID   | Issue                                         | Severity | Location                           | Status        |
+| ---- | --------------------------------------------- | -------- | ---------------------------------- | ------------- |
+| DR7  | No validation on Stripe event payloads        | High     | `webhook-handler.js`               | ✅ Fixed      |
+| DR8  | Usage tracking corruption resets quotas       | High     | `lib/licensing.js:875-914`         | ✅ Fixed      |
+| DR9  | Public DB endpoint returns fallback on error  | High     | `webhook-handler.js:523-544`       | ✅ Fixed      |
+| DR10 | Developer mode ELOOP warning doesn't halt     | High     | `lib/licensing.js:292-308`         | ✅ Fixed      |
+| DR11 | Cache clear failures are silent               | High     | `lib/validation/cache-manager.js`  | ✅ Fixed      |
+| DR12 | GitHub API assumes JSON responses             | High     | `lib/github-api.js:134-152`        | ✅ Fixed      |
+| DR13 | License database won't scale beyond 10k users | High     | `webhook-handler.js:130-149`       | 📋 TODO Added |
+| DR14 | No caching on license validation              | High     | `lib/license-validator.js`         | ✅ Fixed      |
+| DR15 | /status endpoint unauthenticated              | High     | `webhook-handler.js:549-571`       | ✅ Fixed      |
+| DR16 | Signature verification error too generic      | High     | `lib/license-validator.js:451-454` | ✅ Fixed      |
+
+### Medium Priority Issues (Fix Next Sprint)
+
+| ID   | Issue                                         | Severity | Location                          | Status        |
+| ---- | --------------------------------------------- | -------- | --------------------------------- | ------------- |
+| DR17 | License DB signature not required in dev mode | Medium   | `license-validator.js:430-446`    | ✅ Fixed      |
+| DR18 | Webhook handler exposes error details         | Medium   | `webhook-handler.js:386-387`      | ✅ Fixed      |
+| DR19 | Missing rate limiting on public endpoints     | Medium   | `webhook-handler.js:523-543`      | ✅ Fixed      |
+| DR20 | Stack traces may leak in error reporter       | Medium   | `lib/error-reporter.js:131-150`   | ✅ Fixed      |
+| DR21 | Missing email validation before hashing       | Medium   | `license-validator.js:290-302`    | ✅ Fixed      |
+| DR22 | package.json read returns null on all errors  | Medium   | `smart-strategy-generator.js:158` | ✅ Fixed      |
+| DR23 | Mutable exported constants (LICENSE_TIERS)    | Medium   | `lib/licensing.js`                | ✅ Fixed      |
+| DR24 | No tier validation in saveLicense()           | Medium   | `lib/licensing.js`                | ✅ Fixed      |
+| DR25 | Inconsistent result types across modules      | Medium   | Multiple files                    | ✅ Fixed      |
+| DR26 | setup.js still 2201 lines despite TD2         | Medium   | `setup.js`                        | 📋 Documented |
+| DR27 | Mixed async patterns (callbacks vs async)     | Medium   | `lib/licensing.js:763-816`        | ✅ Fixed      |
+
+### Low Priority Issues (Address When Convenient)
+
+| ID   | Issue                                        | Severity | Location                     | Status  |
+| ---- | -------------------------------------------- | -------- | ---------------------------- | ------- |
+| DR28 | Missing helmet.js for security headers       | Low      | `webhook-handler.js:93-121`  | Pending |
+| DR29 | GitHub token exposure in error messages      | Low      | `lib/github-api.js:146-150`  | Pending |
+| DR30 | License DB hash uses unstable JSON.stringify | Low      | `webhook-handler.js:180-183` | Pending |
+| DR31 | Missing input validation on webhook events   | Low      | `webhook-handler.js:392-407` | Pending |
 
 ---
 

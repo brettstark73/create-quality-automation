@@ -88,6 +88,66 @@ if (!LICENSE_REGISTRY_PRIVATE_KEY) {
   process.exit(1)
 }
 
+/**
+ * DR19 fix: Simple in-memory rate limiter for public endpoints
+ * Prevents abuse of health check and license database endpoints
+ */
+class RateLimiter {
+  constructor(windowMs = 60000, maxRequests = 60) {
+    this.windowMs = windowMs
+    this.maxRequests = maxRequests
+    this.requests = new Map() // ip -> [timestamps]
+  }
+
+  middleware() {
+    return (req, res, next) => {
+      const ip = req.ip || req.connection.remoteAddress || 'unknown'
+      const now = Date.now()
+
+      // Get existing requests for this IP
+      let timestamps = this.requests.get(ip) || []
+
+      // Remove expired timestamps (outside the window)
+      timestamps = timestamps.filter(ts => now - ts < this.windowMs)
+
+      // Check if limit exceeded
+      if (timestamps.length >= this.maxRequests) {
+        const oldestTimestamp = timestamps[0]
+        const retryAfter = Math.ceil(
+          (oldestTimestamp + this.windowMs - now) / 1000
+        )
+
+        res.status(429).json({
+          error: 'Too many requests',
+          message: `Rate limit exceeded. Try again in ${retryAfter} seconds.`,
+          retryAfter,
+        })
+        return
+      }
+
+      // Add current request
+      timestamps.push(now)
+      this.requests.set(ip, timestamps)
+
+      // Cleanup old entries periodically (every 100 requests)
+      if (this.requests.size > 100) {
+        for (const [key, value] of this.requests.entries()) {
+          const filtered = value.filter(ts => now - ts < this.windowMs)
+          if (filtered.length === 0) {
+            this.requests.delete(key)
+          }
+        }
+      }
+
+      next()
+    }
+  }
+}
+
+// Create rate limiters for different endpoints
+const healthRateLimiter = new RateLimiter(60000, 60) // 60 requests per minute
+const dbRateLimiter = new RateLimiter(60000, 30) // 30 requests per minute
+
 const app = express()
 
 // TD6 fix: Security headers middleware
@@ -126,6 +186,12 @@ app.use(express.json())
 
 /**
  * Load legitimate license database
+ *
+ * DR13 TODO: Migrate to SQLite for scaling beyond 10k users
+ * - Current JSON file approach works for <10k licenses (~500KB)
+ * - At 100k licenses (~5MB), JSON parsing becomes slow
+ * - Write queue prevents corruption but doesn't scale beyond ~10 req/sec
+ * - Recommended: SQLite with indexed queries for PRO tier
  */
 function loadLicenseDatabase() {
   try {
@@ -340,7 +406,7 @@ function addLicenseToDatabase(licenseKey, customerInfo) {
         !LICENSE_KEY_PATTERN.test(licenseKey)
       ) {
         console.error('Invalid license key format:', licenseKey)
-        return false
+        throw new Error(`Invalid license key format: ${licenseKey}`)
       }
 
       const database = loadLicenseDatabase()
@@ -361,10 +427,28 @@ function addLicenseToDatabase(licenseKey, customerInfo) {
       database._metadata.lastUpdate = new Date().toISOString()
       database._metadata.totalLicenses = Object.keys(database).length - 1 // Exclude metadata
 
-      return saveLicenseDatabase(database)
+      const saveResult = saveLicenseDatabase(database)
+      if (!saveResult) {
+        // DR1 fix: CRITICAL - Payment succeeded but license not saved
+        console.error(`❌ CRITICAL: Payment processed but license save failed`)
+        console.error(`   License Key: ${licenseKey}`)
+        console.error(
+          `   Customer: ${customerInfo.email || customerInfo.customerId}`
+        )
+        console.error(`   Action: Manual license activation required`)
+        throw new Error(
+          'License database save failed - payment succeeded but license not activated'
+        )
+      }
+      return saveResult
     } catch (error) {
-      console.error('Error adding license to database:', error.message)
-      return false
+      // DR1 fix: Re-throw to trigger Stripe webhook retry
+      console.error(`❌ Error adding license to database: ${error.message}`)
+      console.error(`   License Key: ${licenseKey}`)
+      console.error(
+        `   Customer: ${customerInfo.email || customerInfo.customerId}`
+      )
+      throw error
     }
   })
 }
@@ -384,7 +468,12 @@ app.post('/webhook', async (req, res) => {
     event = stripe.webhooks.constructEvent(req.body, sig, STRIPE_WEBHOOK_SECRET)
   } catch (err) {
     console.error('⚠️ Webhook signature verification failed:', err.message)
-    return res.status(400).send(`Webhook Error: ${err.message}`)
+    // DR18 fix: Don't expose error details in production
+    const clientMessage =
+      process.env.NODE_ENV === 'production'
+        ? 'Webhook signature verification failed'
+        : `Webhook Error: ${err.message}`
+    return res.status(400).send(clientMessage)
   }
 
   try {
@@ -420,6 +509,13 @@ async function handleCheckoutCompleted(session) {
   try {
     console.log('💰 Processing checkout completion:', session.id)
 
+    // DR7 fix: Validate session structure
+    if (!session.customer || !session.subscription) {
+      throw new Error(
+        'Invalid checkout session: missing customer or subscription'
+      )
+    }
+
     const stripe = require('stripe')(STRIPE_SECRET_KEY)
 
     // Get customer details
@@ -429,7 +525,20 @@ async function handleCheckoutCompleted(session) {
     const subscription = await stripe.subscriptions.retrieve(
       session.subscription
     )
-    const priceId = subscription.items.data[0].price.id
+
+    // DR7 fix: Validate subscription structure
+    if (
+      !subscription.items ||
+      !subscription.items.data ||
+      subscription.items.data.length === 0
+    ) {
+      throw new Error('Invalid subscription: missing items data')
+    }
+
+    const priceId = subscription.items.data[0].price?.id
+    if (!priceId) {
+      throw new Error('Invalid subscription: missing price ID')
+    }
 
     // Map price to tier
     const priceInfo = mapPriceToTier(priceId)
@@ -481,30 +590,55 @@ async function handlePaymentSucceeded(invoice) {
  * Handle subscription cancellation
  */
 async function handleSubscriptionCanceled(subscription) {
+  console.log(`❌ Subscription canceled: ${subscription.id}`)
+  console.log(`   Customer: ${subscription.customer}`)
+
   try {
-    console.log(`❌ Subscription canceled: ${subscription.id}`)
+    // DR4 fix: Implement license deactivation with proper error handling
+    const database = loadLicenseDatabase()
+    let licenseFound = false
 
-    // Could implement license deactivation logic here
-    // For now, we'll just log it
-    console.log(`   Customer: ${subscription.customer}`)
+    Object.keys(database).forEach(key => {
+      if (key === '_metadata') return
+      // eslint-disable-next-line security/detect-object-injection -- key is from Object.keys(), safe
+      if (database[key].subscriptionId === subscription.id) {
+        // eslint-disable-next-line security/detect-object-injection
+        database[key].status = 'canceled'
+        // eslint-disable-next-line security/detect-object-injection
+        database[key].canceledAt = new Date().toISOString()
+        licenseFound = true
+        console.log(`   Marking license ${key} as canceled`)
+      }
+    })
 
-    // Optional: Remove license from database or mark as canceled
-    // const database = loadLicenseDatabase()
-    // Object.keys(database).forEach(key => {
-    //   if (database[key].subscriptionId === subscription.id) {
-    //     database[key].status = 'canceled'
-    //   }
-    // })
-    // saveLicenseDatabase(database)
+    if (!licenseFound) {
+      console.warn(`⚠️  No license found for subscription ${subscription.id}`)
+      return // Not an error - license may have been manually removed
+    }
+
+    const saveResult = saveLicenseDatabase(database)
+    if (!saveResult) {
+      throw new Error(
+        `Failed to save license cancellation for subscription ${subscription.id}`
+      )
+    }
+
+    console.log(`✅ License deactivated for subscription ${subscription.id}`)
   } catch (error) {
-    console.error('❌ Subscription cancellation error:', error.message)
+    // DR4 fix: Re-throw to trigger webhook retry instead of silently failing
+    console.error(`❌ CRITICAL: Subscription cancellation processing failed`)
+    console.error(`   Subscription: ${subscription.id}`)
+    console.error(`   Error: ${error.message}`)
+    console.error(`   ACTION REQUIRED: Manually deactivate license`)
+    throw error
   }
 }
 
 /**
  * Health check endpoint
+ * DR19 fix: Add rate limiting to prevent DoS
  */
-app.get('/health', (req, res) => {
+app.get('/health', healthRateLimiter.middleware(), (req, res) => {
   res.json({
     status: 'ok',
     timestamp: new Date().toISOString(),
@@ -519,8 +653,9 @@ app.get('/health', (req, res) => {
  *
  * This is the critical endpoint that allows the CLI to fetch
  * the latest legitimate licenses for validation
+ * DR19 fix: Add rate limiting to prevent abuse
  */
-app.get('/legitimate-licenses.json', (req, res) => {
+app.get('/legitimate-licenses.json', dbRateLimiter.middleware(), (req, res) => {
   try {
     const database = loadPublicRegistry()
 
@@ -531,22 +666,52 @@ app.get('/legitimate-licenses.json', (req, res) => {
 
     res.json(database)
   } catch (error) {
+    // DR9 fix: Return proper error status so clients know to retry with cache
     console.error('Failed to serve license database:', error.message)
-    res.status(500).json({
-      error: 'Database temporarily unavailable',
-      _metadata: {
-        version: '1.0',
-        created: new Date().toISOString(),
-        description: 'Error fallback response',
-      },
+    res.status(503).json({
+      error: 'License database temporarily unavailable',
+      message: 'Please retry shortly or use cached license data',
+      retryAfter: 60,
     })
   }
 })
 
 /**
  * License database status endpoint
+ * DR15 fix: Requires authentication
  */
 app.get('/status', (req, res) => {
+  // DR15 fix: Require Bearer token authentication
+  const authHeader = req.headers.authorization
+  const expectedToken = process.env.STATUS_API_TOKEN || 'disabled'
+
+  if (expectedToken === 'disabled') {
+    return res.status(503).json({
+      error:
+        'Status endpoint is disabled. Set STATUS_API_TOKEN env var to enable.',
+    })
+  }
+
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res
+      .status(401)
+      .json({ error: 'Unauthorized: Bearer token required' })
+  }
+
+  const token = authHeader.substring(7)
+  // Use constant-time comparison to prevent timing attacks
+  const tokenBuffer = Buffer.from(token)
+  const expectedBuffer = Buffer.from(expectedToken)
+
+  // Ensure buffers are same length to prevent length-based timing attacks
+  if (tokenBuffer.length !== expectedBuffer.length) {
+    return res.status(403).json({ error: 'Forbidden: Invalid token' })
+  }
+
+  if (!crypto.timingSafeEqual(tokenBuffer, expectedBuffer)) {
+    return res.status(403).json({ error: 'Forbidden: Invalid token' })
+  }
+
   try {
     const database = loadLicenseDatabase()
     const licenses = Object.keys(database).filter(key => key !== '_metadata')
