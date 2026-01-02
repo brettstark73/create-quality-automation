@@ -14,10 +14,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Security**: Added path traversal validation for QAA_LICENSE_DIR and LICENSE_DATABASE_PATH
 - **Security**: Fixed writeQueue promise chain to properly propagate errors
 - **Security**: Added production safety checks to isDeveloperMode() and verifyLicenseSignature()
+- **Security**: Rate limiting on public endpoints (health: 60 req/min, database: 30 req/min) prevents DoS attacks (DR19)
+- **Security**: Frozen LICENSE_TIERS and deep-frozen FEATURES constants prevent mutation (DR23)
+- **Security**: Timing-safe Bearer token comparison in /status endpoint prevents timing attacks (DR15)
+- **Security**: Enhanced signature verification errors with specific error types (DR16)
+- **Security**: Dev mode only bypasses missing signatures, validates when present (DR17)
+- **Security**: Email format validation before hashing prevents timing attacks (DR21)
 - **Code Quality**: Removed underscore-prefixed unused variables across codebase (TD4)
 - **Code Quality**: Added DEBUG-gated logging to empty catches across codebase
 - **Code Quality**: Added error differentiation in loadLegitimateDatabase (EACCES vs SyntaxError)
 - **Code Quality**: Added backup before overwrite in addLegitimateKey for corrupt databases
+- **Code Quality**: Production stack traces limited to 3 lines to prevent information leakage (DR20)
+- **Code Quality**: Specific package.json error messages for syntax errors and permissions (DR22)
+- **Code Quality**: Tier validation in saveLicense() functions (DR24)
+- **Code Quality**: Converted promptLicenseActivation to async/await pattern (DR27)
+
+### Added
+
+- **Code Consistency**: Created lib/result-types.js for standardized result patterns across modules (DR25)
+- **Architecture**: Documented comprehensive refactoring plan for setup.js (DR26)
 
 ### Removed
 
