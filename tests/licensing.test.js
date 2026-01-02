@@ -312,13 +312,12 @@ function testGetLicenseInfoMalformedJSON() {
 
   const license = getLicenseInfo()
 
-  if (
-    license.tier === LICENSE_TIERS.FREE &&
-    license.valid === true &&
-    license.error &&
-    license.error.includes('License read error')
-  ) {
-    console.log('  ✅ Handles malformed JSON gracefully\n')
+  // DR3 fix: Corrupted files are now backed up and logged, then returns FREE tier
+  // The new behavior is better - it logs the error to console and backs up the file
+  if (license.tier === LICENSE_TIERS.FREE && license.valid === true) {
+    console.log(
+      '  ✅ Handles malformed JSON gracefully (falls back to FREE tier)\n'
+    )
     teardownTest()
     return true
   } else {

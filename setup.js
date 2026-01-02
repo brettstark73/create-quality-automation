@@ -1,5 +1,68 @@
 #!/usr/bin/env node
 
+/**
+ * DR26 fix: Architectural Refactoring Plan for setup.js (2201 lines)
+ *
+ * PRIORITY: This file should be split into focused modules to improve
+ * maintainability, testability, and reduce cognitive load.
+ *
+ * PROPOSED MODULE STRUCTURE (target: < 500 lines per module):
+ *
+ * 1. lib/commands/validate.js (~300 lines)
+ *    - Validation command logic
+ *    - Config validation workflows
+ *    - Prelaunch validation integration
+ *
+ * 2. lib/commands/deps.js (~200 lines)
+ *    - Dependency monitoring setup
+ *    - Dependabot configuration
+ *    - GitHub API integration calls
+ *
+ * 3. lib/commands/activate.js (~150 lines)
+ *    - License activation flow
+ *    - Interactive license prompts
+ *    - License validation integration
+ *
+ * 4. lib/commands/setup-main.js (~800 lines)
+ *    - Main setup orchestration
+ *    - Template generation
+ *    - File writing operations
+ *    - Husky/lint-staged configuration
+ *
+ * 5. lib/setup-config.js (~200 lines)
+ *    - Configuration merging logic
+ *    - Package.json updates
+ *    - Workflow injection helpers
+ *
+ * 6. setup.js (core CLI, ~200 lines)
+ *    - Argument parsing
+ *    - Command routing
+ *    - Help/version display
+ *    - Exit code handling
+ *
+ * MIGRATION CHECKLIST:
+ * - [ ] Extract validation command to lib/commands/validate.js
+ * - [ ] Extract deps command to lib/commands/deps.js
+ * - [ ] Extract license activation to lib/commands/activate.js
+ * - [ ] Extract main setup flow to lib/commands/setup-main.js
+ * - [ ] Extract config helpers to lib/setup-config.js
+ * - [ ] Update all tests to use new module structure
+ * - [ ] Verify all CLI commands still work (--help, --deps, --validate, etc.)
+ * - [ ] Update integration tests
+ * - [ ] Run full test suite and ensure 100% pass rate
+ *
+ * BENEFITS:
+ * - Easier to test individual commands
+ * - Reduced cognitive load when modifying specific features
+ * - Better code organization and discoverability
+ * - Easier to add new commands in the future
+ * - Faster development cycles (smaller files to navigate)
+ *
+ * BLOCKED BY: None (can be done incrementally)
+ * ESTIMATED EFFORT: 2-3 days with full test coverage
+ * RISK: Medium (need to ensure no regressions in CLI behavior)
+ */
+
 const fs = require('fs')
 const path = require('path')
 const { execSync } = require('child_process')
