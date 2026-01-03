@@ -254,11 +254,33 @@ const safeReadDir = dir => {
   try {
     return fs.readdirSync(dir, { withFileTypes: true })
   } catch (error) {
-    // Silent failure fix: Log non-ENOENT errors in DEBUG mode
-    // ENOENT is expected (dir doesn't exist), other errors may indicate issues
-    if (process.env.DEBUG && error?.code !== 'ENOENT') {
+    // Silent failure fix: Log non-ENOENT errors even in production
+    // ENOENT is expected (dir doesn't exist), other errors may indicate serious issues
+    if (error?.code !== 'ENOENT') {
       console.warn(`⚠️  Could not read directory ${dir}: ${error.message}`)
+
+      // Report to error tracking in production (if enabled)
+      if (process.env.NODE_ENV === 'production') {
+        try {
+          const errorReporter = new ErrorReporter()
+          errorReporter.captureException(error, {
+            context: 'safeReadDir',
+            directory: dir,
+            errorCode: error.code,
+          })
+        } catch {
+          // Don't fail if error reporting fails
+        }
+      }
     }
+
+    // Always log in DEBUG mode for troubleshooting
+    if (process.env.DEBUG) {
+      console.warn(
+        `   Debug: safeReadDir(${dir}) returned empty (${error?.code || 'unknown error'})`
+      )
+    }
+
     return []
   }
 }
@@ -452,10 +474,38 @@ function parseArguments(rawArgs) {
   // Custom template directory - use raw args to preserve valid path characters (&, <, >, etc.)
   // Normalize path to prevent traversal attacks and make absolute
   const templateFlagIndex = sanitizedArgs.findIndex(arg => arg === '--template')
-  const customTemplatePath =
+  let customTemplatePath =
     templateFlagIndex !== -1 && rawArgs[templateFlagIndex + 1]
       ? path.resolve(rawArgs[templateFlagIndex + 1])
       : null
+
+  // Validate custom template path early to prevent path traversal attacks
+  if (customTemplatePath) {
+    const inputPath = rawArgs[templateFlagIndex + 1]
+    // Check for suspicious patterns (path traversal attempts)
+    if (inputPath.includes('..') || inputPath.includes('~')) {
+      console.error(
+        `❌ Invalid template path: "${inputPath}". Path traversal patterns not allowed.`
+      )
+      console.error('   Use absolute paths only (e.g., /Users/you/templates)')
+      process.exit(1)
+    }
+
+    // Verify the resolved path exists and is a directory
+    try {
+      const stats = fs.statSync(customTemplatePath)
+      if (!stats.isDirectory()) {
+        console.error(
+          `❌ Template path is not a directory: ${customTemplatePath}`
+        )
+        process.exit(1)
+      }
+    } catch (error) {
+      console.error(`❌ Template path does not exist: ${customTemplatePath}`)
+      console.error(`   Error: ${error.message}`)
+      process.exit(1)
+    }
+  }
 
   // Granular tool disable options
   const disableNpmAudit = sanitizedArgs.includes('--no-npm-audit')
@@ -965,47 +1015,84 @@ HELP:
 
         // 1. Lighthouse CI - available to all, thresholds for Pro+
         if (hasLighthouse) {
-          const lighthousePath = path.join(projectPath, 'lighthouserc.js')
-          if (!fs.existsSync(lighthousePath)) {
-            writeLighthouseConfig(projectPath, {
-              hasThresholds: hasLighthouseThresholds,
-            })
-            addedTools.push(
-              hasLighthouseThresholds
-                ? 'Lighthouse CI (with thresholds)'
-                : 'Lighthouse CI (basic)'
-            )
+          try {
+            const lighthousePath = path.join(projectPath, 'lighthouserc.js')
+            if (!fs.existsSync(lighthousePath)) {
+              writeLighthouseConfig(projectPath, {
+                hasThresholds: hasLighthouseThresholds,
+              })
+              addedTools.push(
+                hasLighthouseThresholds
+                  ? 'Lighthouse CI (with thresholds)'
+                  : 'Lighthouse CI (basic)'
+              )
+            }
+          } catch (error) {
+            console.warn('⚠️ Failed to configure Lighthouse CI:', error.message)
+            if (process.env.DEBUG) {
+              console.error('   Stack:', error.stack)
+            }
           }
         }
 
         // 2. Bundle size limits - Pro only
         if (hasBundleSizeLimits) {
-          if (!pkgJson.content['size-limit']) {
-            writeSizeLimitConfig(projectPath)
-            addedTools.push('Bundle size limits (size-limit)')
+          try {
+            if (!pkgJson.content['size-limit']) {
+              writeSizeLimitConfig(projectPath)
+              addedTools.push('Bundle size limits (size-limit)')
+            }
+          } catch (error) {
+            console.warn(
+              '⚠️ Failed to configure bundle size limits:',
+              error.message
+            )
+            if (process.env.DEBUG) {
+              console.error('   Stack:', error.stack)
+            }
           }
         }
 
         // 3. axe-core accessibility testing - available to all
         if (hasAxeAccessibility) {
-          const axeTestPath = path.join(
-            projectPath,
-            'tests',
-            'accessibility.test.js'
-          )
-          if (!fs.existsSync(axeTestPath)) {
-            writeAxeTestSetup(projectPath)
-            addedTools.push('axe-core accessibility tests')
+          try {
+            const axeTestPath = path.join(
+              projectPath,
+              'tests',
+              'accessibility.test.js'
+            )
+            if (!fs.existsSync(axeTestPath)) {
+              writeAxeTestSetup(projectPath)
+              addedTools.push('axe-core accessibility tests')
+            }
+          } catch (error) {
+            console.warn(
+              '⚠️ Failed to configure axe-core tests:',
+              error.message
+            )
+            if (process.env.DEBUG) {
+              console.error('   Stack:', error.stack)
+            }
           }
         }
 
         // 4. Conventional commits (commitlint) - available to all
         if (hasConventionalCommits) {
-          const commitlintPath = path.join(projectPath, 'commitlint.config.js')
-          if (!fs.existsSync(commitlintPath)) {
-            writeCommitlintConfig(projectPath)
-            writeCommitMsgHook(projectPath)
-            addedTools.push('Conventional commits (commitlint)')
+          try {
+            const commitlintPath = path.join(
+              projectPath,
+              'commitlint.config.js'
+            )
+            if (!fs.existsSync(commitlintPath)) {
+              writeCommitlintConfig(projectPath)
+              writeCommitMsgHook(projectPath)
+              addedTools.push('Conventional commits (commitlint)')
+            }
+          } catch (error) {
+            console.warn('⚠️ Failed to configure commitlint:', error.message)
+            if (process.env.DEBUG) {
+              console.error('   Stack:', error.stack)
+            }
           }
         }
 
@@ -1061,8 +1148,17 @@ HELP:
           qualitySpinner.succeed('Quality tools already configured')
         }
       } catch (error) {
-        qualitySpinner.warn('Could not set up some quality tools')
-        console.warn('⚠️ Quality tools setup error:', error.message)
+        qualitySpinner.fail('Quality tools setup failed')
+        console.error(
+          `❌ Unexpected error during quality tools setup: ${error.message}`
+        )
+        if (process.env.DEBUG) {
+          console.error('   Stack:', error.stack)
+        }
+        console.error(
+          '   Please report this issue at https://github.com/your-repo/issues'
+        )
+        throw error // Re-throw to prevent silent continuation
       }
     }
 

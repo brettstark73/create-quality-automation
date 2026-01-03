@@ -9,6 +9,9 @@
  *
  * Deploy this on your server (not distributed with CLI package).
  *
+ * Required dependencies (install separately):
+ *   npm install express helmet stripe
+ *
  * Usage:
  *   1. Deploy this script to your server
  *   2. Set up Stripe webhook endpoint pointing to this handler
@@ -21,6 +24,7 @@ const fs = require('fs')
 const os = require('os')
 const path = require('path')
 const express = require('express')
+const helmet = require('helmet')
 const {
   LICENSE_KEY_PATTERN,
   buildLicensePayload,
@@ -150,35 +154,39 @@ const dbRateLimiter = new RateLimiter(60000, 30) // 30 requests per minute
 
 const app = express()
 
-// TD6 fix: Security headers middleware
-app.use((req, res, next) => {
-  // Prevent clickjacking attacks
-  res.setHeader('X-Frame-Options', 'DENY')
-  // Prevent MIME type sniffing
-  res.setHeader('X-Content-Type-Options', 'nosniff')
-  // XSS protection (legacy browsers)
-  res.setHeader('X-XSS-Protection', '1; mode=block')
-  // Strict Content Security Policy for API endpoints
-  res.setHeader(
-    'Content-Security-Policy',
-    "default-src 'none'; frame-ancestors 'none'"
-  )
-  // Referrer policy
-  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin')
-  // Permissions policy - disable unnecessary browser features
-  res.setHeader(
-    'Permissions-Policy',
-    'geolocation=(), microphone=(), camera=()'
-  )
-  // HSTS - only set in production (when HTTPS is guaranteed)
-  if (process.env.NODE_ENV === 'production') {
-    res.setHeader(
-      'Strict-Transport-Security',
-      'max-age=31536000; includeSubDomains'
-    )
-  }
-  next()
-})
+// DR28 fix: Use helmet.js for comprehensive security headers
+app.use(
+  helmet({
+    // Prevent clickjacking
+    frameguard: { action: 'deny' },
+    // Prevent MIME sniffing
+    noSniff: true,
+    // XSS protection (legacy browsers)
+    xssFilter: true,
+    // Strict Content Security Policy for API endpoints
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'none'"],
+        frameAncestors: ["'none'"],
+      },
+    },
+    // Referrer policy
+    referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
+    // HSTS - only in production
+    hsts:
+      process.env.NODE_ENV === 'production'
+        ? { maxAge: 31536000, includeSubDomains: true }
+        : false,
+    // Permissions policy via custom middleware (helmet doesn't support all features)
+    permissionsPolicy: {
+      features: {
+        geolocation: [],
+        microphone: [],
+        camera: [],
+      },
+    },
+  })
+)
 
 // Raw body parser for Stripe webhooks
 app.use('/webhook', express.raw({ type: 'application/json' }))
@@ -187,11 +195,12 @@ app.use(express.json())
 /**
  * Load legitimate license database
  *
- * DR13 TODO: Migrate to SQLite for scaling beyond 10k users
+ * DR13 SCALABILITY WARNING: JSON file has known limits
  * - Current JSON file approach works for <10k licenses (~500KB)
- * - At 100k licenses (~5MB), JSON parsing becomes slow
+ * - At 10k-50k licenses: Performance degrades, consider monitoring
+ * - At 50k+ licenses: Migrate to SQLite/PostgreSQL required
  * - Write queue prevents corruption but doesn't scale beyond ~10 req/sec
- * - Recommended: SQLite with indexed queries for PRO tier
+ * - See docs/SCALING.md for migration guide (when implemented)
  */
 function loadLicenseDatabase() {
   try {
@@ -199,7 +208,30 @@ function loadLicenseDatabase() {
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     if (fs.existsSync(LICENSE_DATABASE_PATH)) {
       // eslint-disable-next-line security/detect-non-literal-fs-filename
-      return JSON.parse(fs.readFileSync(LICENSE_DATABASE_PATH, 'utf8'))
+      const data = fs.readFileSync(LICENSE_DATABASE_PATH, 'utf8')
+      const database = JSON.parse(data)
+
+      // DR13 fix: Warn when approaching scale limits
+      const licenseCount = Object.keys(database).filter(
+        k => k !== '_metadata'
+      ).length
+      if (licenseCount > 5000 && licenseCount % 1000 === 0) {
+        console.warn(
+          `⚠️  Database contains ${licenseCount} licenses - approaching scale limits`
+        )
+        console.warn(
+          `   Consider migrating to SQLite when you reach 10k licenses`
+        )
+      }
+      if (licenseCount > 10000) {
+        console.error(`❌ CRITICAL: Database contains ${licenseCount} licenses`)
+        console.error(`   JSON storage is not recommended beyond 10k licenses`)
+        console.error(
+          `   Performance degradation expected - migrate to SQLite/PostgreSQL`
+        )
+      }
+
+      return database
     }
   } catch (error) {
     console.error('Error loading license database:', error.message)
@@ -242,10 +274,11 @@ function saveLicenseDatabase(database) {
     }
 
     // Compute integrity hash over licenses (excluding metadata)
+    // DR30 fix: Use stableStringify for deterministic hash computation
     const { _metadata, ...licenses } = database
     const sha = crypto
       .createHash('sha256')
-      .update(JSON.stringify(licenses))
+      .update(stableStringify(licenses))
       .digest('hex')
 
     database._metadata = {
@@ -477,6 +510,22 @@ app.post('/webhook', async (req, res) => {
   }
 
   try {
+    // DR31 fix: Validate event structure before processing
+    if (!event || typeof event !== 'object') {
+      throw new Error('Invalid webhook event: event must be an object')
+    }
+    if (!event.type || typeof event.type !== 'string') {
+      throw new Error('Invalid webhook event: missing or invalid event.type')
+    }
+    if (!event.data || typeof event.data !== 'object') {
+      throw new Error('Invalid webhook event: missing or invalid event.data')
+    }
+    if (!event.data.object || typeof event.data.object !== 'object') {
+      throw new Error(
+        'Invalid webhook event: missing or invalid event.data.object'
+      )
+    }
+
     // Handle the event
     switch (event.type) {
       case 'checkout.session.completed':
@@ -581,6 +630,14 @@ async function handleCheckoutCompleted(session) {
  * Handle successful payment (recurring)
  */
 async function handlePaymentSucceeded(invoice) {
+  // DR31 fix: Validate invoice structure
+  if (!invoice || typeof invoice !== 'object') {
+    throw new Error('Invalid invoice: must be an object')
+  }
+  if (!invoice.id) {
+    throw new Error('Invalid invoice: missing id')
+  }
+
   console.log(`💳 Payment succeeded: ${invoice.id}`)
   // License should already exist from checkout.session.completed
   // Could implement license renewal/extension logic here if needed
@@ -590,6 +647,17 @@ async function handlePaymentSucceeded(invoice) {
  * Handle subscription cancellation
  */
 async function handleSubscriptionCanceled(subscription) {
+  // DR31 fix: Validate subscription structure
+  if (!subscription || typeof subscription !== 'object') {
+    throw new Error('Invalid subscription: must be an object')
+  }
+  if (!subscription.id) {
+    throw new Error('Invalid subscription: missing id')
+  }
+  if (!subscription.customer) {
+    throw new Error('Invalid subscription: missing customer')
+  }
+
   console.log(`❌ Subscription canceled: ${subscription.id}`)
   console.log(`   Customer: ${subscription.customer}`)
 

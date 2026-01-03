@@ -175,24 +175,15 @@ async function runAsyncTest(testName, testFn) {
     }
   })
 
-  // Test 5: npx fallback only when explicitly allowed
+  // Test 5: npx fallback is no longer supported (security fix)
   await runAsyncTest(
-    'npx fallback with explicit allowLatestGitleaks flag',
+    'npx fallback deprecated even with allowLatestGitleaks flag',
     async () => {
       const scanner = new ConfigSecurityScanner({
-        allowLatestGitleaks: true,
+        allowLatestGitleaks: true, // No longer has any effect
         quiet: true,
       })
       delete process.env.GITLEAKS_PATH
-
-      let warningCaptured = false
-      const originalWarn = console.warn
-
-      console.warn = message => {
-        if (message.includes('WARNING: Using npx gitleaks')) {
-          warningCaptured = true
-        }
-      }
 
       // Mock that nothing exists
       require('child_process').execSync = () => {
@@ -206,19 +197,20 @@ async function runAsyncTest(testName, testFn) {
         throw new Error('Download failed')
       }
 
-      const result = await scanner.resolveGitleaksBinary()
-      assert.strictEqual(
-        result,
-        'npx gitleaks',
-        'Should fallback to npx when explicitly allowed'
-      )
-      assert.strictEqual(
-        warningCaptured,
-        true,
-        'Should warn when falling back to npx'
-      )
-
-      console.warn = originalWarn
+      // Should now throw an error even with allowLatestGitleaks flag
+      try {
+        await scanner.resolveGitleaksBinary()
+        assert.fail('Should have thrown an error')
+      } catch (error) {
+        assert(
+          error.message.includes('Cannot resolve secure gitleaks binary'),
+          'Should provide helpful error message'
+        )
+        assert(
+          error.message.includes('--allow-latest-gitleaks flag is deprecated'),
+          'Should explain that flag is deprecated'
+        )
+      }
     }
   )
 
