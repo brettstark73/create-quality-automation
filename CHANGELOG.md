@@ -9,6 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Error Handling**: Comprehensive improvements to error messaging and recovery (10 critical/high fixes)
+  - `safeReadDir()`: Now re-throws critical filesystem errors (EACCES, EIO, ELOOP, EMFILE) instead of silently returning empty arrays
+  - `loadUsage()`: Enhanced FREE tier corruption handling with step-by-step recovery instructions
+  - `saveUsage()`: Prevents FREE tier quota bypass by halting execution on write failures
+  - Smart strategy template errors now include troubleshooting steps and reinstall guidance
+  - Package.json parse errors include error IDs and recovery commands (e.g., `jq` validation)
+  - Validation errors now throw when generated configs fail (indicates tool bug)
+  - GitHub API errors provide specific diagnosis for 401, 404, network, rate limit issues
+  - Directory scan permission errors always logged (affects maturity detection accuracy)
+- **Testing**: Added comprehensive test coverage for result-types module (0% → 100%)
+  - 23 new test cases covering success/failure/valid/invalid builders and checkers
+  - Overall project coverage improved from 72.86% to 73.63%
 - **Testing**: Isolated Free/Pro tier test flows with environment overrides
   - Added isolated license directories per test to prevent state pollution
   - Wired env overrides (QAA_LICENSE_DIR, QAA_DEVELOPER, NODE_ENV) into setup runs
