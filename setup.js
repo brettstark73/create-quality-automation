@@ -254,30 +254,40 @@ const safeReadDir = dir => {
   try {
     return fs.readdirSync(dir, { withFileTypes: true })
   } catch (error) {
-    // Silent failure fix: Log non-ENOENT errors even in production
-    // ENOENT is expected (dir doesn't exist), other errors may indicate serious issues
-    if (error?.code !== 'ENOENT') {
-      console.warn(`⚠️  Could not read directory ${dir}: ${error.message}`)
+    // ENOENT is expected (dir doesn't exist) - return empty silently
+    if (error?.code === 'ENOENT') {
+      if (process.env.DEBUG) {
+        console.warn(
+          `   Debug: safeReadDir(${dir}) returned empty (directory not found)`
+        )
+      }
+      return []
+    }
 
-      // Report to error tracking in production (if enabled)
-      if (process.env.NODE_ENV === 'production') {
-        try {
-          const errorReporter = new ErrorReporter()
-          errorReporter.captureException(error, {
-            context: 'safeReadDir',
-            directory: dir,
-            errorCode: error.code,
-          })
-        } catch {
-          // Don't fail if error reporting fails
-        }
+    // All other errors are unexpected and should be logged with context
+    console.error(`❌ Failed to read directory: ${dir}`)
+    console.error(`   Error: ${error.message} (${error.code || 'unknown'})`)
+    console.error(`   This may indicate a permission or filesystem issue`)
+
+    // Report to error tracking in production
+    if (process.env.NODE_ENV === 'production') {
+      try {
+        const errorReporter = new ErrorReporter()
+        errorReporter.captureException(error, {
+          context: 'safeReadDir',
+          directory: dir,
+          errorCode: error.code,
+        })
+      } catch {
+        // Don't fail if error reporting fails
       }
     }
 
-    // Always log in DEBUG mode for troubleshooting
-    if (process.env.DEBUG) {
-      console.warn(
-        `   Debug: safeReadDir(${dir}) returned empty (${error?.code || 'unknown error'})`
+    // Re-throw for critical errors instead of silently returning []
+    if (['EACCES', 'EIO', 'ELOOP', 'EMFILE'].includes(error.code)) {
+      throw new Error(
+        `Cannot read directory ${dir}: ${error.message}. ` +
+          `This may indicate a serious filesystem or permission issue.`
       )
     }
 
@@ -1557,12 +1567,28 @@ HELP:
         // Validate the generated config
         const validationResult = validateQualityConfig(qualityrcPath)
         if (!validationResult.valid) {
-          console.warn(
-            '⚠️  Warning: Generated config has validation issues (this should not happen):'
+          console.error(
+            '\n❌ CRITICAL: Generated .qualityrc.json failed validation'
           )
-          validationResult.errors.forEach(error => {
-            console.warn(`   - ${error}`)
+          console.error(
+            '   This should never happen. Please report this bug.\n'
+          )
+
+          console.error('Validation errors:')
+          validationResult.errors.forEach((error, index) => {
+            console.error(`   ${index + 1}. ${error}`)
           })
+
+          console.error(`\n🐛 Report issue with this info:`)
+          console.error(`   • File: ${qualityrcPath}`)
+          console.error(`   • Detected maturity: ${detectedMaturity}`)
+          console.error(`   • Error count: ${validationResult.errors.length}`)
+          console.error(
+            `   • https://github.com/vibebuildlab/qa-architect/issues/new\n`
+          )
+
+          // Don't continue - this is a bug in the tool itself
+          throw new Error('Invalid quality config generated - cannot continue')
         }
       } else {
         // TD8 fix: Re-enabled validation (was disabled for debugging)
