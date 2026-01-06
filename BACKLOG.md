@@ -1,6 +1,6 @@
 # qa-architect - Backlog
 
-**Last Updated**: 2026-01-03
+**Last Updated**: 2026-01-06
 **Priority**: Value-based (Revenue + Retention + Differentiation) ÷ Effort
 
 ---
@@ -172,6 +172,7 @@
 | Q9  | **Changelog generation**       | Diff:2 Ret:3 Rev:2 | S      | Free | Pending |
 | Q10 | **E2E test scaffolding**       | Diff:3 Ret:3 Rev:2 | M      | Pro  | Pending |
 | Q11 | **Bash/Shell script support**  | Diff:4 Ret:3 Rev:2 | S      | Free | Pending |
+| Q12 | **GitHub Actions cost analyzer** | Diff:5 Ret:4 Rev:3 | M    | Pro  | Pending |
 
 ### Q11: Bash/Shell Script Support Details
 
@@ -248,3 +249,192 @@
 - Slack/email alerts
 - Custom policies
 - SSO/SAML
+
+---
+
+## 📋 Feature Specifications
+
+### Q12: GitHub Actions Cost Analyzer
+
+**Problem**: Developers building multiple projects in parallel (indie hackers, agencies, SaaS factories) quickly exceed GitHub Actions free tier limits (2,000 min/month) without realizing it. Costs can balloon to $50-200/month across multiple repos with no visibility into optimization opportunities.
+
+**Solution**: Add `--analyze-ci` command that analyzes GitHub Actions usage patterns and provides actionable cost optimization recommendations.
+
+#### Phase 1: Usage Analysis (MVP)
+
+**Requirements**:
+- Detect GitHub Actions workflows in current repo
+- Calculate estimated minutes/month based on:
+  - Average commits/day (from git log)
+  - Workflow duration (from `.github/workflows/*.yml` job estimates)
+  - Number of active branches
+- Compare against tier limits:
+  - Free: 2,000 min/month
+  - Team: 3,000 min/month
+  - Pay-as-you-go: $0.008/min for private repos
+  - Self-hosted: $0/min (but VPS costs)
+
+**Output Example**:
+```bash
+npx create-qa-architect --analyze-ci
+
+📊 GitHub Actions Usage Analysis
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Repository: myapp
+Estimated usage: 3,200 min/month
+  ├─ CI workflow: ~45 min/day (1,350 min/month)
+  ├─ E2E tests: ~60 min/day (1,800 min/month)
+  └─ Deploy: ~2 min/day (60 min/month)
+
+💰 Cost Analysis
+Free tier (2,000 min): EXCEEDED by 1,200 min
+Overage cost: $9.60/month
+
+Alternative options:
+  Team plan ($4/user/month): Saves $5.60
+  Self-hosted runner: $0/month CI + ~$5 VPS
+```
+
+#### Phase 2: Optimization Recommendations (Pro Tier)
+
+**Features**:
+- **Caching audit**: Detect missing dependency caches
+- **Path filters**: Suggest `paths-ignore` for docs/markdown-only changes
+- **Concurrency limits**: Flag missing `concurrency` groups (skip duplicate runs)
+- **Job optimization**: Identify long-running jobs that could be parallelized
+- **Conditional execution**: Recommend `if:` conditions to skip unnecessary jobs
+
+**Output Example**:
+```bash
+💡 Optimization Opportunities (Save ~1,400 min/month)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. ⚡ Enable dependency caching
+   Impact: Save ~40% (1,280 min/month)
+   Files: .github/workflows/ci.yml
+
+   Add to your workflow:
+     - uses: actions/cache@v4
+       with:
+         path: ~/.npm
+         key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+
+2. 📝 Skip CI on docs-only changes
+   Impact: Save ~120 min/month
+
+   Add to workflow trigger:
+     on:
+       push:
+         paths-ignore:
+           - 'docs/**'
+           - '*.md'
+
+3. 🔄 Add concurrency limits
+   Impact: Save ~5% (160 min/month)
+
+   Add to workflow:
+     concurrency:
+       group: ${{ github.workflow }}-${{ github.ref }}
+       cancel-in-progress: true
+```
+
+#### Phase 3: Self-Hosted Runner Setup (Pro Tier - Optional)
+
+**Features**:
+- Docker-based runner setup script
+- VPS provider recommendations with cost comparison
+  - DigitalOcean: $6/month (1GB RAM)
+  - Hetzner: €4.5/month (2GB RAM)
+  - Oracle Cloud: Free tier (1GB ARM)
+- Security hardening checklist
+- Auto-update configuration
+
+**Output**:
+```bash
+🖥️  Self-Hosted Runner Setup
+━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Recommended VPS: Hetzner CX11 (€4.50/month)
+  ├─ 2GB RAM, 20GB SSD
+  ├─ Supports 2-3 concurrent jobs
+  └─ Cost savings: $9.60/month → €4.50/month
+
+Run this script to set up runner:
+  curl -fsSL https://qa-architect.dev/runner-setup.sh | bash
+
+Or use our Docker image:
+  docker run -d qa-architect/github-runner \
+    --token YOUR_RUNNER_TOKEN \
+    --name my-runner
+```
+
+#### Phase 4: Workflow Templates (Free Tier)
+
+**Features**:
+- Generate optimized workflow templates with best practices built-in
+- Smart caching for npm/pnpm/yarn/pip/poetry/cargo
+- Fail-fast strategies
+- Timeout limits
+- Matrix builds vs sequential decision logic
+
+**Implementation**:
+```bash
+npx create-qa-architect --optimize-workflows
+
+✨ Generated optimized workflows:
+  ├─ .github/workflows/ci-optimized.yml (with caching)
+  ├─ .github/workflows/e2e-optimized.yml (with parallelization)
+  └─ .github/workflows/deploy-optimized.yml (with concurrency limits)
+
+These workflows include:
+  ✓ Dependency caching (npm/yarn/pnpm auto-detected)
+  ✓ Path-based filtering
+  ✓ Concurrency limits
+  ✓ 60-minute timeout limits
+  ✓ Fail-fast matrix strategy
+```
+
+#### Integration Points
+
+**Preflight checks** (add to existing audit):
+```bash
+npx create-qa-architect --validate
+
+Quality Audit Results
+━━━━━━━━━━━━━━━━━━━
+✓ ESLint configured
+✓ Prettier configured
+✗ GitHub Actions missing caching (WARN)
+✗ Workflows missing timeout limits (WARN)
+✗ No concurrency limits configured (INFO)
+
+Run 'npx create-qa-architect --optimize-workflows' to fix.
+```
+
+**Tech Stack**:
+- GitHub REST API v3 (`/repos/{owner}/{repo}/actions/runs`)
+- YAML parsing for workflow analysis (`js-yaml`)
+- Git log analysis for commit frequency (`simple-git`)
+- Cost calculation engine
+- Template generator (existing `lib/template-loader.js`)
+
+**User Personas**:
+1. **Indie hacker**: Building 3-5 SaaS products simultaneously, wants to minimize costs
+2. **Agency**: Managing 10+ client repos, needs cost visibility
+3. **Bootstrapped startup**: Tight budget, willing to self-host runners
+
+**Success Metrics**:
+- Adoption: 20% of Pro users run `--analyze-ci` monthly
+- Conversion: 5% of Free users upgrade to Pro for advanced analysis
+- Retention: Users who optimize save average $25/month, cite as key value prop
+
+**Effort Estimate**:
+- Phase 1 (Analysis): 3 days
+- Phase 2 (Recommendations): 4 days
+- Phase 3 (Self-hosted): 3 days
+- Phase 4 (Templates): 2 days
+- Testing & docs: 2 days
+- **Total**: ~14 days (Medium effort)
+
+**Revenue Potential**:
+- **Direct**: Pro feature, supports $19/month value proposition
+- **Indirect**: Attracts cost-conscious developers, improves retention
+- **Competitive moat**: No competing QA tools offer CI cost analysis
