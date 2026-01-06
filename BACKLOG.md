@@ -171,6 +171,34 @@
 | Q8  | **License checker**            | Diff:3 Ret:2 Rev:2 | S      | Pro  | Pending |
 | Q9  | **Changelog generation**       | Diff:2 Ret:3 Rev:2 | S      | Free | Pending |
 | Q10 | **E2E test scaffolding**       | Diff:3 Ret:3 Rev:2 | M      | Pro  | Pending |
+| Q11 | **Bash/Shell script support**  | Diff:4 Ret:3 Rev:2 | S      | Free | Pending |
+
+### Q11: Bash/Shell Script Support Details
+
+**Priority**: P2
+**Use Case**: Config repos, dotfiles, script collections need CI/CD quality gates
+
+**Requirements**:
+- Detect bash-based projects (*.sh files, no package.json)
+- Generate `.github/workflows/ci.yml` with:
+  - shellcheck validation
+  - syntax validation
+  - permissions checking
+- Generate `.github/workflows/quality-checks.yml` with:
+  - maturity assessment
+  - documentation validation
+  - quality summary
+- Optional: Husky pre-commit hooks for shellcheck (requires Git hooks setup)
+
+**Implementation Notes**:
+- Detection logic: Check for `*.sh` files and absence of `package.json`
+- Extend `lib/project-maturity.js` to detect shell script projects
+- Create shell-specific templates in `templates/` or `config/`
+- Add shell script validation to workflow templates
+
+**Tier Assignment**:
+- **Free**: Basic shellcheck CI, syntax validation, quality checks
+- **Pro**: Advanced shell analysis, security scanning for secrets/vulnerabilities
 
 ## 📚 Business & Infrastructure
 
