@@ -476,7 +476,9 @@ function parseArguments(rawArgs) {
   const isDryRun = sanitizedArgs.includes('--dry-run')
   const isWorkflowMinimal = sanitizedArgs.includes('--workflow-minimal')
   const isWorkflowStandard = sanitizedArgs.includes('--workflow-standard')
-  const isWorkflowComprehensive = sanitizedArgs.includes('--workflow-comprehensive')
+  const isWorkflowComprehensive = sanitizedArgs.includes(
+    '--workflow-comprehensive'
+  )
   const ciProviderIndex = sanitizedArgs.findIndex(arg => arg === '--ci')
   const ciProvider =
     ciProviderIndex !== -1 && sanitizedArgs[ciProviderIndex + 1]
@@ -1299,10 +1301,7 @@ HELP:
       const versionMarker = `# WORKFLOW_MODE: ${mode}`
       if (!updated.includes('# WORKFLOW_MODE:')) {
         // Insert after the comment block and before jobs
-        updated = updated.replace(
-          /(\n\njobs:)/,
-          `\n${versionMarker}\n$1`
-        )
+        updated = updated.replace(/(\n\njobs:)/, `\n${versionMarker}\n$1`)
       }
 
       // Replace PATH_FILTERS_PLACEHOLDER
@@ -1328,7 +1327,10 @@ HELP:
           const scheduleConfig = `schedule:
     - cron: '0 0 * * 0'  # Weekly on Sunday (security scans)
   workflow_dispatch:       # Manual trigger`
-          updated = updated.replace('# SECURITY_SCHEDULE_PLACEHOLDER', scheduleConfig)
+          updated = updated.replace(
+            '# SECURITY_SCHEDULE_PLACEHOLDER',
+            scheduleConfig
+          )
         } else {
           // comprehensive: Remove placeholder
           updated = updated.replace(/\s*# SECURITY_SCHEDULE_PLACEHOLDER\n?/, '')
@@ -1341,10 +1343,16 @@ HELP:
           // Only run security on schedule events (not on every push)
           const securityCondition = `if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
     #`
-          updated = updated.replace('# SECURITY_CONDITION_PLACEHOLDER', securityCondition)
+          updated = updated.replace(
+            '# SECURITY_CONDITION_PLACEHOLDER',
+            securityCondition
+          )
         } else {
           // comprehensive: Remove placeholder
-          updated = updated.replace(/\s*# SECURITY_CONDITION_PLACEHOLDER\n?/, '')
+          updated = updated.replace(
+            /\s*# SECURITY_CONDITION_PLACEHOLDER\n?/,
+            ''
+          )
         }
       }
 
@@ -1388,7 +1396,10 @@ HELP:
           testsCondition = '# Matrix testing on every push'
         }
 
-        updated = updated.replace('# TESTS_CONDITION_PLACEHOLDER', testsCondition)
+        updated = updated.replace(
+          '# TESTS_CONDITION_PLACEHOLDER',
+          testsCondition
+        )
       }
 
       return updated
@@ -1958,7 +1969,11 @@ HELP:
           console.log(`✅ Added GitHub Actions workflow (${workflowMode} mode)`)
         } else if (isUpdateMode) {
           // Update existing workflow with new mode if explicitly specified
-          if (isWorkflowMinimal || isWorkflowStandard || isWorkflowComprehensive) {
+          if (
+            isWorkflowMinimal ||
+            isWorkflowStandard ||
+            isWorkflowComprehensive
+          ) {
             // Load fresh template and re-inject
             let templateWorkflow =
               templateLoader.getTemplate(
@@ -1971,12 +1986,18 @@ HELP:
               )
 
             // Inject workflow mode configuration
-            templateWorkflow = injectWorkflowMode(templateWorkflow, workflowMode)
+            templateWorkflow = injectWorkflowMode(
+              templateWorkflow,
+              workflowMode
+            )
 
             // Inject collaboration steps (preserve from existing if present)
             const existingWorkflow = fs.readFileSync(workflowFile, 'utf8')
-            const hasSlackAlerts = existingWorkflow.includes('SLACK_WEBHOOK_URL')
-            const hasPrComments = existingWorkflow.includes('PR_COMMENT_PLACEHOLDER')
+            const hasSlackAlerts =
+              existingWorkflow.includes('SLACK_WEBHOOK_URL')
+            const hasPrComments = existingWorkflow.includes(
+              'PR_COMMENT_PLACEHOLDER'
+            )
 
             templateWorkflow = injectCollaborationSteps(templateWorkflow, {
               enableSlackAlerts: hasSlackAlerts,
@@ -1984,7 +2005,9 @@ HELP:
             })
 
             fs.writeFileSync(workflowFile, templateWorkflow)
-            console.log(`♻️  Updated GitHub Actions workflow to ${workflowMode} mode`)
+            console.log(
+              `♻️  Updated GitHub Actions workflow to ${workflowMode} mode`
+            )
           }
         }
       }
@@ -2396,6 +2419,8 @@ echo "✅ Pre-push validation passed!"
             console.log('✅ Added Python GitHub Actions workflow')
           }
         }
+
+        pythonSpinner.succeed('Python quality tools configured')
       }
 
       // Shell project setup
@@ -2517,8 +2542,6 @@ Quality checks are automated via GitHub Actions:
             )
           }
         }
-
-        pythonSpinner.succeed('Python quality tools configured')
       }
 
       // Smart Test Strategy (Pro/Team/Enterprise feature)
