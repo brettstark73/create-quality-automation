@@ -694,15 +694,32 @@ console.log('🧪 Testing ProjectMaturityDetector...\n')
 
   try {
     // Add shell scripts
-    fs.writeFileSync(path.join(tempDir, 'deploy.sh'), '#!/bin/bash\necho "Deploying..."')
-    fs.writeFileSync(path.join(tempDir, 'backup.sh'), '#!/bin/bash\necho "Backing up..."')
-    fs.writeFileSync(path.join(tempDir, 'setup.bash'), '#!/bin/bash\necho "Setup"')
+    fs.writeFileSync(
+      path.join(tempDir, 'deploy.sh'),
+      '#!/bin/bash\necho "Deploying..."'
+    )
+    fs.writeFileSync(
+      path.join(tempDir, 'backup.sh'),
+      '#!/bin/bash\necho "Backing up..."'
+    )
+    fs.writeFileSync(
+      path.join(tempDir, 'setup.bash'),
+      '#!/bin/bash\necho "Setup"'
+    )
 
     const detector = new ProjectMaturityDetector({ projectPath: tempDir })
     const stats = detector.analyzeProject()
 
-    assert.strictEqual(stats.shellScriptCount, 3, 'Should count 3 shell scripts')
-    assert.strictEqual(stats.hasShellScripts, true, 'Should detect shell scripts')
+    assert.strictEqual(
+      stats.shellScriptCount,
+      3,
+      'Should count 3 shell scripts'
+    )
+    assert.strictEqual(
+      stats.hasShellScripts,
+      true,
+      'Should detect shell scripts'
+    )
     assert.strictEqual(
       stats.isShellProject,
       true,
@@ -727,13 +744,20 @@ console.log('🧪 Testing ProjectMaturityDetector...\n')
 
   try {
     // Add some shell scripts to a Node.js project
-    fs.writeFileSync(path.join(tempDir, 'deploy.sh'), '#!/bin/bash\necho "Deploying..."')
+    fs.writeFileSync(
+      path.join(tempDir, 'deploy.sh'),
+      '#!/bin/bash\necho "Deploying..."'
+    )
 
     const detector = new ProjectMaturityDetector({ projectPath: tempDir })
     const stats = detector.analyzeProject()
 
     assert.strictEqual(stats.shellScriptCount, 1, 'Should count 1 shell script')
-    assert.strictEqual(stats.hasShellScripts, true, 'Should detect shell scripts')
+    assert.strictEqual(
+      stats.hasShellScripts,
+      true,
+      'Should detect shell scripts'
+    )
     assert.strictEqual(
       stats.isShellProject,
       false,
@@ -758,14 +782,28 @@ console.log('🧪 Testing ProjectMaturityDetector...\n')
 
   try {
     // Add shell scripts
-    fs.writeFileSync(path.join(tempDir, 'deploy.sh'), '#!/bin/bash\necho "Deploying..."')
-    fs.writeFileSync(path.join(tempDir, 'backup.sh'), '#!/bin/bash\necho "Backing up..."')
+    fs.writeFileSync(
+      path.join(tempDir, 'deploy.sh'),
+      '#!/bin/bash\necho "Deploying..."'
+    )
+    fs.writeFileSync(
+      path.join(tempDir, 'backup.sh'),
+      '#!/bin/bash\necho "Backing up..."'
+    )
 
     const detector = new ProjectMaturityDetector({ projectPath: tempDir })
     const output = detector.generateGitHubActionsOutput()
 
-    assert.strictEqual(typeof output.hasShell, 'boolean', 'Should have hasShell')
-    assert.strictEqual(typeof output.shellCount, 'number', 'Should have shellCount')
+    assert.strictEqual(
+      typeof output.hasShell,
+      'boolean',
+      'Should have hasShell'
+    )
+    assert.strictEqual(
+      typeof output.shellCount,
+      'number',
+      'Should have shellCount'
+    )
     assert.strictEqual(
       typeof output.isShellProject,
       'boolean',

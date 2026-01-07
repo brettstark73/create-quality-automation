@@ -47,7 +47,7 @@ console.log('🧪 Testing analyze-ci module...\n')
 
     const workflows = discoverWorkflows(testDir)
     assert.strictEqual(workflows.length, 2, 'Should find 2 workflow files')
-    
+
     const names = workflows.map(w => w.name).sort()
     assert.deepStrictEqual(names, ['ci.yml', 'test.yaml'])
     console.log('✅ PASS\n')
@@ -113,10 +113,7 @@ console.log('🧪 Testing analyze-ci module...\n')
             os: ['ubuntu', 'windows'],
           },
         },
-        steps: [
-          { name: 'Checkout' },
-          { name: 'Test' },
-        ],
+        steps: [{ name: 'Checkout' }, { name: 'Test' }],
       },
     },
   }
@@ -134,7 +131,7 @@ console.log('🧪 Testing analyze-ci module...\n')
 
   const workflow = { name: 'test', on: 'push' }
   const duration = estimateWorkflowDuration(workflow)
-  
+
   assert.strictEqual(duration, 0, 'Empty workflow should return 0')
   console.log('✅ PASS\n')
 })()
@@ -154,7 +151,7 @@ console.log('🧪 Testing analyze-ci module...\n')
   assert.ok(costs.tiers.free, 'Should include free tier analysis')
   assert.ok(costs.tiers.team, 'Should include team tier analysis')
   assert.strictEqual(costs.breakdown.length, 2)
-  
+
   console.log(`  Monthly: ${costs.minutesPerMonth} min`)
   console.log(`  Within free tier: ${costs.tiers.free.withinLimit}`)
   console.log('✅ PASS\n')
@@ -176,7 +173,7 @@ console.log('🧪 Testing analyze-ci module...\n')
   assert.strictEqual(costs.tiers.free.withinLimit, false)
   assert.ok(costs.tiers.free.overage > 0)
   assert.ok(costs.tiers.free.cost > 0)
-  
+
   console.log(`  Monthly: ${costs.minutesPerMonth} min`)
   console.log(`  Overage: ${costs.tiers.free.overage} min`)
   console.log(`  Cost: $${costs.tiers.free.cost.toFixed(2)}`)
@@ -196,7 +193,7 @@ console.log('🧪 Testing analyze-ci module...\n')
   assert.strictEqual(costs.minutesPerMonth, 3000)
   assert.strictEqual(costs.tiers.free.overage, 1000)
   assert.strictEqual(costs.tiers.free.cost, 8.0)
-  
+
   console.log('  ✅ Pricing calculations correct')
   console.log('✅ PASS\n')
 })()

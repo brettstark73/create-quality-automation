@@ -286,10 +286,13 @@ function createTempGitRepo() {
     )
 
     // Update to minimal mode
-    execSync(`QAA_DEVELOPER=true node ${setupPath} --update --workflow-minimal`, {
-      cwd: testDir,
-      stdio: 'pipe',
-    })
+    execSync(
+      `QAA_DEVELOPER=true node ${setupPath} --update --workflow-minimal`,
+      {
+        cwd: testDir,
+        stdio: 'pipe',
+      }
+    )
 
     workflowContent = fs.readFileSync(workflowPath, 'utf8')
     assert(

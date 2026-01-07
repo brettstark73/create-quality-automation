@@ -84,6 +84,7 @@ qa-architect defaults to **minimal CI** to avoid unexpected GitHub Actions costs
 - **Comprehensive**: Matrix every commit, inline security (~$100-350/mo)
 
 Implementation:
+
 - `detectExistingWorkflowMode()` - Reads `# WORKFLOW_MODE:` marker or detects legacy
 - `injectWorkflowMode()` - Replaces placeholders in quality.yml template
 - Placeholders: `PATH_FILTERS_PLACEHOLDER`, `SECURITY_SCHEDULE_PLACEHOLDER`, `MATRIX_PLACEHOLDER`, `TESTS_CONDITION_PLACEHOLDER`

@@ -172,17 +172,17 @@ Shows estimated GitHub Actions usage and provides optimization recommendations.
 
 ## Tech Stack
 
-| Component        | Technology                                         |
-| ---------------- | -------------------------------------------------- |
-| **Runtime**      | Node.js 20+                                        |
-| **Linting**      | ESLint 9 (flat config)                             |
-| **Formatting**   | Prettier 3                                         |
-| **CSS Linting**  | Stylelint 16                                       |
-| **Git Hooks**    | Husky 9 + lint-staged 15                           |
-| **Python**       | Black, Ruff, mypy, pytest                          |
+| Component         | Technology                                         |
+| ----------------- | -------------------------------------------------- |
+| **Runtime**       | Node.js 20+                                        |
+| **Linting**       | ESLint 9 (flat config)                             |
+| **Formatting**    | Prettier 3                                         |
+| **CSS Linting**   | Stylelint 16                                       |
+| **Git Hooks**     | Husky 9 + lint-staged 15                           |
+| **Python**        | Black, Ruff, mypy, pytest                          |
 | **Shell Scripts** | ShellCheck, syntax validation, permissions checks  |
-| **Performance**  | Lighthouse CI                                      |
-| **Security**     | npm audit (Free), Gitleaks + ESLint security (Pro) |
+| **Performance**   | Lighthouse CI                                      |
+| **Security**      | npm audit (Free), Gitleaks + ESLint security (Pro) |
 
 ## Getting Started
 

@@ -239,14 +239,11 @@ jobs:
           esac
 
       - name: Check for hardcoded secrets
-        uses: gitleaks/gitleaks-action@ff98106e4c7b2bc287b24eaf42907196329070c7 # v2.3.9
-        env:
-          # Use enhanced token if available, fallback to default GitHub token
-          # GITLEAKS_LICENSE can be set for commercial features
-          GITHUB_TOKEN: ${{ secrets.GITLEAKS_TOKEN || secrets.GITHUB_TOKEN }}
-          GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
-        with:
-          args: --redact --verbose
+        run: |
+          echo "🔍 Running gitleaks secret scanning..."
+          # Use setup.js security scan which manages gitleaks binary internally
+          # This avoids the commercial license requirement of the gitleaks-action
+          node setup.js --security-config
 
       - name: Security pattern detection
         uses: semgrep/semgrep-action@713efdd345f3035192eaa63f56867b88e63e4e5d # v1
@@ -323,7 +320,7 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           echo "🔐 Running real gitleaks binary verification test..."
-          RUN_REAL_BINARY_TEST=1 node tests/gitleaks-real-binary-test.js
+          QAA_DEVELOPER=true RUN_REAL_BINARY_TEST=1 node tests/gitleaks-real-binary-test.js
 
   # Step 6: Documentation - run for production-ready projects
   documentation:
