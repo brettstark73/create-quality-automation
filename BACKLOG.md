@@ -1,6 +1,6 @@
 # qa-architect - Backlog
 
-**Last Updated**: 2026-01-06
+**Last Updated**: 2026-01-07
 **Priority**: Value-based (Revenue + Retention + Differentiation) ÷ Effort
 
 ---
@@ -152,6 +152,56 @@
 
 ---
 
+## 🔧 Technical Debt & Quality (Post-Workflow Tiers)
+
+**Priority**: Critical for production readiness
+
+| ID   | Issue                                          | Type     | Effort | Priority | Status  |
+| ---- | ---------------------------------------------- | -------- | ------ | -------- | ------- |
+| TD32 | **Fix Python setup test failure**              | Bug      | S      | High     | Pending |
+| TD33 | **Improve test coverage to 75%**               | Quality  | M      | High     | Pending |
+| TD34 | **Add integration test for --analyze-ci**      | Testing  | S      | Medium   | Pending |
+| MK1  | **Update landing-page.html with workflow tiers** | Marketing | S   | Medium   | ✅ Done |
+| MK2  | **Update vibebuildlab.com/qa-architect page**   | Marketing | M   | Medium   | Pending |
+
+### Details
+
+**TD32: Fix Python setup test failure**
+- **Issue**: `tests/setup.test.js` Python integration test fails, blocking full test suite
+- **Impact**: Cannot measure accurate test coverage (currently 43.35%, need 75%)
+- **Root cause**: Pre-existing bug unrelated to workflow tiers feature
+- **Location**: `tests/setup.test.js` Python project setup
+- **Effort**: 1-2 hours to debug and fix
+
+**TD33: Improve test coverage to 75%**
+- **Current**: 43.35% lines, 37.11% functions, 57.64% branches
+- **Target**: 75% lines, 70% functions, 65% branches
+- **Gap**: lib/commands/analyze-ci.js (11.72%), deps.js (19.11%), validation modules
+- **Effort**: 4-6 hours to add missing test cases
+
+**TD34: Add integration test for --analyze-ci command**
+- **Issue**: analyze-ci.js has low coverage (11.72%) - only unit tests exist
+- **Need**: Full CLI integration test: `npx . --analyze-ci` with real projects
+- **Benefit**: Increase coverage, validate Pro feature gating
+- **Effort**: 1-2 hours
+
+**MK1: Update landing-page.html with workflow tiers** ✅ Done (2026-01-07)
+- **Completed**: Updated landing page with CI cost optimization messaging
+- **Changes**:
+  - Hero section: "Cut GitHub Actions costs by 95% + reduce dependency PRs by 60%"
+  - Stats bar: Added 95% CI cost reduction, $0-5/mo minimal tier cost
+  - New section: "GitHub Actions Cost Optimization" with before/after comparison
+  - Feature card: CI Cost Optimization (3 workflow tiers)
+  - Pricing: Added CI cost optimization to Pro features
+  - Final CTA: Updated to mention both benefits
+
+**MK2: Update vibebuildlab.com/qa-architect page**
+- **Issue**: External website may not reflect new workflow tier feature
+- **Need**: Update product page with workflow tiers, cost savings, --analyze-ci feature
+- **Effort**: 3-4 hours (depends on CMS/deployment process)
+
+---
+
 ## 🔥 High Value - Next Up
 
 **Scoring**: (Revenue + Retention + Differentiation) ÷ Effort = Priority Score
@@ -167,14 +217,15 @@
 
 ## 📊 Medium Value - Worth Doing
 
-| ID  | Feature                        | Value Drivers      | Effort | Score | Tier | Status  |
-| --- | ------------------------------ | ------------------ | ------ | ----- | ---- | ------- |
-| Q6  | **Semgrep integration**        | Rev:3 Ret:3 Diff:4 | M      | 5.0   | Pro  | Pending |
-| B2  | **Usage analytics**            | Rev:3 Ret:3 Diff:2 | M      | 4.0   | -    | Pending |
-| Q10 | **E2E test scaffolding**       | Rev:2 Ret:3 Diff:3 | M      | 4.0   | Pro  | Pending |
-| Q7  | **Dead code detection (knip)** | Rev:2 Ret:3 Diff:3 | S      | 8.0   | Free | Pending |
-| Q8  | **License checker**            | Rev:2 Ret:2 Diff:3 | S      | 7.0   | Pro  | Pending |
-| Q9  | **Changelog generation**       | Rev:2 Ret:3 Diff:2 | S      | 7.0   | Free | Pending |
+| ID  | Feature                             | Value Drivers      | Effort | Score | Tier | Status  |
+| --- | ----------------------------------- | ------------------ | ------ | ----- | ---- | ------- |
+| Q7  | **Dead code detection (knip)**      | Rev:2 Ret:3 Diff:3 | S      | 8.0   | Free | Pending |
+| Q8  | **License checker**                 | Rev:2 Ret:2 Diff:3 | S      | 7.0   | Pro  | Pending |
+| Q9  | **Changelog generation**            | Rev:2 Ret:3 Diff:2 | S      | 7.0   | Free | Pending |
+| Q12 | **GitHub Actions cost analyzer + workflow tiers**    | Rev:3 Ret:4 Diff:5 | M      | 6.0   | Pro  | ✅ Done |
+| Q6  | **Semgrep integration**             | Rev:3 Ret:3 Diff:4 | M      | 5.0   | Pro  | Pending |
+| B2  | **Usage analytics**                 | Rev:3 Ret:3 Diff:2 | M      | 4.0   | -    | Pending |
+| Q10 | **E2E test scaffolding**            | Rev:2 Ret:3 Diff:3 | M      | 4.0   | Pro  | Pending |
 
 ## 📚 Low Value - When Needed
 
@@ -185,9 +236,11 @@
 
 ## Completed ✅
 
-| ID  | Feature                             | Completed  |
-| --- | ----------------------------------- | ---------- |
-| ✓   | SOTA audit: TD1-TD4 security/arch   | 2025-12-30 |
+| ID  | Feature                                                     | Completed  |
+| --- | ----------------------------------------------------------- | ---------- |
+| Q12 | GitHub Actions cost analyzer + workflow tiers (3 CI modes) | 2026-01-07 |
+| Q11 | Bash/Shell script support                                   | 2026-01-06 |
+| ✓   | SOTA audit: TD1-TD4 security/arch                           | 2025-12-30 |
 | ✓   | Pre-launch validation suite (5.3.0) | 2025-12-29 |
 | ✓   | Quality tools integration (5.2.0)   | 2025-12-29 |
 | ✓   | Stripe payment flow (test mode)     | 2025-12-23 |

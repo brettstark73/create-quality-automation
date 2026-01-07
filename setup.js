@@ -471,8 +471,12 @@ function parseArguments(rawArgs) {
   const isCheckMaturityMode = sanitizedArgs.includes('--check-maturity')
   const isValidateConfigMode = sanitizedArgs.includes('--validate-config')
   const isActivateLicenseMode = sanitizedArgs.includes('--activate-license')
+  const isAnalyzeCiMode = sanitizedArgs.includes('--analyze-ci')
   const isPrelaunchMode = sanitizedArgs.includes('--prelaunch')
   const isDryRun = sanitizedArgs.includes('--dry-run')
+  const isWorkflowMinimal = sanitizedArgs.includes('--workflow-minimal')
+  const isWorkflowStandard = sanitizedArgs.includes('--workflow-standard')
+  const isWorkflowComprehensive = sanitizedArgs.includes('--workflow-comprehensive')
   const ciProviderIndex = sanitizedArgs.findIndex(arg => arg === '--ci')
   const ciProvider =
     ciProviderIndex !== -1 && sanitizedArgs[ciProviderIndex + 1]
@@ -540,6 +544,7 @@ function parseArguments(rawArgs) {
     isCheckMaturityMode,
     isValidateConfigMode,
     isActivateLicenseMode,
+    isAnalyzeCiMode,
     isPrelaunchMode,
     isDryRun,
     ciProvider,
@@ -552,6 +557,9 @@ function parseArguments(rawArgs) {
     disableMarkdownlint,
     disableEslintSecurity,
     allowLatestGitleaks,
+    isWorkflowMinimal,
+    isWorkflowStandard,
+    isWorkflowComprehensive,
   }
 }
 
@@ -580,6 +588,7 @@ function parseArguments(rawArgs) {
     isValidateConfigMode,
     isActivateLicenseMode,
     isPrelaunchMode,
+    isAnalyzeCiMode,
     isDryRun,
     ciProvider,
     enableSlackAlerts,
@@ -591,6 +600,9 @@ function parseArguments(rawArgs) {
     disableMarkdownlint,
     disableEslintSecurity,
     allowLatestGitleaks,
+    isWorkflowMinimal,
+    isWorkflowStandard,
+    isWorkflowComprehensive,
   } = parsedConfig
 
   // Initialize telemetry session (opt-in only, fails silently)
@@ -653,6 +665,8 @@ function parseArguments(rawArgs) {
       isCheckMaturityMode,
       isValidateConfigMode,
       isActivateLicenseMode,
+      isPrelaunchMode,
+      isAnalyzeCiMode,
       isDryRun,
       ciProvider,
       enableSlackAlerts,
@@ -664,6 +678,9 @@ function parseArguments(rawArgs) {
       disableMarkdownlint,
       disableEslintSecurity,
       allowLatestGitleaks,
+      isWorkflowMinimal,
+      isWorkflowStandard,
+      isWorkflowComprehensive,
     } = parsedConfig)
 
     console.log('📋 Configuration after interactive selections applied\n')
@@ -697,6 +714,15 @@ SETUP OPTIONS:
   --ci <provider>   Select CI provider: github (default) | gitlab | circleci
   --template <path> Use custom templates from specified directory
   --dry-run         Preview changes without modifying files
+
+WORKFLOW TIERS (GitHub Actions optimization):
+  --workflow-minimal        Minimal CI (default) - Single Node version, weekly security
+                            ~5-10 min/commit, ~$0-5/mo for typical projects
+  --workflow-standard       Standard CI - Matrix testing on main, weekly security
+                            ~15-20 min/commit, ~$5-20/mo for typical projects
+  --workflow-comprehensive  Comprehensive CI - Matrix on every push, security inline
+                            ~50-100 min/commit, ~$100-350/mo for typical projects
+  --analyze-ci             Analyze GitHub Actions usage and get optimization tips (Pro)
 
 VALIDATION OPTIONS:
   --validate        Run comprehensive validation (same as --comprehensive)
@@ -764,6 +790,18 @@ EXAMPLES:
 
   npx create-qa-architect@latest --dry-run
     → Preview what files and configurations would be created/modified
+
+  npx create-qa-architect@latest --workflow-minimal
+    → Set up with minimal CI (default) - fastest, cheapest, ideal for solo devs
+
+  npx create-qa-architect@latest --workflow-standard
+    → Set up with standard CI - balanced quality/cost for small teams
+
+  npx create-qa-architect@latest --update --workflow-minimal
+    → Convert existing comprehensive workflow to minimal (reduce CI costs)
+
+  npx create-qa-architect@latest --analyze-ci
+    → Analyze your GitHub Actions usage and get cost optimization recommendations (Pro)
 
 PRIVACY & TELEMETRY:
   Telemetry and error reporting are OPT-IN only (disabled by default). To enable:
@@ -870,6 +908,20 @@ HELP:
     })
     detector.printReport()
     process.exit(0)
+  }
+
+  // Handle CI cost analysis command
+  if (isAnalyzeCiMode) {
+    return (async () => {
+      try {
+        const { handleAnalyzeCi } = require('./lib/commands/analyze-ci')
+        await handleAnalyzeCi()
+        process.exit(0)
+      } catch (error) {
+        console.error('CI cost analysis error:', error.message)
+        process.exit(1)
+      }
+    })()
   }
 
   // Handle validate config command
@@ -1172,6 +1224,176 @@ HELP:
       }
     }
 
+    /**
+     * Detect existing workflow mode from quality.yml
+     * @param {string} projectPath - Path to the project
+     * @returns {'minimal'|'standard'|'comprehensive'|null} Detected mode
+     */
+    function detectExistingWorkflowMode(projectPath) {
+      const workflowPath = path.join(
+        projectPath,
+        '.github',
+        'workflows',
+        'quality.yml'
+      )
+
+      if (!fs.existsSync(workflowPath)) {
+        return null
+      }
+
+      try {
+        const content = fs.readFileSync(workflowPath, 'utf8')
+
+        // Check for version markers (new format)
+        if (content.includes('# WORKFLOW_MODE: minimal')) {
+          return 'minimal'
+        }
+        if (content.includes('# WORKFLOW_MODE: standard')) {
+          return 'standard'
+        }
+        if (content.includes('# WORKFLOW_MODE: comprehensive')) {
+          return 'comprehensive'
+        }
+
+        // Legacy detection (no version marker)
+        // Comprehensive: has security job + matrix testing on every push
+        // Standard: has matrix testing but security is scheduled
+        // Minimal: no matrix, single node version
+        const hasSecurityJob = /jobs:\s*\n\s*security:/m.test(content)
+        const hasMatrixInTests = /tests:[\s\S]*?strategy:[\s\S]*?matrix:/m.test(
+          content
+        )
+        const hasScheduledSecurity =
+          /on:\s*\n\s*schedule:[\s\S]*?- cron:/m.test(content)
+
+        if (hasSecurityJob && hasMatrixInTests && !hasScheduledSecurity) {
+          return 'comprehensive'
+        }
+        if (hasMatrixInTests && hasScheduledSecurity) {
+          return 'standard'
+        }
+        if (!hasMatrixInTests) {
+          return 'minimal'
+        }
+
+        // Default to comprehensive for unknown patterns
+        return 'comprehensive'
+      } catch (error) {
+        console.warn(
+          `⚠️  Could not detect existing workflow mode: ${error.message}`
+        )
+        return null
+      }
+    }
+
+    /**
+     * Inject workflow mode-specific configuration into quality.yml
+     * @param {string} workflowContent - Template content
+     * @param {'minimal'|'standard'|'comprehensive'} mode - Selected mode
+     * @returns {string} Modified workflow content
+     */
+    function injectWorkflowMode(workflowContent, mode) {
+      let updated = workflowContent
+
+      // Add version marker at the top (after name section)
+      const versionMarker = `# WORKFLOW_MODE: ${mode}`
+      if (!updated.includes('# WORKFLOW_MODE:')) {
+        // Insert after the comment block and before jobs
+        updated = updated.replace(
+          /(\n\njobs:)/,
+          `\n${versionMarker}\n$1`
+        )
+      }
+
+      // Replace PATH_FILTERS_PLACEHOLDER
+      if (updated.includes('# PATH_FILTERS_PLACEHOLDER')) {
+        if (mode === 'minimal' || mode === 'standard') {
+          const pathsIgnore = `paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - 'LICENSE'
+      - '.gitignore'
+      - '.editorconfig'`
+          updated = updated.replace('# PATH_FILTERS_PLACEHOLDER', pathsIgnore)
+        } else {
+          // comprehensive: Remove placeholder
+          updated = updated.replace(/\s*# PATH_FILTERS_PLACEHOLDER\n?/, '')
+        }
+      }
+
+      // Replace SECURITY_SCHEDULE_PLACEHOLDER
+      if (updated.includes('# SECURITY_SCHEDULE_PLACEHOLDER')) {
+        if (mode === 'minimal' || mode === 'standard') {
+          // Add weekly schedule for security scans
+          const scheduleConfig = `schedule:
+    - cron: '0 0 * * 0'  # Weekly on Sunday (security scans)
+  workflow_dispatch:       # Manual trigger`
+          updated = updated.replace('# SECURITY_SCHEDULE_PLACEHOLDER', scheduleConfig)
+        } else {
+          // comprehensive: Remove placeholder
+          updated = updated.replace(/\s*# SECURITY_SCHEDULE_PLACEHOLDER\n?/, '')
+        }
+      }
+
+      // Replace SECURITY_CONDITION_PLACEHOLDER
+      if (updated.includes('# SECURITY_CONDITION_PLACEHOLDER')) {
+        if (mode === 'minimal' || mode === 'standard') {
+          // Only run security on schedule events (not on every push)
+          const securityCondition = `if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    #`
+          updated = updated.replace('# SECURITY_CONDITION_PLACEHOLDER', securityCondition)
+        } else {
+          // comprehensive: Remove placeholder
+          updated = updated.replace(/\s*# SECURITY_CONDITION_PLACEHOLDER\n?/, '')
+        }
+      }
+
+      // Replace MATRIX_PLACEHOLDER
+      if (updated.includes('# MATRIX_PLACEHOLDER')) {
+        let matrixConfig = ''
+
+        if (mode === 'minimal') {
+          // Single Node version, no matrix
+          matrixConfig = `strategy:
+      matrix:
+        node-version: [22]`
+        } else if (mode === 'standard') {
+          // Matrix testing only on main branch
+          matrixConfig = `if: github.ref == 'refs/heads/main' && fromJSON(needs.detect-maturity.outputs.test-count) > 0
+    strategy:
+      matrix:
+        node-version: [20, 22]`
+        } else {
+          // comprehensive: Matrix on every push
+          matrixConfig = `strategy:
+      matrix:
+        node-version: [20, 22]`
+        }
+
+        updated = updated.replace('# MATRIX_PLACEHOLDER', matrixConfig)
+      }
+
+      // Replace TESTS_CONDITION_PLACEHOLDER
+      if (updated.includes('# TESTS_CONDITION_PLACEHOLDER')) {
+        let testsCondition = ''
+
+        if (mode === 'minimal') {
+          // No matrix, always run
+          testsCondition = '# Runs on every push (single Node version)'
+        } else if (mode === 'standard') {
+          // Matrix only on main
+          testsCondition = '# Matrix testing only on main branch'
+        } else {
+          // comprehensive: Matrix on every push
+          testsCondition = '# Matrix testing on every push'
+        }
+
+        updated = updated.replace('# TESTS_CONDITION_PLACEHOLDER', testsCondition)
+      }
+
+      return updated
+    }
+
     // Normal setup flow
     async function runMainSetup() {
       // Record telemetry start event (opt-in only, fails silently)
@@ -1411,6 +1633,19 @@ HELP:
       if (usesPython) {
         console.log(
           '🐍 Detected Python project; enabling Python quality automation'
+        )
+      }
+
+      // Shell project detection
+      const { ProjectMaturityDetector } = require('./lib/project-maturity')
+      const maturityDetector = new ProjectMaturityDetector({
+        projectPath: process.cwd(),
+      })
+      const projectStats = maturityDetector.analyzeProject()
+      const usesShell = projectStats.isShellProject
+      if (usesShell) {
+        console.log(
+          '🐚 Detected shell script project; enabling shell quality automation'
         )
       }
 
@@ -1682,6 +1917,23 @@ HELP:
         }
 
         const workflowFile = path.join(githubWorkflowDir, 'quality.yml')
+
+        // Determine workflow mode
+        let workflowMode = 'minimal' // Default to minimal
+        if (isWorkflowMinimal) {
+          workflowMode = 'minimal'
+        } else if (isWorkflowStandard) {
+          workflowMode = 'standard'
+        } else if (isWorkflowComprehensive) {
+          workflowMode = 'comprehensive'
+        } else if (fs.existsSync(workflowFile)) {
+          // Detect existing mode when updating
+          const existingMode = detectExistingWorkflowMode(process.cwd())
+          if (existingMode) {
+            workflowMode = existingMode
+          }
+        }
+
         if (!fs.existsSync(workflowFile)) {
           let templateWorkflow =
             templateLoader.getTemplate(
@@ -1693,13 +1945,47 @@ HELP:
               'utf8'
             )
 
+          // Inject workflow mode configuration
+          templateWorkflow = injectWorkflowMode(templateWorkflow, workflowMode)
+
+          // Inject collaboration steps
           templateWorkflow = injectCollaborationSteps(templateWorkflow, {
             enableSlackAlerts,
             enablePrComments,
           })
 
           fs.writeFileSync(workflowFile, templateWorkflow)
-          console.log('✅ Added GitHub Actions workflow')
+          console.log(`✅ Added GitHub Actions workflow (${workflowMode} mode)`)
+        } else if (isUpdateMode) {
+          // Update existing workflow with new mode if explicitly specified
+          if (isWorkflowMinimal || isWorkflowStandard || isWorkflowComprehensive) {
+            // Load fresh template and re-inject
+            let templateWorkflow =
+              templateLoader.getTemplate(
+                templates,
+                path.join('.github', 'workflows', 'quality.yml')
+              ) ||
+              fs.readFileSync(
+                path.join(__dirname, '.github/workflows/quality.yml'),
+                'utf8'
+              )
+
+            // Inject workflow mode configuration
+            templateWorkflow = injectWorkflowMode(templateWorkflow, workflowMode)
+
+            // Inject collaboration steps (preserve from existing if present)
+            const existingWorkflow = fs.readFileSync(workflowFile, 'utf8')
+            const hasSlackAlerts = existingWorkflow.includes('SLACK_WEBHOOK_URL')
+            const hasPrComments = existingWorkflow.includes('PR_COMMENT_PLACEHOLDER')
+
+            templateWorkflow = injectCollaborationSteps(templateWorkflow, {
+              enableSlackAlerts: hasSlackAlerts,
+              enablePrComments: hasPrComments,
+            })
+
+            fs.writeFileSync(workflowFile, templateWorkflow)
+            console.log(`♻️  Updated GitHub Actions workflow to ${workflowMode} mode`)
+          }
         }
       }
 
@@ -2110,7 +2396,85 @@ echo "✅ Pre-push validation passed!"
             console.log('✅ Added Python GitHub Actions workflow')
           }
         }
+      }
 
+      // Shell project setup
+      if (usesShell) {
+        // Copy Shell CI workflow (GitHub Actions only)
+        if (ciProvider === 'github') {
+          const shellCiWorkflowFile = path.join(
+            githubWorkflowDir,
+            'shell-ci.yml'
+          )
+          if (!fs.existsSync(shellCiWorkflowFile)) {
+            const templateShellCiWorkflow =
+              templateLoader.getTemplate(
+                templates,
+                path.join('config', 'shell-ci.yml')
+              ) ||
+              fs.readFileSync(
+                path.join(__dirname, 'config/shell-ci.yml'),
+                'utf8'
+              )
+            fs.writeFileSync(shellCiWorkflowFile, templateShellCiWorkflow)
+            console.log('✅ Added Shell CI GitHub Actions workflow')
+          }
+
+          // Copy Shell Quality workflow
+          const shellQualityWorkflowFile = path.join(
+            githubWorkflowDir,
+            'shell-quality.yml'
+          )
+          if (!fs.existsSync(shellQualityWorkflowFile)) {
+            const templateShellQualityWorkflow =
+              templateLoader.getTemplate(
+                templates,
+                path.join('config', 'shell-quality.yml')
+              ) ||
+              fs.readFileSync(
+                path.join(__dirname, 'config/shell-quality.yml'),
+                'utf8'
+              )
+            fs.writeFileSync(
+              shellQualityWorkflowFile,
+              templateShellQualityWorkflow
+            )
+            console.log('✅ Added Shell Quality GitHub Actions workflow')
+          }
+        }
+
+        // Create a basic README if it doesn't exist
+        const readmePath = path.join(process.cwd(), 'README.md')
+        if (!fs.existsSync(readmePath)) {
+          const projectName = path.basename(process.cwd())
+          const basicReadme = `# ${projectName}
+
+Shell script collection for ${projectName}.
+
+## Usage
+
+\`\`\`bash
+# Make scripts executable
+chmod +x *.sh
+
+# Run a script
+./script-name.sh
+\`\`\`
+
+## Development
+
+Quality checks are automated via GitHub Actions:
+- ShellCheck linting
+- Syntax validation
+- Permission checks
+- Best practices analysis
+`
+          fs.writeFileSync(readmePath, basicReadme)
+          console.log('✅ Created basic README.md')
+        }
+      }
+
+      if (usesPython) {
         // Create tests directory if it doesn't exist
         const testsDir = path.join(process.cwd(), 'tests')
         if (!fs.existsSync(testsDir)) {
