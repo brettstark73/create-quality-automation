@@ -33,3 +33,28 @@ b33af571ee4e029a01ba0391a432dbae3598d753:REVENUE_SYSTEM_SUMMARY.md:generic-api-k
 # Real purchase flow test - mock license keys for testing purchase activation
 01868812cf0b1977e7ba66231190750bc1c0d197:tests/real-purchase-flow.test.js:generic-api-key:93
 01868812cf0b1977e7ba66231190750bc1c0d197:tests/real-purchase-flow.test.js:generic-api-key:347
+
+# License validator integrity test - mock license keys for testing
+0186881:tests/license-validator-integrity.test.js:generic-api-key:48
+0186881:tests/license-validator-integrity.test.js:generic-api-key:66
+0186881:tests/license-validator-integrity.test.js:generic-api-key:86
+9622814:tests/license-validator-integrity.test.js:generic-api-key:48
+9622814:tests/license-validator-integrity.test.js:generic-api-key:66
+9622814:tests/license-validator-integrity.test.js:generic-api-key:86
+
+# Tier enforcement test - mock license keys for testing
+0186881:tests/tier-enforcement.test.js:generic-api-key:59
+0186881:tests/tier-enforcement.test.js:generic-api-key:60
+0186881:tests/tier-enforcement.test.js:generic-api-key:61
+5c65a47:tests/tier-enforcement.test.js:generic-api-key:59
+5c65a47:tests/tier-enforcement.test.js:generic-api-key:60
+5c65a47:tests/tier-enforcement.test.js:generic-api-key:61
+9622814:tests/tier-enforcement.test.js:generic-api-key:59
+9622814:tests/tier-enforcement.test.js:generic-api-key:60
+9622814:tests/tier-enforcement.test.js:generic-api-key:61
+0d7d7c2:tests/tier-enforcement.test.js:generic-api-key:59
+0d7d7c2:tests/tier-enforcement.test.js:generic-api-key:60
+0d7d7c2:tests/tier-enforcement.test.js:generic-api-key:61
+0ce7b11:tests/tier-enforcement.test.js:generic-api-key:59
+0ce7b11:tests/tier-enforcement.test.js:generic-api-key:60
+0ce7b11:tests/tier-enforcement.test.js:generic-api-key:61
