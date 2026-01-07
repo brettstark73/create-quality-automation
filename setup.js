@@ -206,7 +206,7 @@ function normalizeRepoIdentifier(remoteUrl) {
     const repoPath = parsed.pathname.replace(/^\/+/, '').replace(/\.git$/, '')
     if (!host || !repoPath) return null
     return `${host}/${repoPath}`
-  } catch {
+  } catch (_error) {
     return null
   }
 }
@@ -278,7 +278,7 @@ const safeReadDir = dir => {
           directory: dir,
           errorCode: error.code,
         })
-      } catch {
+      } catch (_error) {
         // Don't fail if error reporting fails
       }
     }
@@ -1186,7 +1186,7 @@ HELP:
       try {
         execSync('git status', { stdio: 'ignore' })
         gitSpinner.succeed('Git repository verified')
-      } catch {
+      } catch (_error) {
         gitSpinner.fail('Not a git repository')
         console.error('❌ This must be run in a git repository')
         console.log('Run "git init" first, then try again.')
@@ -1208,7 +1208,7 @@ HELP:
           }).trim()
           const normalized = normalizeRepoIdentifier(remoteUrl)
           repoId = hashRepoIdentifier(normalized || remoteUrl)
-        } catch {
+        } catch (_error) {
           // No remote - use absolute path as fallback
           repoId = hashRepoIdentifier(process.cwd())
         }
@@ -1910,7 +1910,7 @@ let tier = 'FREE'
 try {
   const data = JSON.parse(fs.readFileSync(licenseFile, 'utf8'))
   tier = (data && data.tier) || 'FREE'
-} catch {
+} catch (error) {
   tier = 'FREE'
 }
 
@@ -1923,7 +1923,7 @@ try {
   if (data.month === currentMonth) {
     usage = { ...usage, ...data }
   }
-} catch {
+} catch (error) {
   // First run or corrupt file – start fresh
 }
 

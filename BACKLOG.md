@@ -154,61 +154,34 @@
 
 ## 🔥 High Value - Next Up
 
-| ID  | Feature                    | Value Drivers      | Effort | Tier                            | Status         |
-| --- | -------------------------- | ------------------ | ------ | ------------------------------- | -------------- |
-| Q1  | **Lighthouse CI**          | Diff:5 Ret:4 Rev:3 | S      | Free (basic) / Pro (thresholds) | 🔄 In Progress |
-| Q2  | **Bundle size limits**     | Diff:4 Ret:4 Rev:3 | S      | Pro                             | Pending        |
-| Q3  | **axe-core accessibility** | Diff:4 Ret:3 Rev:2 | S      | Free                            | Pending        |
-| Q4  | **Conventional commits**   | Diff:3 Ret:4 Rev:2 | S      | Free                            | Pending        |
-| Q5  | **Coverage thresholds**    | Diff:3 Ret:4 Rev:3 | S      | Pro                             | Pending        |
+**Scoring**: (Revenue + Retention + Differentiation) ÷ Effort = Priority Score
+
+| ID  | Feature                      | Value Drivers      | Effort | Score | Tier                            | Status         |
+| --- | ---------------------------- | ------------------ | ------ | ----- | ------------------------------- | -------------- |
+| B1  | **Copy Stripe to live mode** | Rev:5 Ret:3 Diff:2 | S      | 10.0  | -                               | 🔜 Ready       |
+| Q1  | **Lighthouse CI**            | Rev:3 Ret:4 Diff:5 | S      | 12.0  | Free (basic) / Pro (thresholds) | 🔄 In Progress |
+| Q2  | **Bundle size limits**       | Rev:3 Ret:4 Diff:4 | S      | 11.0  | Pro                             | Pending        |
+| Q5  | **Coverage thresholds**      | Rev:3 Ret:4 Diff:3 | S      | 10.0  | Pro                             | Pending        |
+| Q3  | **axe-core accessibility**   | Rev:2 Ret:3 Diff:4 | S      | 9.0   | Free                            | Pending        |
+| Q4  | **Conventional commits**     | Rev:2 Ret:4 Diff:3 | S      | 9.0   | Free                            | Pending        |
 
 ## 📊 Medium Value - Worth Doing
 
-| ID  | Feature                        | Value Drivers      | Effort | Tier | Status  |
-| --- | ------------------------------ | ------------------ | ------ | ---- | ------- |
-| Q6  | **Semgrep integration**        | Diff:4 Ret:3 Rev:3 | M      | Pro  | Pending |
-| Q7  | **Dead code detection (knip)** | Diff:3 Ret:3 Rev:2 | S      | Free | Pending |
-| Q8  | **License checker**            | Diff:3 Ret:2 Rev:2 | S      | Pro  | Pending |
-| Q9  | **Changelog generation**       | Diff:2 Ret:3 Rev:2 | S      | Free | Pending |
-| Q10 | **E2E test scaffolding**       | Diff:3 Ret:3 Rev:2 | M      | Pro  | Pending |
-| Q11 | **Bash/Shell script support**  | Diff:4 Ret:3 Rev:2 | S      | Free | Pending |
-| Q12 | **GitHub Actions cost analyzer** | Diff:5 Ret:4 Rev:3 | M    | Pro  | Pending |
+| ID  | Feature                        | Value Drivers      | Effort | Score | Tier | Status  |
+| --- | ------------------------------ | ------------------ | ------ | ----- | ---- | ------- |
+| Q6  | **Semgrep integration**        | Rev:3 Ret:3 Diff:4 | M      | 5.0   | Pro  | Pending |
+| B2  | **Usage analytics**            | Rev:3 Ret:3 Diff:2 | M      | 4.0   | -    | Pending |
+| Q10 | **E2E test scaffolding**       | Rev:2 Ret:3 Diff:3 | M      | 4.0   | Pro  | Pending |
+| Q7  | **Dead code detection (knip)** | Rev:2 Ret:3 Diff:3 | S      | 8.0   | Free | Pending |
+| Q8  | **License checker**            | Rev:2 Ret:2 Diff:3 | S      | 7.0   | Pro  | Pending |
+| Q9  | **Changelog generation**       | Rev:2 Ret:3 Diff:2 | S      | 7.0   | Free | Pending |
 
-### Q11: Bash/Shell Script Support Details
+## 📚 Low Value - When Needed
 
-**Priority**: P2
-**Use Case**: Config repos, dotfiles, script collections need CI/CD quality gates
-
-**Requirements**:
-- Detect bash-based projects (*.sh files, no package.json)
-- Generate `.github/workflows/ci.yml` with:
-  - shellcheck validation
-  - syntax validation
-  - permissions checking
-- Generate `.github/workflows/quality-checks.yml` with:
-  - maturity assessment
-  - documentation validation
-  - quality summary
-- Optional: Husky pre-commit hooks for shellcheck (requires Git hooks setup)
-
-**Implementation Notes**:
-- Detection logic: Check for `*.sh` files and absence of `package.json`
-- Extend `lib/project-maturity.js` to detect shell script projects
-- Create shell-specific templates in `templates/` or `config/`
-- Add shell script validation to workflow templates
-
-**Tier Assignment**:
-- **Free**: Basic shellcheck CI, syntax validation, quality checks
-- **Pro**: Advanced shell analysis, security scanning for secrets/vulnerabilities
-
-## 📚 Business & Infrastructure
-
-| ID  | Feature                      | Value Drivers | Effort | Status   |
-| --- | ---------------------------- | ------------- | ------ | -------- |
-| B1  | **Copy Stripe to live mode** | Rev:5         | S      | 🔜 Ready |
-| B2  | **Usage analytics**          | Rev:3 Ret:3   | M      | Pending  |
-| B3  | **Team tier implementation** | Rev:4 Diff:3  | L      | Pending  |
-| B4  | **Enterprise tier**          | Rev:5 Diff:4  | XL     | Future   |
+| ID  | Feature                      | Value Drivers      | Effort | Score | Status  |
+| --- | ---------------------------- | ------------------ | ------ | ----- | ------- |
+| B3  | **Team tier implementation** | Rev:4 Ret:2 Diff:3 | L      | 3.0   | Pending |
+| B4  | **Enterprise tier**          | Rev:5 Ret:2 Diff:4 | XL     | 2.75  | Future  |
 
 ## Completed ✅
 
@@ -249,192 +222,3 @@
 - Slack/email alerts
 - Custom policies
 - SSO/SAML
-
----
-
-## 📋 Feature Specifications
-
-### Q12: GitHub Actions Cost Analyzer
-
-**Problem**: Developers building multiple projects in parallel (indie hackers, agencies, SaaS factories) quickly exceed GitHub Actions free tier limits (2,000 min/month) without realizing it. Costs can balloon to $50-200/month across multiple repos with no visibility into optimization opportunities.
-
-**Solution**: Add `--analyze-ci` command that analyzes GitHub Actions usage patterns and provides actionable cost optimization recommendations.
-
-#### Phase 1: Usage Analysis (MVP)
-
-**Requirements**:
-- Detect GitHub Actions workflows in current repo
-- Calculate estimated minutes/month based on:
-  - Average commits/day (from git log)
-  - Workflow duration (from `.github/workflows/*.yml` job estimates)
-  - Number of active branches
-- Compare against tier limits:
-  - Free: 2,000 min/month
-  - Team: 3,000 min/month
-  - Pay-as-you-go: $0.008/min for private repos
-  - Self-hosted: $0/min (but VPS costs)
-
-**Output Example**:
-```bash
-npx create-qa-architect --analyze-ci
-
-📊 GitHub Actions Usage Analysis
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Repository: myapp
-Estimated usage: 3,200 min/month
-  ├─ CI workflow: ~45 min/day (1,350 min/month)
-  ├─ E2E tests: ~60 min/day (1,800 min/month)
-  └─ Deploy: ~2 min/day (60 min/month)
-
-💰 Cost Analysis
-Free tier (2,000 min): EXCEEDED by 1,200 min
-Overage cost: $9.60/month
-
-Alternative options:
-  Team plan ($4/user/month): Saves $5.60
-  Self-hosted runner: $0/month CI + ~$5 VPS
-```
-
-#### Phase 2: Optimization Recommendations (Pro Tier)
-
-**Features**:
-- **Caching audit**: Detect missing dependency caches
-- **Path filters**: Suggest `paths-ignore` for docs/markdown-only changes
-- **Concurrency limits**: Flag missing `concurrency` groups (skip duplicate runs)
-- **Job optimization**: Identify long-running jobs that could be parallelized
-- **Conditional execution**: Recommend `if:` conditions to skip unnecessary jobs
-
-**Output Example**:
-```bash
-💡 Optimization Opportunities (Save ~1,400 min/month)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-1. ⚡ Enable dependency caching
-   Impact: Save ~40% (1,280 min/month)
-   Files: .github/workflows/ci.yml
-
-   Add to your workflow:
-     - uses: actions/cache@v4
-       with:
-         path: ~/.npm
-         key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-
-2. 📝 Skip CI on docs-only changes
-   Impact: Save ~120 min/month
-
-   Add to workflow trigger:
-     on:
-       push:
-         paths-ignore:
-           - 'docs/**'
-           - '*.md'
-
-3. 🔄 Add concurrency limits
-   Impact: Save ~5% (160 min/month)
-
-   Add to workflow:
-     concurrency:
-       group: ${{ github.workflow }}-${{ github.ref }}
-       cancel-in-progress: true
-```
-
-#### Phase 3: Self-Hosted Runner Setup (Pro Tier - Optional)
-
-**Features**:
-- Docker-based runner setup script
-- VPS provider recommendations with cost comparison
-  - DigitalOcean: $6/month (1GB RAM)
-  - Hetzner: €4.5/month (2GB RAM)
-  - Oracle Cloud: Free tier (1GB ARM)
-- Security hardening checklist
-- Auto-update configuration
-
-**Output**:
-```bash
-🖥️  Self-Hosted Runner Setup
-━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Recommended VPS: Hetzner CX11 (€4.50/month)
-  ├─ 2GB RAM, 20GB SSD
-  ├─ Supports 2-3 concurrent jobs
-  └─ Cost savings: $9.60/month → €4.50/month
-
-Run this script to set up runner:
-  curl -fsSL https://qa-architect.dev/runner-setup.sh | bash
-
-Or use our Docker image:
-  docker run -d qa-architect/github-runner \
-    --token YOUR_RUNNER_TOKEN \
-    --name my-runner
-```
-
-#### Phase 4: Workflow Templates (Free Tier)
-
-**Features**:
-- Generate optimized workflow templates with best practices built-in
-- Smart caching for npm/pnpm/yarn/pip/poetry/cargo
-- Fail-fast strategies
-- Timeout limits
-- Matrix builds vs sequential decision logic
-
-**Implementation**:
-```bash
-npx create-qa-architect --optimize-workflows
-
-✨ Generated optimized workflows:
-  ├─ .github/workflows/ci-optimized.yml (with caching)
-  ├─ .github/workflows/e2e-optimized.yml (with parallelization)
-  └─ .github/workflows/deploy-optimized.yml (with concurrency limits)
-
-These workflows include:
-  ✓ Dependency caching (npm/yarn/pnpm auto-detected)
-  ✓ Path-based filtering
-  ✓ Concurrency limits
-  ✓ 60-minute timeout limits
-  ✓ Fail-fast matrix strategy
-```
-
-#### Integration Points
-
-**Preflight checks** (add to existing audit):
-```bash
-npx create-qa-architect --validate
-
-Quality Audit Results
-━━━━━━━━━━━━━━━━━━━
-✓ ESLint configured
-✓ Prettier configured
-✗ GitHub Actions missing caching (WARN)
-✗ Workflows missing timeout limits (WARN)
-✗ No concurrency limits configured (INFO)
-
-Run 'npx create-qa-architect --optimize-workflows' to fix.
-```
-
-**Tech Stack**:
-- GitHub REST API v3 (`/repos/{owner}/{repo}/actions/runs`)
-- YAML parsing for workflow analysis (`js-yaml`)
-- Git log analysis for commit frequency (`simple-git`)
-- Cost calculation engine
-- Template generator (existing `lib/template-loader.js`)
-
-**User Personas**:
-1. **Indie hacker**: Building 3-5 SaaS products simultaneously, wants to minimize costs
-2. **Agency**: Managing 10+ client repos, needs cost visibility
-3. **Bootstrapped startup**: Tight budget, willing to self-host runners
-
-**Success Metrics**:
-- Adoption: 20% of Pro users run `--analyze-ci` monthly
-- Conversion: 5% of Free users upgrade to Pro for advanced analysis
-- Retention: Users who optimize save average $25/month, cite as key value prop
-
-**Effort Estimate**:
-- Phase 1 (Analysis): 3 days
-- Phase 2 (Recommendations): 4 days
-- Phase 3 (Self-hosted): 3 days
-- Phase 4 (Templates): 2 days
-- Testing & docs: 2 days
-- **Total**: ~14 days (Medium effort)
-
-**Revenue Potential**:
-- **Direct**: Pro feature, supports $19/month value proposition
-- **Indirect**: Attracts cost-conscious developers, improves retention
-- **Competitive moat**: No competing QA tools offer CI cost analysis
