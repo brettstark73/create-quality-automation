@@ -1,47 +1,35 @@
 # .gitleaksignore
 # Ignore false positive secret detections in test files
-# These are intentional fake license keys in QAA-XXXX format for testing
+# These are intentional fake license keys in QAA-XXXX/CQA-XXXX format for testing
 # Format: [commit:]file:rule:line
 
 # Test license keys in licensing.test.js are mock values for testing
 621c321d17b62afd62cb280efb79083722502f7d:tests/licensing.test.js:generic-api-key:597
-tests/licensing.test.js:generic-api-key:612
 0d7d7c2f64477af9380b674468ea936123c56a37:tests/licensing.test.js:generic-api-key:609
 b33af571ee4e029a01ba0391a432dbae3598d753:tests/licensing.test.js:generic-api-key:609
-tests/licensing.test.js:generic-api-key:151
-tests/licensing.test.js:generic-api-key:190
-tests/licensing.test.js:generic-api-key:387
-tests/licensing.test.js:generic-api-key:428
-tests/licensing.test.js:generic-api-key:565
-tests/licensing.test.js:generic-api-key:636
-tests/licensing.test.js:generic-api-key:681
-tests/licensing.test.js:generic-api-key:718
+9622814404e11508a7e232903cdc582acb2ef173:tests/licensing.test.js:generic-api-key:151
+9622814404e11508a7e232903cdc582acb2ef173:tests/licensing.test.js:generic-api-key:190
+9622814404e11508a7e232903cdc582acb2ef173:tests/licensing.test.js:generic-api-key:387
+9622814404e11508a7e232903cdc582acb2ef173:tests/licensing.test.js:generic-api-key:428
+9622814404e11508a7e232903cdc582acb2ef173:tests/licensing.test.js:generic-api-key:565
+9622814404e11508a7e232903cdc582acb2ef173:tests/licensing.test.js:generic-api-key:636
+9622814404e11508a7e232903cdc582acb2ef173:tests/licensing.test.js:generic-api-key:681
+9622814404e11508a7e232903cdc582acb2ef173:tests/licensing.test.js:generic-api-key:718
 
 # Test cache keys in cache-manager.test.js are mock values for testing
 754a9f3c027f2fd4aac44281d579a6fcf6a8d897:tests/cache-manager.test.js:generic-api-key:21
-tests/cache-manager.test.js:generic-api-key:21
 
 # Security licensing test file - fake keys for testing activation flows
-tests/security-licensing.test.js:generic-api-key:136
-tests/security-licensing.test.js:generic-api-key:279
 0d7d7c2f64477af9380b674468ea936123c56a37:tests/security-licensing.test.js:generic-api-key:133
 0d7d7c2f64477af9380b674468ea936123c56a37:tests/security-licensing.test.js:generic-api-key:276
 b33af571ee4e029a01ba0391a432dbae3598d753:tests/security-licensing.test.js:generic-api-key:133
 b33af571ee4e029a01ba0391a432dbae3598d753:tests/security-licensing.test.js:generic-api-key:276
-tests/security-licensing.test.js:generic-api-key:264
+01868812cf0b1977e7ba66231190750bc1c0d197:tests/security-licensing.test.js:generic-api-key:264
 
 # REVENUE_SYSTEM_SUMMARY.md - documentation example code showing test key format
 0d7d7c2f64477af9380b674468ea936123c56a37:REVENUE_SYSTEM_SUMMARY.md:generic-api-key:157
 b33af571ee4e029a01ba0391a432dbae3598d753:REVENUE_SYSTEM_SUMMARY.md:generic-api-key:157
-REVENUE_SYSTEM_SUMMARY.md:generic-api-key:157
 
 # Real purchase flow test - mock license keys for testing purchase activation
-tests/real-purchase-flow.test.js:generic-api-key:93
-tests/real-purchase-flow.test.js:generic-api-key:100
-tests/real-purchase-flow.test.js:generic-api-key:347
-7c08d31:tests/real-purchase-flow.test.js:generic-api-key:93
-7c08d31:tests/real-purchase-flow.test.js:generic-api-key:100
-7c08d31:tests/real-purchase-flow.test.js:generic-api-key:347
-929a5a3:tests/real-purchase-flow.test.js:generic-api-key:93
-929a5a3:tests/real-purchase-flow.test.js:generic-api-key:100
-929a5a3:tests/real-purchase-flow.test.js:generic-api-key:347
+01868812cf0b1977e7ba66231190750bc1c0d197:tests/real-purchase-flow.test.js:generic-api-key:93
+01868812cf0b1977e7ba66231190750bc1c0d197:tests/real-purchase-flow.test.js:generic-api-key:347
