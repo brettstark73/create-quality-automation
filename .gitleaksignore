@@ -77,8 +77,10 @@ tests/real-purchase-flow.test.js:generic-api-key:93
 tests/real-purchase-flow.test.js:generic-api-key:347
 tests/licensing.test.js:generic-api-key:151
 tests/licensing.test.js:generic-api-key:190
+tests/licensing.test.js:generic-api-key:267
 tests/licensing.test.js:generic-api-key:386
 tests/licensing.test.js:generic-api-key:427
+tests/licensing.test.js:generic-api-key:483
 tests/licensing.test.js:generic-api-key:564
 tests/licensing.test.js:generic-api-key:635
 tests/licensing.test.js:generic-api-key:680
