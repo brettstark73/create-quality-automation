@@ -1357,27 +1357,43 @@ HELP:
 
       // Replace MATRIX_PLACEHOLDER
       if (updated.includes('# MATRIX_PLACEHOLDER')) {
-        let matrixConfig = ''
-
         if (mode === 'minimal') {
           // Single Node version, no matrix
-          matrixConfig = `strategy:
+          // Replace both the placeholder comment AND the existing strategy block
+          updated = updated.replace(
+            /# MATRIX_PLACEHOLDER\n\s*strategy:\n\s*fail-fast: false/,
+            `strategy:
+      fail-fast: false
       matrix:
         node-version: [22]`
+          )
         } else if (mode === 'standard') {
           // Matrix testing only on main branch
-          matrixConfig = `if: github.ref == 'refs/heads/main' && fromJSON(needs.detect-maturity.outputs.test-count) > 0
-    strategy:
+          // 1. Modify the job-level if condition to add branch check
+          updated = updated.replace(
+            /if: fromJSON\(needs\.detect-maturity\.outputs\.test-count\) > 0\n\s*# TESTS_CONDITION_PLACEHOLDER/,
+            `if: github.ref == 'refs/heads/main' && fromJSON(needs.detect-maturity.outputs.test-count) > 0
+    # TESTS_CONDITION_PLACEHOLDER`
+          )
+          // 2. Replace matrix placeholder and existing strategy block
+          updated = updated.replace(
+            /# MATRIX_PLACEHOLDER\n\s*strategy:\n\s*fail-fast: false/,
+            `strategy:
+      fail-fast: false
       matrix:
         node-version: [20, 22]`
+          )
         } else {
           // comprehensive: Matrix on every push
-          matrixConfig = `strategy:
+          // Replace placeholder, merge with existing strategy
+          updated = updated.replace(
+            /# MATRIX_PLACEHOLDER\n\s*strategy:\n\s*fail-fast: false/,
+            `strategy:
+      fail-fast: false
       matrix:
         node-version: [20, 22]`
+          )
         }
-
-        updated = updated.replace('# MATRIX_PLACEHOLDER', matrixConfig)
       }
 
       // Replace TESTS_CONDITION_PLACEHOLDER
