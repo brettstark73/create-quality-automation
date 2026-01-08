@@ -227,7 +227,7 @@ npx create-qa-architect@latest --deps
 ```bash
 npx create-qa-architect@latest --prelaunch
 npm install
-npm run validate:prelaunch
+npm run validate:all
 ```
 
 ## Usage Examples
