@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.4.3] - 2026-01-08
+
+### Fixed
+
+- **CI/CD**: Fixed duplicate 'strategy' key in workflow tier generation
+  - The MATRIX_PLACEHOLDER replacement was creating duplicate YAML keys in quality.yml
+  - Now correctly merges matrix configuration with existing strategy block
+  - Also fixes standard mode to properly combine branch check with test-count condition
+  - Prevents "Map keys must be unique" errors during GitHub Actions workflow validation
+
 ## [5.4.2] - 2026-01-08
 
 ### Fixed
