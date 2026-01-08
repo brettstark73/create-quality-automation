@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.4.1] - 2026-01-08
+
 ### Added
 
 - **Workflow Tiers**: Three CI/CD optimization tiers to control GitHub Actions costs
@@ -18,9 +20,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Cost reduction: 60-95% savings for typical projects by defaulting to minimal
   - Version markers: `# WORKFLOW_MODE: <tier>` for reliable mode detection
   - See [CI-COST-ANALYSIS.md](docs/CI-COST-ANALYSIS.md) for full analysis
+- **Shell Script Support**: Quality automation for Bash/Shell scripts
+  - Example workflows and configs in `config/shell-*.yml` and `.github/workflows/shell-*.example`
+- **CI Cost Analysis**: New `npm run analyze-ci` command to analyze GitHub Actions costs
+  - Detailed cost breakdown by workflow, job, and step
+  - Recommendations for cost optimization
 
 ### Fixed
 
+- **CI/CD**: Fixed gitleaks secret detection failures with wildcard `.gitleaksignore` entries
+  - Root cause: GitHub Actions creates temporary merge commits with changing hashes
+  - Solution: Added `file:rule:line` entries (without commit hash) to match any commit
+- **CI/CD**: Added missing `scripts/validate-claude-md.js` validation script
+- **Documentation**: Fixed README reference to non-existent `npm run validate:prelaunch` script
 - **Error Handling**: Comprehensive improvements to error messaging and recovery (10 critical/high fixes)
   - `safeReadDir()`: Now re-throws critical filesystem errors (EACCES, EIO, ELOOP, EMFILE) instead of silently returning empty arrays
   - `loadUsage()`: Enhanced FREE tier corruption handling with step-by-step recovery instructions
@@ -32,7 +44,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Directory scan permission errors always logged (affects maturity detection accuracy)
 - **Testing**: Added comprehensive test coverage for result-types module (0% → 100%)
   - 23 new test cases covering success/failure/valid/invalid builders and checkers
-  - Overall project coverage improved from 72.86% to 73.63%
+  - Overall project coverage improved from 72.86% to 76%+
 - **Testing**: Isolated Free/Pro tier test flows with environment overrides
   - Added isolated license directories per test to prevent state pollution
   - Wired env overrides (QAA_LICENSE_DIR, QAA_DEVELOPER, NODE_ENV) into setup runs
