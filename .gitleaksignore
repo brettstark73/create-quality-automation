@@ -40,21 +40,16 @@ b33af571ee4e029a01ba0391a432dbae3598d753:REVENUE_SYSTEM_SUMMARY.md:generic-api-k
 01868812cf0b1977e7ba66231190750bc1c0d197:tests/license-validator-integrity.test.js:generic-api-key:86
 9622814404e11508a7e232903cdc582acb2ef173:tests/license-validator-integrity.test.js:generic-api-key:48
 9622814404e11508a7e232903cdc582acb2ef173:tests/license-validator-integrity.test.js:generic-api-key:66
-9622814404e11508a7e232903cdc582acb2ef173:tests/license-validator-integrity.test.js:generic-api-key:86
+9622814404e11508a7e232903cdc582acb2ef173:tests/license-validator-integrity.test.js:generic-api-key:85
 
 # Tier enforcement test - mock license keys for testing
 01868812cf0b1977e7ba66231190750bc1c0d197:tests/tier-enforcement.test.js:generic-api-key:59
 01868812cf0b1977e7ba66231190750bc1c0d197:tests/tier-enforcement.test.js:generic-api-key:60
 01868812cf0b1977e7ba66231190750bc1c0d197:tests/tier-enforcement.test.js:generic-api-key:61
-5c65a47fbba44d66a40187883f93c2a05f72e1cf:tests/tier-enforcement.test.js:generic-api-key:59
-5c65a47fbba44d66a40187883f93c2a05f72e1cf:tests/tier-enforcement.test.js:generic-api-key:60
-5c65a47fbba44d66a40187883f93c2a05f72e1cf:tests/tier-enforcement.test.js:generic-api-key:61
-9622814404e11508a7e232903cdc582acb2ef173:tests/tier-enforcement.test.js:generic-api-key:59
-9622814404e11508a7e232903cdc582acb2ef173:tests/tier-enforcement.test.js:generic-api-key:60
-9622814404e11508a7e232903cdc582acb2ef173:tests/tier-enforcement.test.js:generic-api-key:61
-0d7d7c2f64477af9380b674468ea936123c56a37:tests/tier-enforcement.test.js:generic-api-key:59
-0d7d7c2f64477af9380b674468ea936123c56a37:tests/tier-enforcement.test.js:generic-api-key:60
-0d7d7c2f64477af9380b674468ea936123c56a37:tests/tier-enforcement.test.js:generic-api-key:61
-0ce7b1183f8ad3fceee5f69b8240338d4b9aa02e:tests/tier-enforcement.test.js:generic-api-key:59
-0ce7b1183f8ad3fceee5f69b8240338d4b9aa02e:tests/tier-enforcement.test.js:generic-api-key:60
-0ce7b1183f8ad3fceee5f69b8240338d4b9aa02e:tests/tier-enforcement.test.js:generic-api-key:61
+5c65a47fbba44d66a40187883f93c2a05f72e1cf:tests/tier-enforcement.test.js:generic-api-key:53
+5c65a47fbba44d66a40187883f93c2a05f72e1cf:tests/tier-enforcement.test.js:generic-api-key:54
+5c65a47fbba44d66a40187883f93c2a05f72e1cf:tests/tier-enforcement.test.js:generic-api-key:55
+9622814404e11508a7e232903cdc582acb2ef173:tests/tier-enforcement.test.js:generic-api-key:52
+9622814404e11508a7e232903cdc582acb2ef173:tests/tier-enforcement.test.js:generic-api-key:53
+9622814404e11508a7e232903cdc582acb2ef173:tests/tier-enforcement.test.js:generic-api-key:54
+0d7d7c2f64477af9380b674468ea936123c56a37:tests/tier-enforcement.test.js:generic-api-key:51
