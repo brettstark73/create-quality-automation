@@ -71,8 +71,12 @@ b33af571ee4e029a01ba0391a432dbae3598d753:REVENUE_SYSTEM_SUMMARY.md:generic-api-k
 
 # Wildcard entries for merge commits (no commit hash = matches any commit)
 tests/cache-manager.test.js:generic-api-key:21
-tests/security-licensing.test.js:generic-api-key:145
-tests/security-licensing.test.js:generic-api-key:264
+tests/security-licensing.test.js:generic-api-key:82
+tests/security-licensing.test.js:generic-api-key:83
+tests/security-licensing.test.js:generic-api-key:84
+tests/security-licensing.test.js:generic-api-key:146
+tests/security-licensing.test.js:generic-api-key:207
+tests/security-licensing.test.js:generic-api-key:260
 tests/real-purchase-flow.test.js:generic-api-key:93
 tests/real-purchase-flow.test.js:generic-api-key:347
 tests/licensing.test.js:generic-api-key:151
