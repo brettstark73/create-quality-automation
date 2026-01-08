@@ -1,27 +1,85 @@
 # .gitleaksignore
 # Ignore false positive secret detections in test files
-# These are intentional fake license keys in QAA-XXXX format for testing
+# These are intentional fake license keys in QAA-XXXX/CQA-XXXX format for testing
 # Format: [commit:]file:rule:line
 
 # Test license keys in licensing.test.js are mock values for testing
 621c321d17b62afd62cb280efb79083722502f7d:tests/licensing.test.js:generic-api-key:597
-tests/licensing.test.js:generic-api-key:612
 0d7d7c2f64477af9380b674468ea936123c56a37:tests/licensing.test.js:generic-api-key:609
 b33af571ee4e029a01ba0391a432dbae3598d753:tests/licensing.test.js:generic-api-key:609
+9622814404e11508a7e232903cdc582acb2ef173:tests/licensing.test.js:generic-api-key:151
+9622814404e11508a7e232903cdc582acb2ef173:tests/licensing.test.js:generic-api-key:190
+9622814404e11508a7e232903cdc582acb2ef173:tests/licensing.test.js:generic-api-key:387
+9622814404e11508a7e232903cdc582acb2ef173:tests/licensing.test.js:generic-api-key:428
+9622814404e11508a7e232903cdc582acb2ef173:tests/licensing.test.js:generic-api-key:565
+9622814404e11508a7e232903cdc582acb2ef173:tests/licensing.test.js:generic-api-key:636
+9622814404e11508a7e232903cdc582acb2ef173:tests/licensing.test.js:generic-api-key:681
+9622814404e11508a7e232903cdc582acb2ef173:tests/licensing.test.js:generic-api-key:718
 
 # Test cache keys in cache-manager.test.js are mock values for testing
 754a9f3c027f2fd4aac44281d579a6fcf6a8d897:tests/cache-manager.test.js:generic-api-key:21
-tests/cache-manager.test.js:generic-api-key:21
 
 # Security licensing test file - fake keys for testing activation flows
-tests/security-licensing.test.js:generic-api-key:136
-tests/security-licensing.test.js:generic-api-key:279
 0d7d7c2f64477af9380b674468ea936123c56a37:tests/security-licensing.test.js:generic-api-key:133
 0d7d7c2f64477af9380b674468ea936123c56a37:tests/security-licensing.test.js:generic-api-key:276
 b33af571ee4e029a01ba0391a432dbae3598d753:tests/security-licensing.test.js:generic-api-key:133
 b33af571ee4e029a01ba0391a432dbae3598d753:tests/security-licensing.test.js:generic-api-key:276
+01868812cf0b1977e7ba66231190750bc1c0d197:tests/security-licensing.test.js:generic-api-key:264
 
 # REVENUE_SYSTEM_SUMMARY.md - documentation example code showing test key format
 0d7d7c2f64477af9380b674468ea936123c56a37:REVENUE_SYSTEM_SUMMARY.md:generic-api-key:157
 b33af571ee4e029a01ba0391a432dbae3598d753:REVENUE_SYSTEM_SUMMARY.md:generic-api-key:157
-REVENUE_SYSTEM_SUMMARY.md:generic-api-key:157
+
+# Real purchase flow test - mock license keys for testing purchase activation
+01868812cf0b1977e7ba66231190750bc1c0d197:tests/real-purchase-flow.test.js:generic-api-key:93
+01868812cf0b1977e7ba66231190750bc1c0d197:tests/real-purchase-flow.test.js:generic-api-key:347
+
+# License validator integrity test - mock license keys for testing
+01868812cf0b1977e7ba66231190750bc1c0d197:tests/license-validator-integrity.test.js:generic-api-key:48
+01868812cf0b1977e7ba66231190750bc1c0d197:tests/license-validator-integrity.test.js:generic-api-key:66
+01868812cf0b1977e7ba66231190750bc1c0d197:tests/license-validator-integrity.test.js:generic-api-key:86
+9622814404e11508a7e232903cdc582acb2ef173:tests/license-validator-integrity.test.js:generic-api-key:48
+9622814404e11508a7e232903cdc582acb2ef173:tests/license-validator-integrity.test.js:generic-api-key:66
+9622814404e11508a7e232903cdc582acb2ef173:tests/license-validator-integrity.test.js:generic-api-key:85
+
+# Tier enforcement test - mock license keys for testing
+01868812cf0b1977e7ba66231190750bc1c0d197:tests/tier-enforcement.test.js:generic-api-key:59
+01868812cf0b1977e7ba66231190750bc1c0d197:tests/tier-enforcement.test.js:generic-api-key:60
+01868812cf0b1977e7ba66231190750bc1c0d197:tests/tier-enforcement.test.js:generic-api-key:61
+5c65a47fbba44d66a40187883f93c2a05f72e1cf:tests/tier-enforcement.test.js:generic-api-key:53
+5c65a47fbba44d66a40187883f93c2a05f72e1cf:tests/tier-enforcement.test.js:generic-api-key:54
+5c65a47fbba44d66a40187883f93c2a05f72e1cf:tests/tier-enforcement.test.js:generic-api-key:55
+9622814404e11508a7e232903cdc582acb2ef173:tests/tier-enforcement.test.js:generic-api-key:52
+9622814404e11508a7e232903cdc582acb2ef173:tests/tier-enforcement.test.js:generic-api-key:53
+9622814404e11508a7e232903cdc582acb2ef173:tests/tier-enforcement.test.js:generic-api-key:54
+0d7d7c2f64477af9380b674468ea936123c56a37:tests/tier-enforcement.test.js:generic-api-key:51
+
+# Commit 665b041 - Main branch commit with test keys
+665b0415ca263a082bebe32b938170a9f985e169:tests/cache-manager.test.js:generic-api-key:21
+665b0415ca263a082bebe32b938170a9f985e169:tests/security-licensing.test.js:generic-api-key:145
+665b0415ca263a082bebe32b938170a9f985e169:tests/security-licensing.test.js:generic-api-key:264
+665b0415ca263a082bebe32b938170a9f985e169:tests/real-purchase-flow.test.js:generic-api-key:93
+665b0415ca263a082bebe32b938170a9f985e169:tests/real-purchase-flow.test.js:generic-api-key:347
+665b0415ca263a082bebe32b938170a9f985e169:tests/licensing.test.js:generic-api-key:151
+665b0415ca263a082bebe32b938170a9f985e169:tests/licensing.test.js:generic-api-key:190
+665b0415ca263a082bebe32b938170a9f985e169:tests/licensing.test.js:generic-api-key:386
+665b0415ca263a082bebe32b938170a9f985e169:tests/licensing.test.js:generic-api-key:427
+665b0415ca263a082bebe32b938170a9f985e169:tests/licensing.test.js:generic-api-key:564
+665b0415ca263a082bebe32b938170a9f985e169:tests/licensing.test.js:generic-api-key:635
+665b0415ca263a082bebe32b938170a9f985e169:tests/licensing.test.js:generic-api-key:680
+665b0415ca263a082bebe32b938170a9f985e169:tests/licensing.test.js:generic-api-key:717
+
+# Wildcard entries for merge commits (no commit hash = matches any commit)
+tests/cache-manager.test.js:generic-api-key:21
+tests/security-licensing.test.js:generic-api-key:145
+tests/security-licensing.test.js:generic-api-key:264
+tests/real-purchase-flow.test.js:generic-api-key:93
+tests/real-purchase-flow.test.js:generic-api-key:347
+tests/licensing.test.js:generic-api-key:151
+tests/licensing.test.js:generic-api-key:190
+tests/licensing.test.js:generic-api-key:386
+tests/licensing.test.js:generic-api-key:427
+tests/licensing.test.js:generic-api-key:564
+tests/licensing.test.js:generic-api-key:635
+tests/licensing.test.js:generic-api-key:680
+tests/licensing.test.js:generic-api-key:717

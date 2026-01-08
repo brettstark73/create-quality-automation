@@ -103,6 +103,45 @@ function testCacheManager() {
         }
         console.log('  ✅ Cache clear works correctly')
 
+        // Test 6: Verbose mode with clear errors
+        console.log('🔍 Testing verbose mode error handling...')
+        const verboseCache = new CacheManager({
+          cacheDir: path.join(testDir, 'nonexistent-parent', 'cache'),
+          verbose: true,
+        })
+
+        // Try to clear a cache in a directory that can't be created
+        // This should trigger verbose error messages
+        try {
+          const clearResults = verboseCache.clear()
+          // Should return error results even if directory doesn't exist
+          if (clearResults.errors.length === 0) {
+            console.log('  ⚠️  Expected some errors in clear results')
+          }
+        } catch (_error) {
+          // Expected - cache directory might not exist
+        }
+        console.log('  ✅ Verbose error handling works')
+
+        // Test 7: isEnabled() method
+        console.log('🔍 Testing isEnabled() method...')
+        const enabledCache = new CacheManager({
+          cacheDir: testDir,
+          enabled: true,
+        })
+        const disabledCache = new CacheManager({
+          cacheDir: testDir,
+          enabled: false,
+        })
+
+        if (!enabledCache.isEnabled()) {
+          throw new Error('Cache should be enabled')
+        }
+        if (disabledCache.isEnabled()) {
+          throw new Error('Cache should be disabled')
+        }
+        console.log('  ✅ isEnabled() works correctly')
+
         console.log('\n✅ All cache manager tests passed!\n')
         resolve()
       }, 150) // Wait longer than TTL

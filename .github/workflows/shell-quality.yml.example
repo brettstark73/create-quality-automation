@@ -1,0 +1,148 @@
+name: Shell Script Quality Checks
+
+on:
+  push:
+    branches: [main, master, develop]
+  pull_request:
+    branches: [main, master, develop]
+
+jobs:
+  documentation:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check README exists
+        run: |
+          if [ ! -f "README.md" ]; then
+            echo "❌ README.md is missing"
+            exit 1
+          fi
+          echo "✅ README.md exists"
+
+      - name: Validate README content
+        run: |
+          readme_lines=$(wc -l < README.md)
+          if [ "$readme_lines" -lt 10 ]; then
+            echo "⚠️  README.md is very short (< 10 lines)"
+            echo "   Consider adding: description, usage examples, installation"
+          else
+            echo "✅ README.md has adequate content ($readme_lines lines)"
+          fi
+
+      - name: Check for usage documentation
+        run: |
+          if grep -q -i "usage\|example\|how to" README.md; then
+            echo "✅ README includes usage documentation"
+          else
+            echo "⚠️  README should include usage examples"
+          fi
+
+  script-analysis:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Count shell scripts
+        id: count
+        run: |
+          script_count=$(find . -type f -name "*.sh" ! -path "*/node_modules/*" ! -path "*/.git/*" | wc -l)
+          echo "count=$script_count" >> $GITHUB_OUTPUT
+          echo "Found $script_count shell script(s)"
+
+      - name: Analyze script complexity
+        if: steps.count.outputs.count > 0
+        run: |
+          echo "Analyzing shell script complexity..."
+          find . -type f -name "*.sh" ! -path "*/node_modules/*" ! -path "*/.git/*" | while read -r script; do
+            lines=$(wc -l < "$script")
+            functions=$(grep -c "^[[:space:]]*function\|^[[:space:]]*[a-zA-Z_][a-zA-Z0-9_]*[[:space:]]*()[[:space:]]*{" "$script" || echo 0)
+            echo "  $script: $lines lines, $functions functions"
+
+            if [ "$lines" -gt 500 ]; then
+              echo "    ⚠️  Large script (>500 lines) - consider splitting"
+            fi
+          done
+
+  best-practices:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check for shebang
+        run: |
+          echo "Checking for proper shebang in shell scripts..."
+          missing_shebang=0
+          find . -type f -name "*.sh" ! -path "*/node_modules/*" ! -path "*/.git/*" | while read -r script; do
+            if ! head -n 1 "$script" | grep -q "^#!/"; then
+              echo "⚠️  Missing shebang: $script"
+              missing_shebang=$((missing_shebang + 1))
+            fi
+          done
+
+          if [ "$missing_shebang" -eq 0 ]; then
+            echo "✅ All scripts have proper shebang"
+          fi
+
+      - name: Check for set -e or set -euo pipefail
+        run: |
+          echo "Checking for error handling (set -e / set -euo pipefail)..."
+          missing_set_e=0
+          find . -type f -name "*.sh" ! -path "*/node_modules/*" ! -path "*/.git/*" | while read -r script; do
+            if ! grep -q "set -e\|set -euo pipefail" "$script"; then
+              echo "⚠️  Missing error handling: $script"
+              echo "   Recommendation: Add 'set -euo pipefail' after shebang"
+              missing_set_e=$((missing_set_e + 1))
+            fi
+          done
+
+          if [ "$missing_set_e" -eq 0 ]; then
+            echo "✅ All scripts use error handling"
+          fi
+
+  security:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check for hardcoded secrets
+        run: |
+          echo "Scanning for potential hardcoded secrets..."
+          found_issues=0
+
+          # Check for common secret patterns
+          if grep -r -i "password\s*=\|api_key\s*=\|secret\s*=" --include="*.sh" .; then
+            echo "⚠️  Found potential hardcoded secrets"
+            echo "   Use environment variables instead: \${VARIABLE_NAME}"
+            found_issues=1
+          fi
+
+          # Check for AWS keys
+          if grep -r "AKIA[0-9A-Z]{16}" --include="*.sh" .; then
+            echo "❌ Found AWS access key pattern"
+            found_issues=1
+          fi
+
+          if [ "$found_issues" -eq 0 ]; then
+            echo "✅ No obvious hardcoded secrets found"
+          fi
+
+      - name: Check for unsafe practices
+        run: |
+          echo "Checking for unsafe shell practices..."
+
+          # Check for eval usage
+          if grep -r "eval " --include="*.sh" . | grep -v "^#"; then
+            echo "⚠️  Found 'eval' usage - potential security risk"
+          fi
+
+          # Check for unquoted variables
+          echo "  (ShellCheck will provide detailed analysis)"

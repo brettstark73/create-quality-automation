@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-QA Architect is a CLI tool (`create-qa-architect`) that bootstraps quality automation for JS/TS/Python projects. One command adds ESLint, Prettier, Husky, lint-staged, and GitHub Actions. Pro tiers add security scanning (Gitleaks), Smart Test Strategy, and multi-language support.
+QA Architect is a CLI tool (`create-qa-architect`) that bootstraps quality automation for JS/TS/Python/Shell script projects. One command adds ESLint, Prettier, Husky, lint-staged, and GitHub Actions. Pro tiers add security scanning (Gitleaks), Smart Test Strategy, and multi-language support.
 
 ## Commands
 
@@ -21,6 +21,7 @@ npm run format              # Prettier
 
 # Run single test file
 node tests/licensing.test.js
+node tests/workflow-tiers.test.js
 QAA_DEVELOPER=true node tests/setup.test.js
 
 # Validation
@@ -31,6 +32,10 @@ npm run prerelease          # Required before publishing
 npx . --dry-run             # Test setup without changes
 npx . --check-maturity      # Show project maturity detection
 npx . --validate            # Run validation checks
+npx . --workflow-minimal    # Test minimal CI setup (default)
+npx . --workflow-standard   # Test standard CI setup
+npx . --workflow-comprehensive  # Test comprehensive CI setup
+npx . --analyze-ci          # Analyze GitHub Actions costs (Pro)
 ```
 
 ## Architecture
@@ -42,11 +47,12 @@ setup.js                    # Main CLI entry - argument parsing, orchestration
 │   ├── project-maturity.js # Detects project stage (minimal→production-ready)
 │   ├── smart-strategy-generator.js  # Risk-based test selection (Pro)
 │   ├── dependency-monitoring-*.js   # Dependabot config generation
+│   ├── commands/           # Command handlers (validate, deps, analyze-ci)
 │   ├── validation/         # Validators (security, docs, config)
 │   ├── interactive/        # TTY prompt system
 │   └── template-loader.js  # Custom template merging
 ├── templates/              # Config file templates
-├── config/                 # Language-specific configs (Python, etc.)
+├── config/                 # Language-specific configs (Python, Shell, etc.)
 └── tests/                  # 40+ test files
 ```
 
@@ -54,7 +60,7 @@ setup.js                    # Main CLI entry - argument parsing, orchestration
 
 1. **Parse args** → `parseArguments()` handles CLI flags
 2. **Route command** → validation-only, deps, license, or full setup
-3. **Detect project** → TypeScript, Python, Stylelint targets
+3. **Detect project** → TypeScript, Python, Shell scripts, Stylelint targets
 4. **Load templates** → merge custom templates with defaults
 5. **Generate configs** → ESLint, Prettier, Husky hooks, workflows
 6. **Apply enhancements** → production quality fixes
@@ -68,6 +74,23 @@ The tool uses a freemium model with feature gating in `lib/licensing.js`:
 - **TEAM/ENTERPRISE**: RBAC, Slack alerts, multi-repo dashboard
 
 Check tier with `hasFeature('smartTestStrategy')` or `getLicenseInfo()`.
+
+### Workflow Tier System
+
+qa-architect defaults to **minimal CI** to avoid unexpected GitHub Actions costs:
+
+- **Minimal (default)**: Single Node 22, weekly security, path filters (~$0-5/mo)
+- **Standard**: Matrix on main only, weekly security, path filters (~$5-20/mo)
+- **Comprehensive**: Matrix every commit, inline security (~$100-350/mo)
+
+Implementation:
+
+- `detectExistingWorkflowMode()` - Reads `# WORKFLOW_MODE:` marker or detects legacy
+- `injectWorkflowMode()` - Replaces placeholders in quality.yml template
+- Placeholders: `PATH_FILTERS_PLACEHOLDER`, `SECURITY_SCHEDULE_PLACEHOLDER`, `MATRIX_PLACEHOLDER`, `TESTS_CONDITION_PLACEHOLDER`
+- Update mode: Re-loads template and re-injects to switch modes
+
+See `docs/CI-COST-ANALYSIS.md` for full analysis and `tests/workflow-tiers.test.js` for test patterns.
 
 ## Key Files
 

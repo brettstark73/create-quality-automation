@@ -42,6 +42,8 @@ const configs = [
       '**/Thumbs.db',
       // HTML files
       '**/*.html',
+      // User config symlinks
+      '**/.claude-setup/**',
     ],
   },
   js.configs.recommended,

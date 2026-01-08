@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Workflow Tiers**: Three CI/CD optimization tiers to control GitHub Actions costs
+  - **Minimal (default)**: Single Node version, weekly security, path filters (~$0-5/mo)
+  - **Standard**: Matrix on main branch only, weekly security, path filters (~$5-20/mo)
+  - **Comprehensive**: Matrix on every push, inline security, no filters (~$100-350/mo)
+  - Flags: `--workflow-minimal`, `--workflow-standard`, `--workflow-comprehensive`
+  - Auto-detection: Preserves existing mode on update, detects legacy workflows
+  - Cost reduction: 60-95% savings for typical projects by defaulting to minimal
+  - Version markers: `# WORKFLOW_MODE: <tier>` for reliable mode detection
+  - See [CI-COST-ANALYSIS.md](docs/CI-COST-ANALYSIS.md) for full analysis
+
 ### Fixed
 
 - **Error Handling**: Comprehensive improvements to error messaging and recovery (10 critical/high fixes)
