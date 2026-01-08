@@ -1,0 +1,82 @@
+name: Shell Script CI
+
+on:
+  push:
+    branches: [main, master, develop]
+  pull_request:
+    branches: [main, master, develop]
+
+jobs:
+  shellcheck:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run ShellCheck
+        uses: ludeeus/action-shellcheck@master
+        with:
+          scandir: '.'
+          severity: warning
+          format: gcc
+        env:
+          SHELLCHECK_OPTS: -x -s bash
+
+  syntax-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Bash syntax validation
+        run: |
+          echo "Validating bash syntax for all .sh files..."
+          find . -type f -name "*.sh" ! -path "*/node_modules/*" ! -path "*/.git/*" | while read -r script; do
+            echo "Checking: $script"
+            bash -n "$script" || exit 1
+          done
+
+  permissions-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check script permissions
+        run: |
+          echo "Checking that shell scripts are executable..."
+          non_executable=$(find . -type f -name "*.sh" ! -path "*/node_modules/*" ! -path "*/.git/*" ! -perm -u+x)
+          if [ -n "$non_executable" ]; then
+            echo "⚠️  Warning: The following scripts are not executable:"
+            echo "$non_executable"
+            echo ""
+            echo "To fix, run: chmod +x <script-name>"
+          else
+            echo "✅ All shell scripts are executable"
+          fi
+
+  bats-tests:
+    runs-on: ubuntu-latest
+    if: hashFiles('**/*.bats') != ''
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup BATS
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y bats
+
+      - name: Run BATS tests
+        run: |
+          if [ -d "tests" ] && [ -n "$(find tests -name '*.bats' 2>/dev/null)" ]; then
+            bats tests/*.bats
+          elif [ -n "$(find . -maxdepth 1 -name '*.bats' 2>/dev/null)" ]; then
+            bats *.bats
+          else
+            echo "No BATS test files found"
+          fi

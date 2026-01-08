@@ -682,6 +682,152 @@ console.log('🧪 Testing ProjectMaturityDetector...\n')
 })()
 
 // ============================================================================
+// Test Suite: Shell Script Detection
+// ============================================================================
+
+// Test 16: Shell script file detection
+;(() => {
+  const tempDir = createTempProject({
+    sourceFiles: 0,
+    hasPackageJson: false,
+  })
+
+  try {
+    // Add shell scripts
+    fs.writeFileSync(
+      path.join(tempDir, 'deploy.sh'),
+      '#!/bin/bash\necho "Deploying..."'
+    )
+    fs.writeFileSync(
+      path.join(tempDir, 'backup.sh'),
+      '#!/bin/bash\necho "Backing up..."'
+    )
+    fs.writeFileSync(
+      path.join(tempDir, 'setup.bash'),
+      '#!/bin/bash\necho "Setup"'
+    )
+
+    const detector = new ProjectMaturityDetector({ projectPath: tempDir })
+    const stats = detector.analyzeProject()
+
+    assert.strictEqual(
+      stats.shellScriptCount,
+      3,
+      'Should count 3 shell scripts'
+    )
+    assert.strictEqual(
+      stats.hasShellScripts,
+      true,
+      'Should detect shell scripts'
+    )
+    assert.strictEqual(
+      stats.isShellProject,
+      true,
+      'Should identify as shell project (no package.json)'
+    )
+
+    console.log('✅ Test 16 passed: Shell script file detection')
+  } catch (error) {
+    console.error('❌ Test 16 failed:', error.message)
+    process.exitCode = 1
+  } finally {
+    cleanupTempProject(tempDir)
+  }
+})()
+
+// Test 17: Shell scripts in non-shell project
+;(() => {
+  const tempDir = createTempProject({
+    sourceFiles: 5,
+    hasPackageJson: true,
+  })
+
+  try {
+    // Add some shell scripts to a Node.js project
+    fs.writeFileSync(
+      path.join(tempDir, 'deploy.sh'),
+      '#!/bin/bash\necho "Deploying..."'
+    )
+
+    const detector = new ProjectMaturityDetector({ projectPath: tempDir })
+    const stats = detector.analyzeProject()
+
+    assert.strictEqual(stats.shellScriptCount, 1, 'Should count 1 shell script')
+    assert.strictEqual(
+      stats.hasShellScripts,
+      true,
+      'Should detect shell scripts'
+    )
+    assert.strictEqual(
+      stats.isShellProject,
+      false,
+      'Should NOT identify as shell project (has package.json)'
+    )
+
+    console.log('✅ Test 17 passed: Shell scripts in non-shell project')
+  } catch (error) {
+    console.error('❌ Test 17 failed:', error.message)
+    process.exitCode = 1
+  } finally {
+    cleanupTempProject(tempDir)
+  }
+})()
+
+// Test 18: GitHub Actions output includes shell info
+;(() => {
+  const tempDir = createTempProject({
+    sourceFiles: 0,
+    hasPackageJson: false,
+  })
+
+  try {
+    // Add shell scripts
+    fs.writeFileSync(
+      path.join(tempDir, 'deploy.sh'),
+      '#!/bin/bash\necho "Deploying..."'
+    )
+    fs.writeFileSync(
+      path.join(tempDir, 'backup.sh'),
+      '#!/bin/bash\necho "Backing up..."'
+    )
+
+    const detector = new ProjectMaturityDetector({ projectPath: tempDir })
+    const output = detector.generateGitHubActionsOutput()
+
+    assert.strictEqual(
+      typeof output.hasShell,
+      'boolean',
+      'Should have hasShell'
+    )
+    assert.strictEqual(
+      typeof output.shellCount,
+      'number',
+      'Should have shellCount'
+    )
+    assert.strictEqual(
+      typeof output.isShellProject,
+      'boolean',
+      'Should have isShellProject'
+    )
+
+    assert.strictEqual(output.hasShell, true, 'Should report has shell scripts')
+    assert.strictEqual(output.shellCount, 2, 'Should report 2 shell scripts')
+    assert.strictEqual(
+      output.isShellProject,
+      true,
+      'Should report is shell project'
+    )
+
+    console.log('✅ Test 18 passed: GitHub Actions output includes shell info')
+  } catch (error) {
+    console.error('❌ Test 18 failed:', error.message)
+    process.exitCode = 1
+  } finally {
+    cleanupTempProject(tempDir)
+  }
+})()
+
+// ============================================================================
 // Summary
 // ============================================================================
 

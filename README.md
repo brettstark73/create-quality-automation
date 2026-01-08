@@ -1,6 +1,6 @@
 # QA Architect
 
-Quality automation CLI for JavaScript/TypeScript and Python projects. One command adds ESLint, Prettier, Husky, lint-staged, and GitHub Actions. Pro tiers add security scanning (Gitleaks), Smart Test Strategy, and multi-language support.
+Quality automation CLI for JavaScript/TypeScript, Python, and shell script projects. One command adds ESLint, Prettier, Husky, lint-staged, and GitHub Actions. Pro tiers add security scanning (Gitleaks), Smart Test Strategy, and multi-language support.
 
 **This repo = the free CLI.** For the Pro dashboard with repo analytics, CI integration, and automation workflows, see [QA Architect Pro](https://vibebuildlab.com/qa-architect) (included in VBL Starter Kit).
 
@@ -21,6 +21,7 @@ Quality automation CLI for JavaScript/TypeScript and Python projects. One comman
 - **GitHub Actions** - Automated quality checks in CI/CD
 - **TypeScript Smart** - Auto-detects and configures TypeScript projects
 - **Python Support** - Complete Python toolchain with Black, Ruff, isort, mypy, pytest
+- **Shell Script Support** - ShellCheck linting, syntax validation, permissions checks, best practices
 - **Security Automation** - npm audit (Free), Gitleaks + ESLint security (Pro)
 - **Progressive Quality** - Adaptive checks based on project maturity
 - **Smart Test Strategy** - Risk-based pre-push validation (Pro feature)
@@ -95,22 +96,93 @@ npx create-qa-architect@latest
 | Documentation check | ✅   | ✅   |
 | Env vars audit      | ❌   | ✅   |
 
+### CI/CD Optimization by Tier
+
+| Feature                      | Free | Pro+ |
+| ---------------------------- | ---- | ---- |
+| GitHub Actions cost analyzer | ❌   | ✅   |
+
+## Workflow Tiers (GitHub Actions Cost Optimization)
+
+qa-architect now defaults to **minimal CI** to avoid unexpected GitHub Actions bills. Choose the tier that matches your needs:
+
+### Minimal (Default) - $0-5/month
+
+**Best for:** Solo developers, side projects, open source
+
+- Single Node version (22) testing
+- Security scans run weekly (not on every commit)
+- Path filters skip CI for docs/README changes
+- **Runtime:** ~5-10 min/commit
+- **Est. cost:** ~$0-5/mo for typical projects (2-5 commits/day)
+
+```bash
+npx create-qa-architect@latest
+# or explicitly:
+npx create-qa-architect@latest --workflow-minimal
+```
+
+### Standard - $5-20/month
+
+**Best for:** Small teams, client projects, production apps
+
+- Matrix testing (Node 20 + 22) **only on main branch**
+- Security scans run weekly
+- Path filters enabled
+- **Runtime:** ~15-20 min/commit
+- **Est. cost:** ~$5-20/mo for typical projects
+
+```bash
+npx create-qa-architect@latest --workflow-standard
+```
+
+### Comprehensive - $100-350/month
+
+**Best for:** Enterprise teams, high-compliance projects, large teams
+
+- Matrix testing (Node 20 + 22) on **every commit**
+- Security scans inline (every commit)
+- No path filters (runs on all changes)
+- **Runtime:** ~50-100 min/commit
+- **Est. cost:** ~$100-350/mo for typical projects
+
+```bash
+npx create-qa-architect@latest --workflow-comprehensive
+```
+
+### Switching Between Tiers
+
+Already using qa-architect? Convert to minimal to reduce costs:
+
+```bash
+npx create-qa-architect@latest --update --workflow-minimal
+```
+
+### Analyzing Your Costs (Pro Feature)
+
+```bash
+npx create-qa-architect@latest --analyze-ci
+```
+
+Shows estimated GitHub Actions usage and provides optimization recommendations.
+
 ### License
 
 **Commercial License (freemium)** — free tier covers the basic CLI; Pro/Team/Enterprise features require a paid subscription. See [LICENSE](LICENSE).
 
 ## Tech Stack
 
-| Component       | Technology                                         |
-| --------------- | -------------------------------------------------- |
-| **Runtime**     | Node.js 20+                                        |
-| **Linting**     | ESLint 9 (flat config)                             |
-| **Formatting**  | Prettier 3                                         |
-| **CSS Linting** | Stylelint 16                                       |
-| **Git Hooks**   | Husky 9 + lint-staged 15                           |
-| **Python**      | Black, Ruff, mypy, pytest                          |
-| **Performance** | Lighthouse CI                                      |
-| **Security**    | npm audit (Free), Gitleaks + ESLint security (Pro) |
+| Component         | Technology                                         |
+| ----------------- | -------------------------------------------------- |
+| **Runtime**       | Node.js 20+                                        |
+| **Linting**       | ESLint 9 (flat config)                             |
+| **Formatting**    | Prettier 3                                         |
+| **CSS Linting**   | Stylelint 16                                       |
+| **Git Hooks**     | Husky 9 + lint-staged 15                           |
+| **Python**        | Black, Ruff, mypy, pytest                          |
+| **Shell Scripts** | ShellCheck, syntax validation, permissions checks  |
+| **Performance**   | Lighthouse CI                                      |
+| **Security**      | npm audit (Free), Gitleaks + ESLint security (Pro) |
 
 ## Getting Started
 
@@ -155,7 +227,7 @@ npx create-qa-architect@latest --deps
 ```bash
 npx create-qa-architect@latest --prelaunch
 npm install
-npm run validate:prelaunch
+npm run validate:all
 ```
 
 ## Usage Examples
@@ -191,6 +263,42 @@ npx create-qa-architect@latest --validate-docs
 
 # Comprehensive validation
 npx create-qa-architect@latest --comprehensive
+```
+
+### GitHub Actions Cost Analysis (Pro)
+
+```bash
+# Analyze GitHub Actions usage and costs
+npx create-qa-architect@latest --analyze-ci
+```
+
+**Output:**
+
+```
+📊 GitHub Actions Usage Analysis
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Repository: my-project
+
+Estimated usage: 4,800 min/month
+  Commit frequency: ~2.0 commits/day
+  Workflows detected: 2
+
+Workflow breakdown:
+  ├─ ci.yml:
+     • ~50 min/run
+     • ~60 runs/month = 3000 min/month
+  ├─ test.yml:
+     • ~30 min/run
+     • ~60 runs/month = 1800 min/month
+
+💰 Cost Analysis
+Free tier (2,000 min): ⚠️  EXCEEDED by 2,800 min
+Overage cost: $22.40/month
+
+Alternative options:
+  Team plan ($4/user/month): Still exceeds (1,800 min overage)
+    Total cost: $18.40/month
+  Self-hosted runners: $0/min (but VPS costs ~$5-20/month)
 ```
 
 ### Custom Templates
