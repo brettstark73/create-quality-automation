@@ -68,3 +68,18 @@ b33af571ee4e029a01ba0391a432dbae3598d753:REVENUE_SYSTEM_SUMMARY.md:generic-api-k
 665b0415ca263a082bebe32b938170a9f985e169:tests/licensing.test.js:generic-api-key:635
 665b0415ca263a082bebe32b938170a9f985e169:tests/licensing.test.js:generic-api-key:680
 665b0415ca263a082bebe32b938170a9f985e169:tests/licensing.test.js:generic-api-key:717
+
+# Wildcard entries for merge commits (no commit hash = matches any commit)
+tests/cache-manager.test.js:generic-api-key:21
+tests/security-licensing.test.js:generic-api-key:145
+tests/security-licensing.test.js:generic-api-key:264
+tests/real-purchase-flow.test.js:generic-api-key:93
+tests/real-purchase-flow.test.js:generic-api-key:347
+tests/licensing.test.js:generic-api-key:151
+tests/licensing.test.js:generic-api-key:190
+tests/licensing.test.js:generic-api-key:386
+tests/licensing.test.js:generic-api-key:427
+tests/licensing.test.js:generic-api-key:564
+tests/licensing.test.js:generic-api-key:635
+tests/licensing.test.js:generic-api-key:680
+tests/licensing.test.js:generic-api-key:717
