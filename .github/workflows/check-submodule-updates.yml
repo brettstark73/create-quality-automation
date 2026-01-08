@@ -17,8 +17,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          submodules: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+          submodules: recursive
           fetch-depth: 0
+
+      - name: Configure Git for submodule access
+        run: |
+          # Configure git to use GITHUB_TOKEN for HTTPS submodule URLs
+          git config --global url."https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/".insteadOf "git@github.com:"
+          git config --global url."https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/".insteadOf "ssh://git@github.com/"
 
       - name: Check for submodule updates
         id: check
@@ -29,8 +36,8 @@ jobs:
             exit 0
           fi
 
-          # Update submodules to latest remote
-          git submodule update --remote
+          # Initialize and update submodules to latest remote
+          git submodule update --init --recursive --remote
 
           # Check if any submodules changed
           if ! git diff --quiet --ignore-submodules=dirty; then
@@ -39,8 +46,8 @@ jobs:
             # Get list of updated submodules with versions
             echo "updates<<EOF" >> $GITHUB_OUTPUT
             git submodule foreach --quiet '
-              CURRENT=$(git describe --tags --always HEAD^)
-              LATEST=$(git describe --tags --always HEAD)
+              CURRENT=$(git describe --tags --always HEAD^ 2>/dev/null || echo "initial")
+              LATEST=$(git describe --tags --always HEAD 2>/dev/null || echo "latest")
               if [ "$CURRENT" != "$LATEST" ]; then
                 echo "- **$(basename $PWD)**: $CURRENT → $LATEST"
               fi
