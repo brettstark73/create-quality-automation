@@ -1341,14 +1341,13 @@ HELP:
       if (updated.includes('# SECURITY_CONDITION_PLACEHOLDER')) {
         if (mode === 'minimal' || mode === 'standard') {
           // Only run security on schedule events (not on every push)
-          const securityCondition = `if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
-    #`
+          // Replace both the placeholder comment AND the existing if line
           updated = updated.replace(
-            '# SECURITY_CONDITION_PLACEHOLDER',
-            securityCondition
+            /# SECURITY_CONDITION_PLACEHOLDER\n\s*if: needs\.detect-maturity\.outputs\.has-deps == 'true'/,
+            `if: (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && needs.detect-maturity.outputs.has-deps == 'true'`
           )
         } else {
-          // comprehensive: Remove placeholder
+          // comprehensive: Remove placeholder, keep the existing if condition
           updated = updated.replace(
             /\s*# SECURITY_CONDITION_PLACEHOLDER\n?/,
             ''
