@@ -123,19 +123,30 @@ const { runInteractiveFlow } = require('./lib/interactive/questions')
 
 // Custom template loading
 const { TemplateLoader } = require('./lib/template-loader')
+const {
+  detectExistingWorkflowMode,
+  injectWorkflowMode,
+} = require('./lib/workflow-config')
 
 // Command handlers (extracted for maintainability)
 const {
   handleValidationCommands,
   handleDependencyMonitoring,
 } = require('./lib/commands')
+const { handleDryRun } = require('./lib/commands/dry-run')
+const {
+  handleLicenseStatus,
+  handleLicenseActivation,
+} = require('./lib/commands/license-commands')
+const { handleMaturityCheck } = require('./lib/commands/maturity-check')
+const { handlePrelaunchSetup } = require('./lib/commands/prelaunch-setup')
+const { handleInteractiveMode } = require('./lib/commands/interactive-handler')
 
 // Licensing system
 const {
   getLicenseInfo,
   hasFeature,
   showUpgradeMessage,
-  showLicenseStatus,
   checkUsageCaps,
   incrementUsage,
 } = require('./lib/licensing')
@@ -273,7 +284,7 @@ const safeReadDir = dir => {
     if (process.env.NODE_ENV === 'production') {
       try {
         const errorReporter = new ErrorReporter()
-        errorReporter.captureException(error, {
+        errorReporter.captureError(error, {
           context: 'safeReadDir',
           directory: dir,
           errorCode: error.code,
@@ -613,45 +624,14 @@ function parseArguments(rawArgs) {
   // Handle interactive mode FIRST (before any routing)
   // This must happen before help/dry-run/routing to ensure interactive selections drive behavior
   if (isInteractiveRequested) {
-    const prompt = new InteractivePrompt()
+    parsedConfig = await handleInteractiveMode({
+      args,
+      InteractivePrompt,
+      runInteractiveFlow,
+      parseArguments,
+    })
 
-    // Check TTY availability
-    if (!prompt.isTTY()) {
-      console.error(
-        '❌ Interactive mode requires a TTY environment (interactive terminal).'
-      )
-      console.error(
-        '   For non-interactive use, please specify flags directly.'
-      )
-      console.error('   Run with --help to see available options.\n')
-      process.exit(1)
-    }
-
-    // Run interactive flow
-    let interactiveFlags
-    try {
-      interactiveFlags = await runInteractiveFlow(prompt)
-      console.log(
-        `\n🚀 Running setup with options: ${interactiveFlags.join(' ')}\n`
-      )
-    } catch (error) {
-      if (error.message.includes('cancelled')) {
-        console.log('\n❌ Interactive mode cancelled\n')
-        process.exit(0)
-      }
-      console.error(`❌ Interactive mode error: ${error.message}\n`)
-      process.exit(1)
-    }
-
-    // Merge interactive flags with original command-line args
-    // Remove --interactive flag, keep all other original flags (like --template)
-    const originalFlags = args.filter(arg => arg !== '--interactive')
-    const mergedFlags = [...originalFlags, ...interactiveFlags]
-
-    // Re-parse with merged flags
-    parsedConfig = parseArguments(mergedFlags)
-
-    // Update all configuration variables
+    // Update all configuration variables from re-parsed config
     ;({
       sanitizedArgs,
       isInteractiveRequested, // Will be false after re-parse since we filtered it out
@@ -684,8 +664,6 @@ function parseArguments(rawArgs) {
       isWorkflowStandard,
       isWorkflowComprehensive,
     } = parsedConfig)
-
-    console.log('📋 Configuration after interactive selections applied\n')
   }
 
   // Show telemetry status if requested
@@ -819,97 +797,25 @@ HELP:
     process.exit(0)
   }
 
-  console.log(
-    `🚀 ${isDryRun ? '[DRY RUN] Previewing' : isUpdateMode ? 'Updating' : isDependencyMonitoringMode ? 'Adding dependency monitoring to' : 'Setting up'} Quality Automation...\n`
-  )
-
-  // Handle dry-run mode - preview what would be changed
-  if (isDryRun) {
-    console.log('📋 DRY RUN MODE - No files will be modified\n')
-    console.log('The following files would be created/modified:\n')
-    console.log('Configuration Files:')
-    console.log('  • .prettierrc - Prettier formatting configuration')
-    console.log('  • .prettierignore - Files to exclude from formatting')
-    console.log('  • eslint.config.cjs - ESLint linting configuration')
-    console.log('  • .stylelintrc.json - Stylelint CSS linting configuration')
-    console.log(
-      '  • .editorconfig - Editor configuration for consistent formatting'
-    )
-    console.log('  • .nvmrc - Node version specification')
-    console.log('  • .npmrc - npm configuration with engine-strict')
-    console.log('')
-    console.log('Git Hooks (Husky):')
-    console.log('  • .husky/pre-commit - Pre-commit hook for lint-staged')
-    console.log(
-      '  • .husky/pre-push - Pre-push validation (lint, format, tests)'
-    )
-    console.log('')
-    console.log('GitHub Actions:')
-    console.log('  • .github/workflows/quality.yml - Quality checks workflow')
-    console.log('')
-    console.log('Package.json Modifications:')
-    console.log(
-      '  • Add devDependencies: eslint, prettier, stylelint, husky, lint-staged'
-    )
-    console.log('  • Add scripts: format, lint, prepare')
-    console.log('  • Add lint-staged configuration')
-    console.log('  • Add engines requirement (Node >=20)')
-    console.log('')
-    console.log('✅ Dry run complete - no files were modified')
-    console.log('')
-    console.log('To apply these changes, run without --dry-run flag:')
-    console.log('  npx create-qa-architect@latest')
-    process.exit(0)
-  }
+  // Handle dry-run mode and show mode banner
+  handleDryRun({ isDryRun, isUpdateMode, isDependencyMonitoringMode })
 
   // Note: handleValidationCommands, handleDependencyMonitoring, detectPythonProject,
   // detectRustProject, detectRubyProject are now imported from ./lib/commands
 
   // Handle license status command
   if (isLicenseStatusMode) {
-    showLicenseStatus()
-    process.exit(0)
+    handleLicenseStatus()
   }
 
   // Handle license activation command
   if (isActivateLicenseMode) {
-    const { promptLicenseActivation } = require('./lib/licensing')
-
-    console.log('🔑 Create Quality Automation - License Activation')
-    console.log('════════════════════════════════════════════════')
-
-    try {
-      const result = await promptLicenseActivation()
-
-      if (result.success) {
-        console.log('\n🎉 Success! Premium features are now available.')
-        console.log('\nNext steps:')
-        console.log('• Run: npx create-qa-architect@latest --deps')
-        console.log('• Enable framework-aware dependency grouping')
-        console.log('• Enjoy 60%+ reduction in dependency PRs!')
-      } else {
-        console.log('\n❌ License activation failed.')
-        console.log('• Check your license key format (QAA-XXXX-XXXX-XXXX-XXXX)')
-        console.log('• Verify your email address')
-        console.log('• Contact support: support@vibebuildlab.com')
-      }
-    } catch (error) {
-      console.error('\n❌ License activation error:', error.message)
-      console.log('Contact support for assistance: support@vibebuildlab.com')
-    }
-
-    process.exit(0)
+    await handleLicenseActivation()
   }
 
   // Handle check maturity command
   if (isCheckMaturityMode) {
-    const { ProjectMaturityDetector } = require('./lib/project-maturity')
-    const detector = new ProjectMaturityDetector({
-      projectPath: process.cwd(),
-      verbose: true,
-    })
-    detector.printReport()
-    process.exit(0)
+    handleMaturityCheck()
   }
 
   // Handle CI cost analysis command
@@ -949,79 +855,14 @@ HELP:
 
   // Handle pre-launch validation setup command
   if (isPrelaunchMode) {
-    return (async () => {
-      try {
-        const projectPath = process.cwd()
-        const PackageJson = checkNodeVersionAndLoadPackageJson()
-        const pkgJson = await PackageJson.load(projectPath)
-        const license = getLicenseInfo()
-        const isPro =
-          license.tier === 'PRO' ||
-          license.tier === 'TEAM' ||
-          license.tier === 'ENTERPRISE'
-
-        console.log('\n📋 Setting up pre-launch validation suite...\n')
-        console.log(`   License tier: ${license.tier.toUpperCase()}`)
-
-        // Check feature availability
-        if (!hasFeature('prelaunchValidation')) {
-          console.error('❌ Pre-launch validation requires a valid license.')
-          showUpgradeMessage('Pre-launch validation')
-          process.exit(1)
-        }
-
-        // Write validation scripts
-        const scriptsWritten = writeValidationScripts(projectPath)
-        console.log(`   ✅ Created ${scriptsWritten.length} validation scripts`)
-
-        // Write pa11y config
-        writePa11yConfig(projectPath)
-        console.log('   ✅ Created .pa11yci config')
-
-        // Write env validator for Pro+
-        if (isPro && hasFeature('envValidation')) {
-          writeEnvValidator(projectPath)
-          console.log('   ✅ Created env vars validator (Pro)')
-        }
-
-        // Add scripts to package.json
-        const prelaunchScripts = getPrelaunchScripts(isPro)
-        const prelaunchDeps = getPrelaunchDependencies(isPro)
-
-        // Merge scripts
-        const existingScripts = pkgJson.content.scripts || {}
-        pkgJson.update({
-          scripts: { ...existingScripts, ...prelaunchScripts },
-        })
-
-        // Merge devDependencies
-        const existingDevDeps = pkgJson.content.devDependencies || {}
-        pkgJson.update({
-          devDependencies: { ...existingDevDeps, ...prelaunchDeps },
-        })
-
-        await pkgJson.save()
-
-        console.log('\n✅ Pre-launch validation setup complete!\n')
-        console.log('Available scripts:')
-        console.log('  npm run validate:sitemap   - Check sitemap.xml')
-        console.log('  npm run validate:robots    - Check robots.txt')
-        console.log('  npm run validate:meta      - Check meta tags')
-        console.log('  npm run validate:links     - Check for broken links')
-        console.log('  npm run validate:a11y      - Run accessibility audit')
-        console.log('  npm run validate:docs      - Check documentation')
-        if (isPro) {
-          console.log('  npm run validate:env       - Audit env vars (Pro)')
-        }
-        console.log('  npm run validate:prelaunch - Run all checks')
-        console.log('\n💡 Run: npm install && npm run validate:prelaunch')
-
-        process.exit(0)
-      } catch (error) {
-        console.error('Pre-launch validation setup error:', error.message)
-        process.exit(1)
-      }
-    })()
+    await handlePrelaunchSetup({
+      checkNodeVersionAndLoadPackageJson,
+      writeValidationScripts,
+      writePa11yConfig,
+      writeEnvValidator,
+      getPrelaunchScripts,
+      getPrelaunchDependencies,
+    })
   }
 
   // Run validation commands if requested
@@ -1224,200 +1065,6 @@ HELP:
         )
         throw error // Re-throw to prevent silent continuation
       }
-    }
-
-    /**
-     * Detect existing workflow mode from quality.yml
-     * @param {string} projectPath - Path to the project
-     * @returns {'minimal'|'standard'|'comprehensive'|null} Detected mode
-     */
-    function detectExistingWorkflowMode(projectPath) {
-      const workflowPath = path.join(
-        projectPath,
-        '.github',
-        'workflows',
-        'quality.yml'
-      )
-
-      if (!fs.existsSync(workflowPath)) {
-        return null
-      }
-
-      try {
-        const content = fs.readFileSync(workflowPath, 'utf8')
-
-        // Check for version markers (new format)
-        if (content.includes('# WORKFLOW_MODE: minimal')) {
-          return 'minimal'
-        }
-        if (content.includes('# WORKFLOW_MODE: standard')) {
-          return 'standard'
-        }
-        if (content.includes('# WORKFLOW_MODE: comprehensive')) {
-          return 'comprehensive'
-        }
-
-        // Legacy detection (no version marker)
-        // Comprehensive: has security job + matrix testing on every push
-        // Standard: has matrix testing but security is scheduled
-        // Minimal: no matrix, single node version
-        const hasSecurityJob = /jobs:\s*\n\s*security:/m.test(content)
-        const hasMatrixInTests = /tests:[\s\S]*?strategy:[\s\S]*?matrix:/m.test(
-          content
-        )
-        const hasScheduledSecurity =
-          /on:\s*\n\s*schedule:[\s\S]*?- cron:/m.test(content)
-
-        if (hasSecurityJob && hasMatrixInTests && !hasScheduledSecurity) {
-          return 'comprehensive'
-        }
-        if (hasMatrixInTests && hasScheduledSecurity) {
-          return 'standard'
-        }
-        if (!hasMatrixInTests) {
-          return 'minimal'
-        }
-
-        // Default to comprehensive for unknown patterns
-        return 'comprehensive'
-      } catch (error) {
-        console.warn(
-          `⚠️  Could not detect existing workflow mode: ${error.message}`
-        )
-        return null
-      }
-    }
-
-    /**
-     * Inject workflow mode-specific configuration into quality.yml
-     * @param {string} workflowContent - Template content
-     * @param {'minimal'|'standard'|'comprehensive'} mode - Selected mode
-     * @returns {string} Modified workflow content
-     */
-    function injectWorkflowMode(workflowContent, mode) {
-      let updated = workflowContent
-
-      // Add version marker at the top (after name section)
-      const versionMarker = `# WORKFLOW_MODE: ${mode}`
-      if (!updated.includes('# WORKFLOW_MODE:')) {
-        // Insert after the comment block and before jobs
-        updated = updated.replace(/(\n\njobs:)/, `\n${versionMarker}\n$1`)
-      }
-
-      // Replace PATH_FILTERS_PLACEHOLDER
-      if (updated.includes('# PATH_FILTERS_PLACEHOLDER')) {
-        if (mode === 'minimal' || mode === 'standard') {
-          const pathsIgnore = `paths-ignore:
-      - '**.md'
-      - 'docs/**'
-      - 'LICENSE'
-      - '.gitignore'
-      - '.editorconfig'`
-          updated = updated.replace('# PATH_FILTERS_PLACEHOLDER', pathsIgnore)
-        } else {
-          // comprehensive: Remove placeholder
-          updated = updated.replace(/\s*# PATH_FILTERS_PLACEHOLDER\n?/, '')
-        }
-      }
-
-      // Replace SECURITY_SCHEDULE_PLACEHOLDER
-      if (updated.includes('# SECURITY_SCHEDULE_PLACEHOLDER')) {
-        if (mode === 'minimal' || mode === 'standard') {
-          // Add weekly schedule for security scans
-          const scheduleConfig = `schedule:
-    - cron: '0 0 * * 0'  # Weekly on Sunday (security scans)
-  workflow_dispatch:       # Manual trigger`
-          updated = updated.replace(
-            '# SECURITY_SCHEDULE_PLACEHOLDER',
-            scheduleConfig
-          )
-        } else {
-          // comprehensive: Remove placeholder
-          updated = updated.replace(/\s*# SECURITY_SCHEDULE_PLACEHOLDER\n?/, '')
-        }
-      }
-
-      // Replace SECURITY_CONDITION_PLACEHOLDER
-      if (updated.includes('# SECURITY_CONDITION_PLACEHOLDER')) {
-        if (mode === 'minimal' || mode === 'standard') {
-          // Only run security on schedule events (not on every push)
-          // Replace both the placeholder comment AND the existing if line
-          updated = updated.replace(
-            /# SECURITY_CONDITION_PLACEHOLDER\n\s*if: needs\.detect-maturity\.outputs\.has-deps == 'true'/,
-            `if: (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && needs.detect-maturity.outputs.has-deps == 'true'`
-          )
-        } else {
-          // comprehensive: Remove placeholder, keep the existing if condition
-          updated = updated.replace(
-            /\s*# SECURITY_CONDITION_PLACEHOLDER\n?/,
-            ''
-          )
-        }
-      }
-
-      // Replace MATRIX_PLACEHOLDER
-      if (updated.includes('# MATRIX_PLACEHOLDER')) {
-        if (mode === 'minimal') {
-          // Single Node version, no matrix
-          // Replace both the placeholder comment AND the existing strategy block
-          updated = updated.replace(
-            /# MATRIX_PLACEHOLDER\n\s*strategy:\n\s*fail-fast: false/,
-            `strategy:
-      fail-fast: false
-      matrix:
-        node-version: [22]`
-          )
-        } else if (mode === 'standard') {
-          // Matrix testing only on main branch
-          // 1. Modify the job-level if condition to add branch check
-          updated = updated.replace(
-            /if: fromJSON\(needs\.detect-maturity\.outputs\.test-count\) > 0\n\s*# TESTS_CONDITION_PLACEHOLDER/,
-            `if: github.ref == 'refs/heads/main' && fromJSON(needs.detect-maturity.outputs.test-count) > 0
-    # TESTS_CONDITION_PLACEHOLDER`
-          )
-          // 2. Replace matrix placeholder and existing strategy block
-          updated = updated.replace(
-            /# MATRIX_PLACEHOLDER\n\s*strategy:\n\s*fail-fast: false/,
-            `strategy:
-      fail-fast: false
-      matrix:
-        node-version: [20, 22]`
-          )
-        } else {
-          // comprehensive: Matrix on every push
-          // Replace placeholder, merge with existing strategy
-          updated = updated.replace(
-            /# MATRIX_PLACEHOLDER\n\s*strategy:\n\s*fail-fast: false/,
-            `strategy:
-      fail-fast: false
-      matrix:
-        node-version: [20, 22]`
-          )
-        }
-      }
-
-      // Replace TESTS_CONDITION_PLACEHOLDER
-      if (updated.includes('# TESTS_CONDITION_PLACEHOLDER')) {
-        let testsCondition = ''
-
-        if (mode === 'minimal') {
-          // No matrix, always run
-          testsCondition = '# Runs on every push (single Node version)'
-        } else if (mode === 'standard') {
-          // Matrix only on main
-          testsCondition = '# Matrix testing only on main branch'
-        } else {
-          // comprehensive: Matrix on every push
-          testsCondition = '# Matrix testing on every push'
-        }
-
-        updated = updated.replace(
-          '# TESTS_CONDITION_PLACEHOLDER',
-          testsCondition
-        )
-      }
-
-      return updated
     }
 
     // Normal setup flow
@@ -1789,12 +1436,9 @@ HELP:
       // Generate .qualityrc.json with detected maturity level
       const qualityrcPath = path.join(process.cwd(), '.qualityrc.json')
       if (!fs.existsSync(qualityrcPath)) {
-        const { ProjectMaturityDetector } = require('./lib/project-maturity')
-        const detector = new ProjectMaturityDetector({
-          projectPath: process.cwd(),
-        })
-        const detectedMaturity = detector.detect()
-        const stats = detector.analyzeProject()
+        // Reuse maturityDetector from earlier in this scope
+        const detectedMaturity = maturityDetector.detect()
+        const stats = maturityDetector.analyzeProject()
 
         const qualityConfig = {
           version: '1.0.0',
@@ -1945,6 +1589,7 @@ HELP:
         const workflowFile = path.join(githubWorkflowDir, 'quality.yml')
 
         // Determine workflow mode
+        /** @type {'minimal'|'standard'|'comprehensive'} */
         let workflowMode = 'minimal' // Default to minimal
         if (isWorkflowMinimal) {
           workflowMode = 'minimal'
@@ -1955,7 +1600,11 @@ HELP:
         } else if (fs.existsSync(workflowFile)) {
           // Detect existing mode when updating
           const existingMode = detectExistingWorkflowMode(process.cwd())
-          if (existingMode) {
+          if (
+            existingMode === 'minimal' ||
+            existingMode === 'standard' ||
+            existingMode === 'comprehensive'
+          ) {
             workflowMode = existingMode
           }
         }

@@ -15,8 +15,10 @@ const targetPath = path.join(tempDir, 'gitleaks-redirect-test')
 const originalGet = https.get
 let callCount = 0
 
+// @ts-ignore - Mocking https.get for test purposes
 https.get = (url, callback) => {
   callCount += 1
+  /** @type {PassThrough & { statusCode?: number, headers?: Record<string, string> }} */
   const response = new PassThrough()
 
   if (callCount === 1) {
@@ -35,9 +37,11 @@ https.get = (url, callback) => {
     })
   }
 
-  return {
+  /** @type {any} */
+  const mockRequest = {
     on: () => {},
   }
+  return mockRequest
 }
 
 async function runTest() {
