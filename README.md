@@ -158,6 +158,26 @@ Already using qa-architect? Convert to minimal to reduce costs:
 npx create-qa-architect@latest --update --workflow-minimal
 ```
 
+### ⚠️ Avoid Duplicate Workflows
+
+**qa-architect's `quality.yml` is designed to be your single CI workflow.** Do not use it alongside a separate `ci.yml` - this causes:
+
+- **2-3x CI minutes usage** (both workflows run on every push)
+- **Duplicate checks** (ESLint, tests, security scans run twice)
+- **Unexpected billing** (easily exceeds GitHub's 2,000 min/month free tier)
+
+**If you have both `ci.yml` and `quality.yml`:**
+
+```bash
+# Remove the duplicate ci.yml
+rm .github/workflows/ci.yml
+
+# Ensure quality.yml uses minimal mode
+npx create-qa-architect@latest --update --workflow-minimal
+```
+
+The `quality.yml` workflow is adaptive - it runs appropriate checks based on your project's maturity level, so a separate `ci.yml` is unnecessary.
+
 ### Analyzing Your Costs (Pro Feature)
 
 ```bash

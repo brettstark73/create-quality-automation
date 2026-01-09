@@ -17,6 +17,11 @@ on:
     branches: [main, master, develop]
   # SECURITY_SCHEDULE_PLACEHOLDER
 
+# Prevent duplicate runs - cancel in-progress when new commit pushed
+concurrency:
+  group: quality-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   # Step 1: Detect project maturity level and package manager
   detect-maturity:
