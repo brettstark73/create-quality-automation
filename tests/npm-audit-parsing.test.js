@@ -18,7 +18,9 @@ try {
     JSON.stringify({ name: 'audit-test', version: '1.0.0' }, null, 2)
   )
 
+  // @ts-ignore - Mocking execSync for test purposes
   childProcess.execSync = () => {
+    /** @type {Error & { stdout?: Buffer }} */
     const error = new Error('npm audit found vulnerabilities')
     error.stdout = Buffer.from(
       JSON.stringify({

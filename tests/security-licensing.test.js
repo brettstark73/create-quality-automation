@@ -56,6 +56,7 @@ function setupSecurityTest() {
   process.env = { ...originalEnv }
   delete process.env.STRIPE_SECRET_KEY
   delete process.env.QAA_LICENSE_PUBLIC_KEY
+  delete process.env.QAA_DEVELOPER // Must disable dev mode for security tests
   setTestPublicKeyEnv(publicKey)
 }
 
@@ -200,24 +201,19 @@ function testLicenseSignatureValidation() {
   setupSecurityTest()
   console.log('Security Test 3: License signature validation')
 
-  // Test valid signature
-  const validPayload = {
+  // Build a signed entry (includes payload + signature)
+  const issued = new Date().toISOString()
+  const signedEntry = buildSignedLicenseEntry({
     licenseKey: 'QAA-AAAA-BBBB-CCCC-DDDD',
     tier: 'PRO',
     isFounder: false,
-    issued: new Date().toISOString(),
-  }
-
-  const validSignature = buildSignedLicenseEntry({
-    licenseKey: validPayload.licenseKey,
-    tier: validPayload.tier,
-    isFounder: validPayload.isFounder,
-    issued: validPayload.issued,
+    email: 'test@example.com',
+    issued,
     privateKey,
-  }).signature
+  })
 
-  // Test valid signature
-  if (!verifyLicenseSignature(validPayload, validSignature)) {
+  // Test valid signature with correct payload
+  if (!verifyLicenseSignature(signedEntry.payload, signedEntry.signature)) {
     console.error('  ❌ Valid signature not verified correctly')
     teardownSecurityTest()
     process.exit(1)
@@ -225,15 +221,15 @@ function testLicenseSignatureValidation() {
 
   // Test invalid signature
   const invalidSignature = 'invalid_signature_should_fail'
-  if (verifyLicenseSignature(validPayload, invalidSignature)) {
+  if (verifyLicenseSignature(signedEntry.payload, invalidSignature)) {
     console.error('  ❌ SECURITY VIOLATION: Invalid signature was accepted')
     teardownSecurityTest()
     process.exit(1)
   }
 
-  // Test tampered payload
-  const tamperedPayload = { ...validPayload, tier: 'ENTERPRISE' }
-  if (verifyLicenseSignature(tamperedPayload, validSignature)) {
+  // Test tampered payload (change tier)
+  const tamperedPayload = { ...signedEntry.payload, tier: 'ENTERPRISE' }
+  if (verifyLicenseSignature(tamperedPayload, signedEntry.signature)) {
     console.error(
       '  ❌ SECURITY VIOLATION: Tampered payload with valid signature was accepted'
     )

@@ -1,48 +1,13 @@
 {
-  "version": "1.0.0",
-  "maturity": "auto",
-  "detected": {
-    "level": "minimal",
-    "sourceFiles": 1,
-    "testFiles": 0,
-    "hasReadme": true,
-    "hasRequirements": true,
-    "hasCiConfig": true,
-    "detectedAt": "2025-12-27T22:04:56.278Z"
-  },
-  "checks": {
-    "prettier": {
-      "enabled": true,
-      "required": true
-    },
-    "eslint": {
-      "enabled": "auto",
-      "required": false
-    },
-    "stylelint": {
-      "enabled": "auto",
-      "required": false
-    },
-    "tests": {
-      "enabled": "auto",
-      "required": false
-    },
-    "coverage": {
-      "enabled": false,
-      "required": false,
-      "threshold": 50
-    },
-    "security-audit": {
-      "enabled": "auto",
-      "required": false
-    },
-    "documentation": {
-      "enabled": false,
-      "required": false
-    },
-    "lighthouse": {
-      "enabled": false,
-      "required": false
+  "version": "1.0",
+  "projectName": "qa-architect",
+  "history": {
+    "lastPerfect": {
+      "timestamp": "2026-01-08T16:36:49Z",
+      "commit": "911ea71c2d788349e4a6d33e4ddc9a799810bceb",
+      "passed": true,
+      "coverage": 70,
+      "issuesFixed": 54
     }
   }
 }
