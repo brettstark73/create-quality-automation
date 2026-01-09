@@ -117,3 +117,19 @@ The `QAA_DEVELOPER=true` env var bypasses license checks during testing.
 - Coverage: 75% lines, 70% functions, 65% branches
 - Pre-push: lint, format:check, test:patterns, test:commands, test
 - Pre-release: `npm run prerelease` (docs:check + all tests + e2e)
+
+## Publishing
+
+**This repo uses GitHub trusted publishing for npm** - DO NOT run `npm publish` manually.
+
+Publishing workflow:
+
+1. Run `npm run prerelease` to validate
+2. Commit and push changes to `main`
+3. GitHub Actions automatically publishes to npm via trusted publishing
+
+No OTP/2FA codes needed. The `.github/workflows/release.yml` workflow handles publishing when:
+
+- Version in `package.json` changes
+- All tests pass
+- Pushed to `main` branch
