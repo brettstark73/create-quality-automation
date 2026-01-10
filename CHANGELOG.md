@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.6.1] - 2026-01-09
+
+### Added
+
+- **Concurrency Controls**: Workflow now cancels in-progress runs when new commits are pushed, saving CI minutes
+- **Documentation**: Added warning about avoiding duplicate workflows (ci.yml + quality.yml) which can cause 2-3x CI usage
+
 ## [5.6.0] - 2026-01-08
 
 ### Added
