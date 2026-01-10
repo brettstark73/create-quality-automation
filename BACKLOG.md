@@ -1,7 +1,15 @@
 # qa-architect - Backlog
 
-**Last Updated**: 2026-01-08 (Evening)
+**Last Updated**: 2026-01-10 (Evening)
 **Priority**: Value-based (Revenue + Retention + Differentiation) ÷ Effort
+
+---
+
+## 🔍 Pending Review Items
+
+| ID | Item | Priority | Notes |
+|----|------|----------|-------|
+| R1 | Review workflow path fix across all repos | Medium | Fixed `quality.yml` to use `node_modules/create-qa-architect/lib/project-maturity.js` instead of `lib/project-maturity.js`. Verify fix is correct and update starter-kit template. |
 
 ---
 
