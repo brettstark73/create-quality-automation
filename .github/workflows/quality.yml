@@ -85,22 +85,19 @@ jobs:
           echo "Has CSS files: ${{ steps.detect.outputs.has-css }}"
 
   # Step 2: Core checks - ALWAYS run (all maturity levels)
+  # Note: Runs on Node 22 only - Prettier formatting is not sensitive to Node version
   core-checks:
     runs-on: ubuntu-latest
     needs: detect-maturity
-    strategy:
-      matrix:
-        node-version: [20, 22]
-      fail-fast: false
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
 
-      - name: Setup Node.js ${{ matrix.node-version }}
+      - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: '22'
           cache: ${{ needs.detect-maturity.outputs.package-manager }}
 
       - name: Install dependencies
@@ -113,7 +110,7 @@ jobs:
 
   # Step 3: Linting - run if source files exist (bootstrap+)
   # Note: Runs on Node 20 only - linting tools are less sensitive to Node version differences
-  # Core runtime compatibility is tested via matrix in core-checks and tests jobs
+  # Core runtime compatibility is tested via matrix in tests job when enabled
   linting:
     runs-on: ubuntu-latest
     needs: detect-maturity

@@ -1,11 +1,11 @@
-name: Nightly Gitleaks Real Download Verification
+name: Weekly Gitleaks Real Download Verification
 
-# Run nightly to verify real gitleaks download and checksum verification
+# Run weekly to verify real gitleaks download and checksum verification
 # This catches upstream asset changes, checksum drift, and download issues
 on:
   schedule:
-    # Run at 2 AM UTC daily
-    - cron: '0 2 * * *'
+    # Run at 2 AM UTC every Sunday (weekly)
+    - cron: '0 2 * * 0'
   workflow_dispatch: # Allow manual trigger
 
 jobs:
@@ -118,7 +118,7 @@ jobs:
 
       - name: Report success
         run: |
-          echo "✅ Nightly gitleaks verification completed successfully!"
+          echo "✅ Weekly gitleaks verification completed successfully!"
           echo "📊 Verification report:"
           echo "  - Real download: ✅ Successful"
           echo "  - Checksum verification: ✅ Passed"
