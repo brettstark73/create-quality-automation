@@ -275,6 +275,8 @@ jobs:
     # MATRIX_PLACEHOLDER
     strategy:
       fail-fast: false
+      matrix:
+        node-version: [22]
 
     steps:
       - name: Checkout code

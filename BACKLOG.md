@@ -7,9 +7,9 @@
 
 ## 🔍 Pending Review Items
 
-| ID | Item | Priority | Notes |
-|----|------|----------|-------|
-| R1 | Review workflow path fix across all repos | Medium | Fixed `quality.yml` to use `node_modules/create-qa-architect/lib/project-maturity.js` instead of `lib/project-maturity.js`. Verify fix is correct and update starter-kit template. |
+| ID  | Item                                      | Priority | Notes                                                                                                                                                                              |
+| --- | ----------------------------------------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| R1  | Review workflow path fix across all repos | Medium   | Fixed `quality.yml` to use `node_modules/create-qa-architect/lib/project-maturity.js` instead of `lib/project-maturity.js`. Verify fix is correct and update starter-kit template. |
 
 ---
 
