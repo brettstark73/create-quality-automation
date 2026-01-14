@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.8.0] - 2026-01-14
+
+### Fixed
+
+- **Lighthouse CI Failures**: Lighthouse failures now explicitly fail builds for production-ready projects
+  - Added failure reporting step that logs errors and adds job summary
+  - Production-ready projects must pass Lighthouse checks (hard gate)
+  - Other maturity levels show warnings but don't block (soft failure)
+  - Prevents performance regressions, accessibility issues, and SEO problems from merging silently
+
+- **Job Summary Accuracy**: Quality check summary now shows actual pass/fail results instead of just "enabled"
+  - Uses `needs.<job>.result` to check actual job outcomes
+  - Shows ✅ for success, ❌ for failure, ⏭️ for skipped, ⚠️ for cancelled
+  - Prevents misleading "all green" summaries when checks actually failed
+
+### Changed
+
+- **ESLint Configuration**: Fixed unsafe regex warnings in workflow-config.js with proper disable comments
+
 ## [5.7.0] - 2026-01-13
 
 ### Added
