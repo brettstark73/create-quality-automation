@@ -402,10 +402,32 @@ jobs:
 
       - name: Lighthouse CI
         if: hashFiles('.lighthouserc.js', '.lighthouserc.json', 'lighthouserc.js') != ''
+        id: lighthouse
         run: |
           echo "🚢 Running Lighthouse CI..."
           npx lhci autorun
         continue-on-error: true
+
+      - name: Report Lighthouse Failures
+        if: steps.lighthouse.outcome == 'failure'
+        env:
+          MATURITY: ${{ needs.detect-maturity.outputs.maturity }}
+        run: |
+          echo "::error::Lighthouse CI failed - performance budgets or quality thresholds violated"
+          echo "Review the Lighthouse report to see which metrics failed."
+          echo "Common failures: performance score, accessibility issues, SEO problems"
+
+          # Add to job summary for visibility
+          echo "## ⚠️ Lighthouse CI Failed" >> $GITHUB_STEP_SUMMARY
+          echo "Performance budgets or quality thresholds were violated." >> $GITHUB_STEP_SUMMARY
+          echo "This is currently a soft failure (continue-on-error: true)." >> $GITHUB_STEP_SUMMARY
+          echo "Review the Lighthouse report in the Actions logs above." >> $GITHUB_STEP_SUMMARY
+
+          # Fail build for production-ready projects
+          if [ "$MATURITY" == "production-ready" ]; then
+            echo "::error::Production-ready projects must pass Lighthouse CI checks"
+            exit 1
+          fi
 
   # Step 7: Summary - report what checks ran
   summary:
@@ -421,6 +443,12 @@ jobs:
 
     steps:
       - name: Generate Check Summary
+        env:
+          CORE_RESULT: ${{ needs.core-checks.result }}
+          LINTING_RESULT: ${{ needs.linting.result }}
+          SECURITY_RESULT: ${{ needs.security.result }}
+          TESTS_RESULT: ${{ needs.tests.result }}
+          DOCS_RESULT: ${{ needs.documentation.result }}
         run: |
           echo "## Quality Checks Summary 📊" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
@@ -433,11 +461,59 @@ jobs:
           echo "- Has documentation: ${{ needs.detect-maturity.outputs.has-docs }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Checks Executed" >> $GITHUB_STEP_SUMMARY
-          echo "- ✅ Core checks: Always run" >> $GITHUB_STEP_SUMMARY
-          echo "- ${{ needs.detect-maturity.outputs.source-count > 0 && '✅' || '⏭️' }} Linting: ${{ needs.detect-maturity.outputs.source-count > 0 && 'Enabled' || 'Skipped (no source files)' }}" >> $GITHUB_STEP_SUMMARY
-          echo "- ${{ needs.detect-maturity.outputs.has-deps == 'true' && '✅' || '⏭️' }} Security: ${{ needs.detect-maturity.outputs.has-deps == 'true' && 'Enabled' || 'Skipped (no dependencies)' }}" >> $GITHUB_STEP_SUMMARY
-          echo "- ${{ needs.detect-maturity.outputs.test-count > 0 && '✅' || '⏭️' }} Tests: ${{ needs.detect-maturity.outputs.test-count > 0 && 'Enabled' || 'Skipped (no test files)' }}" >> $GITHUB_STEP_SUMMARY
-          echo "- ${{ needs.detect-maturity.outputs.maturity == 'production-ready' && '✅' || '⏭️' }} Documentation: ${{ needs.detect-maturity.outputs.maturity == 'production-ready' && 'Enabled' || 'Skipped (not production-ready)' }}" >> $GITHUB_STEP_SUMMARY
+
+          # Core checks
+          if [ "$CORE_RESULT" == "success" ]; then
+            echo "- ✅ Core checks: Passed" >> $GITHUB_STEP_SUMMARY
+          elif [ "$CORE_RESULT" == "failure" ]; then
+            echo "- ❌ Core checks: Failed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- ⚠️ Core checks: $CORE_RESULT" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          # Linting
+          if [ "$LINTING_RESULT" == "success" ]; then
+            echo "- ✅ Linting: Passed" >> $GITHUB_STEP_SUMMARY
+          elif [ "$LINTING_RESULT" == "failure" ]; then
+            echo "- ❌ Linting: Failed" >> $GITHUB_STEP_SUMMARY
+          elif [ "$LINTING_RESULT" == "skipped" ]; then
+            echo "- ⏭️ Linting: Skipped (no source files)" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- ⚠️ Linting: $LINTING_RESULT" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          # Security
+          if [ "$SECURITY_RESULT" == "success" ]; then
+            echo "- ✅ Security: Passed" >> $GITHUB_STEP_SUMMARY
+          elif [ "$SECURITY_RESULT" == "failure" ]; then
+            echo "- ❌ Security: Failed" >> $GITHUB_STEP_SUMMARY
+          elif [ "$SECURITY_RESULT" == "skipped" ]; then
+            echo "- ⏭️ Security: Skipped (no dependencies)" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- ⚠️ Security: $SECURITY_RESULT" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          # Tests
+          if [ "$TESTS_RESULT" == "success" ]; then
+            echo "- ✅ Tests: Passed" >> $GITHUB_STEP_SUMMARY
+          elif [ "$TESTS_RESULT" == "failure" ]; then
+            echo "- ❌ Tests: Failed" >> $GITHUB_STEP_SUMMARY
+          elif [ "$TESTS_RESULT" == "skipped" ]; then
+            echo "- ⏭️ Tests: Skipped (no test files)" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- ⚠️ Tests: $TESTS_RESULT" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          # Documentation
+          if [ "$DOCS_RESULT" == "success" ]; then
+            echo "- ✅ Documentation: Passed" >> $GITHUB_STEP_SUMMARY
+          elif [ "$DOCS_RESULT" == "failure" ]; then
+            echo "- ❌ Documentation: Failed" >> $GITHUB_STEP_SUMMARY
+          elif [ "$DOCS_RESULT" == "skipped" ]; then
+            echo "- ⏭️ Documentation: Skipped (not production-ready)" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- ⚠️ Documentation: $DOCS_RESULT" >> $GITHUB_STEP_SUMMARY
+          fi
       # PR_COMMENTS_PLACEHOLDER
 
 # ALERTS_PLACEHOLDER
