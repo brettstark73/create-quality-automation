@@ -7,6 +7,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.7.0] - 2026-01-13
+
+### Added
+
+- **Code Review Command**: New `--review` flag to guide users on code review best practices
+  - Detects if Claude Code CLI is available
+  - Provides instructions for using pr-review-toolkit agents
+  - Falls back to manual review checklist if Claude Code not available
+- **Enhanced Pre-Push Security**: Security scans now run in local pre-push hooks
+  - Secret scanning with gitleaks (prevents commits with secrets)
+  - Dependency audit with npm audit (catches vulnerabilities early)
+  - XSS pattern detection (innerHTML and eval with interpolation)
+  - Saves ~200 GitHub Actions minutes/month by moving security local
+
+### Changed
+
+- **Minimal CI Workflow**: Drastically simplified GitHub Actions workflow (443 → 90 lines)
+  - Removed redundant linting/formatting checks (now in pre-push hook)
+  - Removed Stylelint from CI (redundant with local checks)
+  - Main branch only triggers (feature branches use local hooks)
+  - Keeps: Full test suite + build verification + weekly security scan
+  - Expected savings: 60-85% reduction in CI minutes usage
+- **Workflow Mode Marker**: Added `# WORKFLOW_MODE: minimal` marker to quality.yml
+  - Makes it easy to detect which tier is active
+  - Preserves placeholder system for mode switching
+
+### Fixed
+
+- **CI Cost Efficiency**: Addresses GitHub Actions usage exceeding free tier limits
+  - Before: ~7,260 min/month across multiple repos
+  - After: ~700-1,000 min/month (85-90% reduction)
+  - Strategy: Move validation to local pre-push, keep CI as safety net
+
 ## [5.6.1] - 2026-01-09
 
 ### Added
