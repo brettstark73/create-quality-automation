@@ -11,10 +11,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- **Code Review Command**: New `--review` flag to guide users on code review best practices
-  - Detects if Claude Code CLI is available
-  - Provides instructions for using pr-review-toolkit agents
-  - Falls back to manual review checklist if Claude Code not available
 - **Enhanced Pre-Push Security**: Security scans now run in local pre-push hooks
   - Secret scanning with gitleaks (prevents commits with secrets)
   - Dependency audit with npm audit (catches vulnerabilities early)
