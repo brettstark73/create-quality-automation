@@ -6,13 +6,13 @@
 - Need: Under 2,000 min/month
 - Waste: 60% redundancy (lint/format runs twice)
 
-## The Solution (3 Changes)
+## The Solution (2 Changes)
 
 ### 1. Add Security to Pre-Push
 
-**What:** gitleaks + npm audit + XSS patterns
-**Why:** Catch issues locally before CI
-**Cost:** +15 seconds to pre-push
+**What:** gitleaks + npm audit + XSS patterns  
+**Why:** Catch issues locally before CI  
+**Cost:** +15 seconds to pre-push  
 **Saves:** 200 min/month (no nightly gitleaks in CI)
 
 ### 2. Slim GitHub Actions
@@ -32,12 +32,6 @@
 **Trigger:** Main branch only (not every feature branch)
 
 **Saves:** 60% of CI minutes
-
-### 3. Add Code Review Command
-
-**New:** `npx create-qa-architect --review`
-**Uses:** Claude Code pr-review-toolkit agents (if user has Claude Code)
-**Fallback:** Manual review if no Claude Code
 
 ## Expected Result
 
