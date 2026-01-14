@@ -646,22 +646,22 @@ assert.ok(
   'TypeScript ESLint config should include security plugin'
 )
 
-// Test that GitHub Actions includes security checks
+// Test that GitHub Actions includes security checks (v5.7.0+ minimal workflow)
 const workflowContent = fs.readFileSync(
   path.join(templateRoot, '.github/workflows/quality.yml'),
   'utf8'
 )
 assert.ok(
-  workflowContent.includes('Security audit'),
-  'Workflow should include security audit step'
+  workflowContent.includes('weekly-security'),
+  'Workflow should include weekly-security job'
 )
 assert.ok(
-  workflowContent.includes('hardcoded secrets'),
-  'Workflow should include secrets detection'
+  workflowContent.includes('Gitleaks scan'),
+  'Workflow should include Gitleaks scan step'
 )
 assert.ok(
-  workflowContent.includes('Security pattern detection'),
-  'Workflow should include security pattern detection'
+  workflowContent.includes('Dependency audit'),
+  'Workflow should include dependency audit step'
 )
 
 console.log('✅ All security pattern tests passed!')
