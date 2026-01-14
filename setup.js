@@ -483,6 +483,7 @@ function parseArguments(rawArgs) {
   const isValidateConfigMode = sanitizedArgs.includes('--validate-config')
   const isActivateLicenseMode = sanitizedArgs.includes('--activate-license')
   const isAnalyzeCiMode = sanitizedArgs.includes('--analyze-ci')
+  const isCodeReviewMode = sanitizedArgs.includes('--review')
   const isPrelaunchMode = sanitizedArgs.includes('--prelaunch')
   const isDryRun = sanitizedArgs.includes('--dry-run')
   const isWorkflowMinimal = sanitizedArgs.includes('--workflow-minimal')
@@ -558,6 +559,7 @@ function parseArguments(rawArgs) {
     isValidateConfigMode,
     isActivateLicenseMode,
     isAnalyzeCiMode,
+    isCodeReviewMode,
     isPrelaunchMode,
     isDryRun,
     ciProvider,
@@ -602,6 +604,7 @@ function parseArguments(rawArgs) {
     isActivateLicenseMode,
     isPrelaunchMode,
     isAnalyzeCiMode,
+    isCodeReviewMode,
     isDryRun,
     ciProvider,
     enableSlackAlerts,
@@ -703,6 +706,7 @@ WORKFLOW TIERS (GitHub Actions optimization):
   --workflow-comprehensive  Comprehensive CI - Matrix on every push, security inline
                             ~50-100 min/commit, ~$100-350/mo for typical projects
   --analyze-ci             Analyze GitHub Actions usage and get optimization tips (Pro)
+  --review                 Guide for code review best practices and autonomous review
 
 VALIDATION OPTIONS:
   --validate        Run comprehensive validation (same as --comprehensive)
@@ -827,6 +831,20 @@ HELP:
         process.exit(0)
       } catch (error) {
         console.error('CI cost analysis error:', error.message)
+        process.exit(1)
+      }
+    })()
+  }
+
+  // Handle code review command
+  if (isCodeReviewMode) {
+    return (async () => {
+      try {
+        const { handleCodeReview } = require('./lib/commands/code-review')
+        await handleCodeReview(sanitizedArgs)
+        process.exit(0)
+      } catch (error) {
+        console.error('Code review error:', error.message)
         process.exit(1)
       }
     })()

@@ -250,6 +250,18 @@ npm install
 npm run validate:all
 ```
 
+### Code Review (Free)
+
+```bash
+npx create-qa-architect@latest --review
+```
+
+Guides you through code review best practices:
+
+- Detects if Claude Code CLI is available for autonomous review
+- Provides instructions for using pr-review-toolkit agents
+- Falls back to manual review checklist if needed
+
 ## Usage Examples
 
 ### Check Project Maturity
