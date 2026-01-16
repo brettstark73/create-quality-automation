@@ -415,9 +415,6 @@ function mapPriceToTier(priceId) {
   const priceMapping = new Map([
     ['price_pro_monthly', { tier: 'PRO', isFounder: false }],
     ['price_pro_annual', { tier: 'PRO', isFounder: false }],
-    ['price_team_monthly', { tier: 'TEAM', isFounder: false }],
-    ['price_team_annual', { tier: 'TEAM', isFounder: false }],
-    ['price_enterprise_annual', { tier: 'ENTERPRISE', isFounder: false }],
   ])
 
   if (typeof priceId === 'string' && priceMapping.has(priceId)) {

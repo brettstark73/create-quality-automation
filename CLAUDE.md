@@ -43,7 +43,7 @@ npx . --analyze-ci          # Analyze GitHub Actions costs (Pro)
 ```
 setup.js                    # Main CLI entry - argument parsing, orchestration
 ├── lib/
-│   ├── licensing.js        # Tier system (FREE/PRO/TEAM/ENTERPRISE), feature gating
+│   ├── licensing.js        # Tier system (FREE/PRO), feature gating
 │   ├── project-maturity.js # Detects project stage (minimal→production-ready)
 │   ├── smart-strategy-generator.js  # Risk-based test selection (Pro)
 │   ├── dependency-monitoring-*.js   # Dependabot config generation
@@ -71,7 +71,6 @@ The tool uses a freemium model with feature gating in `lib/licensing.js`:
 
 - **FREE**: Basic linting/formatting, 1 private repo, 50 runs/month
 - **PRO**: Security scanning, Smart Test Strategy, unlimited
-- **TEAM/ENTERPRISE**: RBAC, Slack alerts, multi-repo dashboard
 
 Check tier with `hasFeature('smartTestStrategy')` or `getLicenseInfo()`.
 

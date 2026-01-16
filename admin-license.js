@@ -30,14 +30,11 @@ async function main() {
     console.log(
       '  node admin-license.js QAA-1234-ABCD-5678-EF90 cus_stripe_customer123 PRO'
     )
-    console.log(
-      '  node admin-license.js QAA-ABCD-1234-EFGH-5678 cus_stripe_founder456 ENTERPRISE true user@company.com'
-    )
     console.log('')
     console.log('Arguments:')
     console.log('  license-key   The QAA license key to add')
     console.log('  customer-id   Stripe customer ID (or unique identifier)')
-    console.log('  tier         PRO or ENTERPRISE')
+    console.log('  tier         PRO')
     console.log('  founder      true/false (optional, default false)')
     console.log('  email        Purchase email (optional, for verification)')
     console.log('')
@@ -65,8 +62,8 @@ async function main() {
   console.log('')
 
   // Validate tier
-  if (!['PRO', 'ENTERPRISE'].includes(tier)) {
-    console.error('❌ Error: Tier must be PRO or ENTERPRISE')
+  if (tier !== 'PRO') {
+    console.error('❌ Error: Tier must be PRO')
     process.exit(1)
   }
 

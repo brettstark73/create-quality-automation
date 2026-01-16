@@ -669,43 +669,6 @@ function testShowLicenseStatusPro() {
 }
 
 /**
- * Test 15: Valid ENTERPRISE license
- */
-function testValidEnterpriseLicense() {
-  setupTest()
-  console.log('Test 15: Valid ENTERPRISE license')
-
-  const licenseData = buildSignedLicense({
-    tier: LICENSE_TIERS.ENTERPRISE,
-    licenseKey: 'QAA-1234-ABCD-5678-EF90',
-    email: 'enterprise@company.com',
-  })
-
-  const { licenseDir, licenseFile } = getTestLicensePaths()
-  if (!fs.existsSync(licenseDir)) {
-    fs.mkdirSync(licenseDir, { recursive: true })
-  }
-
-  fs.writeFileSync(licenseFile, JSON.stringify(licenseData, null, 2))
-
-  const license = getLicenseInfo()
-
-  if (
-    license.tier === LICENSE_TIERS.ENTERPRISE &&
-    license.valid === true &&
-    license.email === 'enterprise@company.com'
-  ) {
-    console.log('  ✅ Validates ENTERPRISE license correctly\n')
-    teardownTest()
-    return true
-  } else {
-    console.error('  ❌ Failed to validate ENTERPRISE license')
-    teardownTest()
-    process.exit(1)
-  }
-}
-
-/**
  * Test 16: License with error displays warning in status
  */
 function testLicenseStatusWithError() {
@@ -770,7 +733,6 @@ testShowUpgradeMessageFree()
 testShowUpgradeMessagePro()
 testShowLicenseStatusFree()
 testShowLicenseStatusPro()
-testValidEnterpriseLicense()
 testLicenseStatusWithError()
 
 console.log('============================================================')

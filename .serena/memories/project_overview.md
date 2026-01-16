@@ -24,7 +24,7 @@ QA Architect (`create-qa-architect`) is a CLI tool that bootstraps quality autom
 
 ## Key Features
 
-- Freemium model: FREE/PRO/TEAM/ENTERPRISE tiers
+- Freemium model: FREE/PRO tiers
 - Multi-language: JS/TS/Python/Shell scripts
 - Adaptive quality: Project maturity detection (minimal→production-ready)
 - Workflow tiers: Minimal/Standard/Comprehensive CI modes

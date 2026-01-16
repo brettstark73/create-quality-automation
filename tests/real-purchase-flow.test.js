@@ -96,14 +96,6 @@ async function testWebhookLicensePopulation() {
       email: 'customer@example.com',
       privateKey,
     })
-    const enterpriseEntry = buildSignedLicenseEntry({
-      licenseKey: 'QAA-9999-8888-EFGH-1234',
-      tier: 'ENTERPRISE',
-      isFounder: false,
-      email: 'enterprise@company.com',
-      privateKey,
-    })
-
     const mockDatabase = buildSignedRegistry(
       {
         [proEntry.licenseKey]: {
@@ -114,19 +106,11 @@ async function testWebhookLicensePopulation() {
           signature: proEntry.signature,
           keyId: 'test-key',
         },
-        [enterpriseEntry.licenseKey]: {
-          tier: enterpriseEntry.tier,
-          isFounder: enterpriseEntry.isFounder,
-          issued: enterpriseEntry.issued,
-          emailHash: enterpriseEntry.emailHash,
-          signature: enterpriseEntry.signature,
-          keyId: 'test-key',
-        },
       },
       privateKey
     )
 
-    console.log('  ✅ Webhook database created with 2 legitimate licenses')
+    console.log('  ✅ Webhook database created with 1 legitimate license')
     return { mockDatabase }
   } catch (error) {
     console.error(`  ❌ Test failed: ${error.message}`)

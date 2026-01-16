@@ -19,7 +19,7 @@
 
 ### License System (`lib/licensing.js`)
 
-- Tier system: FREE/PRO/TEAM/ENTERPRISE
+- Tier system: FREE/PRO
 - Feature gating: `hasFeature('smartTestStrategy')`
 - Usage caps: 1 private repo, 50 runs/month (FREE)
 - License info: `getLicenseInfo()`

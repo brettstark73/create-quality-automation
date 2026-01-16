@@ -113,7 +113,7 @@ CLI (setup.js) → Commands → Business Logic → Utilities
 - ✅ config/constants.js for all magic numbers
 - ✅ config/defaults.js for default scripts/dependencies
 - ✅ Environment variables: QAA_LICENSE_DIR, QAA_ERROR_DIR, QAA_TELEMETRY_DIR
-- ✅ Feature flags via tier system (FREE/PRO/TEAM/ENTERPRISE)
+- ✅ Feature flags via tier system (FREE/PRO)
 
 #### Upgrade/Migration Path
 
@@ -402,7 +402,7 @@ Remaining low-priority items in BACKLOG.md:
    - Extensible linter/formatter support
    - Community plugins for new languages
 
-2. **Cloud Sync (Team/Enterprise)**
+2. **Cloud Sync (Future)**
    - Shared policies across teams
    - Centralized dashboard
 

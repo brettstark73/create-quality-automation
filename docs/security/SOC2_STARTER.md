@@ -19,7 +19,7 @@ This starter doc is a lightweight preflight for teams using QA Architect. It is 
 
 ## Gaps to plan for
 
-- **SSO/SAML & RBAC:** Roadmap item (Enterprise); track in issue tracker.
+- **SSO/SAML & RBAC:** Future roadmap item; track in issue tracker.
 - **Audit logging:** Add a central log sink (e.g., S3/CloudWatch) for CI events.
 - **Vendor risk:** Document third-party actions; pin SHAs (already pinned in quality.yml) and review quarterly.
 
