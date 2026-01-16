@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.9.0] - 2026-01-16
+
+### Changed
+
+- **Licensing Simplification**: Removed TEAM and ENTERPRISE tiers
+  - Simplified to FREE + PRO two-tier model (TEAM/ENTERPRISE were marked "coming soon" but never implemented)
+  - Removed 244 lines of unused code (RBAC, SSO, SAML, Slack integration, multi-repo dashboard, audit logging)
+  - No impact on existing FREE/PRO users
+  - Updated: lib/licensing.js (tiers, features, upgrade messages), webhook-handler.js (Stripe prices), admin-license.js
+  - Updated tests: removed TEAM/ENTERPRISE test cases, fixed security tampering tests
+  - Updated documentation: README.md, CLAUDE.md, docs/, .serena/memories
+  - Result: Clean two-tier architecture with no unimplemented features
+
 ## [5.8.0] - 2026-01-14
 
 ### Fixed
