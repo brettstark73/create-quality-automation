@@ -303,8 +303,8 @@
 
 ## Completed ✅
 
-| ID  | Feature                                                    | Completed  |
-| --- | ---------------------------------------------------------- | ---------- |
+| ID  | Item                                                       | Type       | Completed |
+| --- | ---------------------------------------------------------- | ---------- | --------- |
 | Q12 | GitHub Actions cost analyzer + workflow tiers (3 CI modes) | 2026-01-07 |
 | Q11 | Bash/Shell script support                                  | 2026-01-06 |
 | ✓   | SOTA audit: TD1-TD4 security/arch                          | 2025-12-30 |
