@@ -255,7 +255,7 @@ if: github.event.pull_request.draft == false
 
 **Current Default** (what qa-architect creates):
 
-- ❌ Enterprise-grade CI for solo devs
+- ❌ Comprehensive CI for solo devs
 - ❌ Costs $100-350/mo for typical projects
 - ❌ Over-engineering: Gitleaks + Semgrep on every commit
 

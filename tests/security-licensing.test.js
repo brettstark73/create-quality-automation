@@ -228,7 +228,7 @@ function testLicenseSignatureValidation() {
   }
 
   // Test tampered payload (change tier)
-  const tamperedPayload = { ...signedEntry.payload, tier: 'ENTERPRISE' }
+  const tamperedPayload = { ...signedEntry.payload, tier: 'FREE' }
   if (verifyLicenseSignature(tamperedPayload, signedEntry.signature)) {
     console.error(
       '  ❌ SECURITY VIOLATION: Tampered payload with valid signature was accepted'
@@ -292,12 +292,12 @@ function testLocalLicenseFileTamperingDetection() {
   // Test 2: Tampered payload in license file (signature should detect this)
   const tamperedPayload = {
     ...entry.payload,
-    tier: 'ENTERPRISE',
+    tier: 'FREE',
   }
 
   const tamperedLicenseData = {
     ...validLicenseData,
-    tier: 'ENTERPRISE', // Changed top-level tier
+    tier: 'FREE', // Changed top-level tier
     payload: tamperedPayload, // Changed payload tier - signature should be invalid
   }
 

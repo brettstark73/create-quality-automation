@@ -58,14 +58,12 @@ npx create-qa-architect@latest
 
 ## Pricing
 
-| Tier           | Price             | What You Get                                                                                       |
-| -------------- | ----------------- | -------------------------------------------------------------------------------------------------- |
-| **Free**       | $0                | CLI tool, basic linting/formatting, npm audit (capped: 1 private repo, 50 runs/mo)                 |
-| **Pro**        | $19/mo or $190/yr | **Security scanning (Gitleaks + ESLint security)**, Smart Test Strategy, multi-language, unlimited |
-| **Team**       | Contact us        | + RBAC, Slack alerts, multi-repo dashboard, team audit log _(coming soon)_                         |
-| **Enterprise** | Contact us        | + SSO/SAML, custom policies, compliance pack, dedicated TAM _(coming soon)_                        |
+| Tier     | Price             | What You Get                                                                                       |
+| -------- | ----------------- | -------------------------------------------------------------------------------------------------- |
+| **Free** | $0                | CLI tool, basic linting/formatting, npm audit (capped: 1 private repo, 50 runs/mo)                 |
+| **Pro**  | $19/mo or $190/yr | **Security scanning (Gitleaks + ESLint security)**, Smart Test Strategy, multi-language, unlimited |
 
-> **Pro included in [VBL Starter Kit](https://vibebuildlab.com/starter-kit)** — Team/Enterprise are standalone purchases.
+> **Pro included in [VBL Starter Kit](https://vibebuildlab.com/starter-kit)**
 
 ### Security Features by Tier
 
@@ -138,7 +136,7 @@ npx create-qa-architect@latest --workflow-standard
 
 ### Comprehensive - $100-350/month
 
-**Best for:** Enterprise teams, high-compliance projects, large teams
+**Best for:** High-compliance projects, large teams
 
 - Matrix testing (Node 20 + 22) on **every commit**
 - Security scans inline (every commit)
@@ -188,7 +186,7 @@ Shows estimated GitHub Actions usage and provides optimization recommendations.
 
 ### License
 
-**Commercial License (freemium)** — free tier covers the basic CLI; Pro/Team/Enterprise features require a paid subscription. See [LICENSE](LICENSE).
+**Commercial License (freemium)** — free tier covers the basic CLI; Pro features require a paid subscription. See [LICENSE](LICENSE).
 
 ## Tech Stack
 
@@ -381,7 +379,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ## License
 
-Commercial freemium license — the base CLI is free to use; Pro/Team/Enterprise features require a paid subscription. See [LICENSE](LICENSE) for details.
+Commercial freemium license — the base CLI is free to use; Pro features require a paid subscription. See [LICENSE](LICENSE) for details.
 
 ## Legal
 

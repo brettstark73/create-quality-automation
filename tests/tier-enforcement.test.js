@@ -3,7 +3,7 @@
 /**
  * Tier Enforcement Tests
  *
- * Tests FREE tier cap enforcement and TEAM tier access paths
+ * Tests FREE tier cap enforcement and PRO tier access paths
  * Validates the monetization restructure works correctly
  */
 
@@ -57,8 +57,6 @@ function setTier(tier) {
   } else {
     const tierKeys = {
       PRO: 'QAA-AAAA-BBBB-CCCC-DDDD',
-      TEAM: 'QAA-BBBB-CCCC-DDDD-EEEE',
-      ENTERPRISE: 'QAA-CCCC-DDDD-EEEE-FFFF',
     }
     saveLicense(tier, tierKeys[tier], 'test@example.com')
   }
@@ -88,12 +86,12 @@ function testFreeTierCaps() {
 }
 
 /**
- * Test 2: PRO/TEAM/ENTERPRISE tiers have unlimited caps
+ * Test 2: PRO tier has unlimited caps
  */
 function testPaidTiersUnlimited() {
-  console.log('Test 2: PRO/TEAM/ENTERPRISE tiers have unlimited caps')
+  console.log('Test 2: PRO tier has unlimited caps')
 
-  const paidTiers = ['PRO', 'TEAM', 'ENTERPRISE']
+  const paidTiers = ['PRO']
 
   for (const tier of paidTiers) {
     const features = FEATURES[LICENSE_TIERS[tier]]
@@ -191,7 +189,7 @@ function testPaidTiersBypassCaps() {
   cleanTestEnv()
   console.log('Test 6: Paid tiers bypass cap checks')
 
-  const paidTiers = ['PRO', 'TEAM', 'ENTERPRISE']
+  const paidTiers = ['PRO']
 
   for (const tier of paidTiers) {
     setTier(tier)
@@ -211,31 +209,6 @@ function testPaidTiersBypassCaps() {
 
   console.log('  ✅ All paid tiers bypass cap checks\n')
   return true
-}
-
-/**
- * Test 7: TEAM tier gets premium features
- */
-function testTeamTierFeatures() {
-  cleanTestEnv()
-  console.log('Test 7: TEAM tier gets premium features')
-
-  const teamFeatures = FEATURES[LICENSE_TIERS.TEAM]
-
-  if (
-    teamFeatures.dependencyMonitoring === 'premium' &&
-    teamFeatures.smartTestStrategy === true &&
-    teamFeatures.securityScanning === true &&
-    teamFeatures.frameworkGrouping === true &&
-    teamFeatures.teamPolicies === true
-  ) {
-    console.log('  ✅ TEAM tier has all premium features\n')
-    return true
-  } else {
-    console.error('  ❌ TEAM tier missing premium features')
-    console.error('  Features:', teamFeatures)
-    process.exit(1)
-  }
 }
 
 /**
@@ -303,7 +276,6 @@ try {
   testIncrementUsagePrePush()
   testCheckUsageCapsAtLimit()
   testPaidTiersBypassCaps()
-  testTeamTierFeatures()
   testUsageSummaryRemaining()
   testDependencyPRCap()
 
@@ -317,7 +289,7 @@ try {
   console.log('✅ Paid tiers have unlimited access')
   console.log('✅ Usage tracking works for all operation types')
   console.log('✅ Cap enforcement blocks operations at limit')
-  console.log('✅ TEAM tier has all premium features')
+
   console.log('')
 } catch (error) {
   console.error('❌ Test failed:', error.message)
