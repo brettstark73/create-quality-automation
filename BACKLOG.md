@@ -180,33 +180,39 @@
 
 ---
 
-## 🚨 CRITICAL: CI Pipeline Failures (2026-01-07)
+## 🚨 CRITICAL: CI Pipeline Failures (2026-01-07) - ✅ RESOLVED (2026-01-17)
 
 **Priority**: BLOCKING - Must fix before any merges
 
-| ID  | Issue                                    | Type | Effort | Priority | Status  |
-| --- | ---------------------------------------- | ---- | ------ | -------- | ------- |
-| CI1 | **Missing validate-claude-md.js script** | Bug  | S      | CRITICAL | Pending |
-| CI2 | **core-checks failing (Node 20 & 22)**   | Bug  | M      | CRITICAL | Pending |
-| CI3 | **documentation check failing**          | Bug  | M      | CRITICAL | Pending |
-| CI4 | **security check failing**               | Bug  | M      | CRITICAL | Pending |
+| ID  | Issue                                    | Type | Effort | Priority | Status   |
+| --- | ---------------------------------------- | ---- | ------ | -------- | -------- |
+| CI1 | **Missing validate-claude-md.js script** | Bug  | S      | CRITICAL | N/A      |
+| CI2 | **core-checks failing (Node 20 & 22)**   | Bug  | M      | CRITICAL | N/A      |
+| CI3 | **documentation check failing**          | Bug  | M      | CRITICAL | ✅ Fixed |
+| CI4 | **security check failing**               | Bug  | M      | CRITICAL | ✅ Fixed |
 
-### Details
+### Resolution (2026-01-17)
 
-**CI1: Missing validate-claude-md.js script**
+**Root Causes Identified:**
 
-- **Error**: `Cannot find module '/home/runner/work/qa-architect/qa-architect/scripts/validate-claude-md.js'`
-- **Impact**: CLAUDE.md validation workflow fails on every PR
-- **Root cause**: Script referenced in `.github/workflows/` but doesn't exist in `scripts/`
-- **Fix**: Either create the missing script or remove the validation step
-- **Effort**: 30 min
+1. **Gitleaks false positives** - Test files with mock license keys (QAA-XXXX format) were triggering secret detection in CI's shallow clone environment
+2. **Documentation validation** - README.md example output referenced `ci.yml` and `test.yml` workflow files that don't exist in this repo
 
-**CI2-CI4: Multiple workflow check failures**
+**Fixes Applied:**
 
-- **Checks failing**: core-checks, documentation, security
-- **Impact**: Cannot merge any PRs until fixed
-- **Investigation needed**: Check CI logs to determine root cause
-- **Effort**: 2-4 hours total
+- **CI3 (Documentation)**: Added `ci.yml` and `test.yml` to the `createdByTool` skip list in `lib/validation/documentation.js` since these are common workflow names users might have
+- **CI4 (Security)**: Added missing wildcard entries to `.gitleaksignore` for all test license keys:
+  - `tests/real-purchase-flow.test.js` (lines 144, 238, 285, 300, 331, 363)
+  - `tests/tier-enforcement.test.js` (line 59)
+
+**CI1 & CI2**: These were not actual issues - script exists and core checks were passing
+
+**Commits:**
+
+- `c0865b8` - fix: add missing gitleaks ignore entries for test files
+- `142f4fe` - fix: skip common workflow names in documentation validation
+
+**Verification**: All CI checks now passing ✅
 
 ---
 
