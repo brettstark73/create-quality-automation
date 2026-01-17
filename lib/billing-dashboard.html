@@ -462,7 +462,10 @@
     </div>
 
     <script>
-      const stripe = Stripe('pk_test_your_stripe_publishable_key_here') // Replace with actual key
+      // DEPLOYMENT: Replace with your Stripe publishable key
+      // Test mode: pk_test_...
+      // Live mode: pk_live_...
+      const stripe = Stripe('pk_live_your_stripe_publishable_key_here')
       let selectedTier = null
       let isFounder = true // Enable founder pricing
 

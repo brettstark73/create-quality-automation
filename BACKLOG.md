@@ -280,9 +280,7 @@
 
 **Scoring**: (Revenue + Retention + Differentiation) ÷ Effort = Priority Score
 
-| ID  | Feature                      | Value Drivers      | Effort | Score | Tier | Status   |
-| --- | ---------------------------- | ------------------ | ------ | ----- | ---- | -------- |
-| B1  | **Copy Stripe to live mode** | Rev:5 Ret:3 Diff:2 | S      | 10.0  | -    | 🔜 Ready |
+_No items - All high-value work complete!_
 
 ## 📊 Medium Value - Worth Doing
 
@@ -307,6 +305,7 @@
 
 | ID  | Item                                                       | Type    | Completed  |
 | --- | ---------------------------------------------------------- | ------- | ---------- |
+| B1  | Stripe live mode deployment (docs + config)                | Feature | 2026-01-17 |
 | Q1  | Lighthouse CI (Free: basic, Pro: thresholds)               | Feature | 2026-01-16 |
 | Q2  | Bundle size limits (size-limit)                            | Feature | 2026-01-17 |
 | Q3  | axe-core accessibility (WCAG testing scaffolding)          | Feature | 2026-01-17 |
