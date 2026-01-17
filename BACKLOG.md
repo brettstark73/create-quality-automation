@@ -279,14 +279,13 @@
 
 **Scoring**: (Revenue + Retention + Differentiation) ÷ Effort = Priority Score
 
-| ID  | Feature                      | Value Drivers      | Effort | Score | Tier                            | Status         |
-| --- | ---------------------------- | ------------------ | ------ | ----- | ------------------------------- | -------------- |
-| B1  | **Copy Stripe to live mode** | Rev:5 Ret:3 Diff:2 | S      | 10.0  | -                               | 🔜 Ready       |
-| Q1  | **Lighthouse CI**            | Rev:3 Ret:4 Diff:5 | S      | 12.0  | Free (basic) / Pro (thresholds) | 🔄 In Progress |
-| Q2  | **Bundle size limits**       | Rev:3 Ret:4 Diff:4 | S      | 11.0  | Pro                             | Pending        |
-| Q5  | **Coverage thresholds**      | Rev:3 Ret:4 Diff:3 | S      | 10.0  | Pro                             | Pending        |
-| Q3  | **axe-core accessibility**   | Rev:2 Ret:3 Diff:4 | S      | 9.0   | Free                            | Pending        |
-| Q4  | **Conventional commits**     | Rev:2 Ret:4 Diff:3 | S      | 9.0   | Free                            | Pending        |
+| ID  | Feature                      | Value Drivers      | Effort | Score | Tier | Status   |
+| --- | ---------------------------- | ------------------ | ------ | ----- | ---- | -------- |
+| Q2  | **Bundle size limits**       | Rev:3 Ret:4 Diff:4 | S      | 11.0  | Pro  | Pending  |
+| B1  | **Copy Stripe to live mode** | Rev:5 Ret:3 Diff:2 | S      | 10.0  | -    | 🔜 Ready |
+| Q5  | **Coverage thresholds**      | Rev:3 Ret:4 Diff:3 | S      | 10.0  | Pro  | Pending  |
+| Q3  | **axe-core accessibility**   | Rev:2 Ret:3 Diff:4 | S      | 9.0   | Free | Pending  |
+| Q4  | **Conventional commits**     | Rev:2 Ret:4 Diff:3 | S      | 9.0   | Free | Pending  |
 
 ## 📊 Medium Value - Worth Doing
 
@@ -309,17 +308,18 @@
 
 ## Completed ✅
 
-| ID  | Item                                                       | Type       | Completed |
-| --- | ---------------------------------------------------------- | ---------- | --------- |
-| Q12 | GitHub Actions cost analyzer + workflow tiers (3 CI modes) | 2026-01-07 |
-| Q11 | Bash/Shell script support                                  | 2026-01-06 |
-| ✓   | SOTA audit: TD1-TD4 security/arch                          | 2025-12-30 |
-| ✓   | Pre-launch validation suite (5.3.0)                        | 2025-12-29 |
-| ✓   | Quality tools integration (5.2.0)                          | 2025-12-29 |
-| ✓   | Stripe payment flow (test mode)                            | 2025-12-23 |
-| ✓   | Landing page comparison table                              | 2025-12-23 |
-| ✓   | Terminal demo animation                                    | 2025-12-26 |
-| ✓   | Expanded FAQs                                              | 2025-12-26 |
+| ID  | Item                                                       | Type    | Completed  |
+| --- | ---------------------------------------------------------- | ------- | ---------- |
+| Q1  | Lighthouse CI (Free: basic, Pro: thresholds)               | Feature | 2026-01-16 |
+| Q12 | GitHub Actions cost analyzer + workflow tiers (3 CI modes) | Feature | 2026-01-07 |
+| Q11 | Bash/Shell script support                                  | Feature | 2026-01-06 |
+| ✓   | SOTA audit: TD1-TD4 security/arch                          | Quality | 2025-12-30 |
+| ✓   | Pre-launch validation suite (5.3.0)                        | Feature | 2025-12-29 |
+| ✓   | Quality tools integration (5.2.0)                          | Feature | 2025-12-29 |
+| ✓   | Stripe payment flow (test mode)                            | Feature | 2025-12-23 |
+| ✓   | Landing page comparison table                              | Feature | 2025-12-23 |
+| ✓   | Terminal demo animation                                    | Feature | 2025-12-26 |
+| ✓   | Expanded FAQs                                              | Feature | 2025-12-26 |
 
 ---
 
