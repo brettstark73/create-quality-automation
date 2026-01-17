@@ -8,3 +8,6 @@ coverage/
 .create-quality-automation-cache/
 coverage/
 .playwright-mcp/
+
+# QA Architect license files (never commit)
+.qa-architect/
