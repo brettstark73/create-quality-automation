@@ -43,6 +43,7 @@ QA Architect uses Stripe for Pro tier subscriptions ($49/mo or $490/yr). The sys
    - `customer.subscription.created`
    - `customer.subscription.updated`
    - `customer.subscription.deleted`
+   - `invoice.payment_succeeded`
 5. Click "Add endpoint"
 6. Reveal and copy the webhook signing secret (starts with `whsec_`)
 
