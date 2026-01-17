@@ -78,7 +78,14 @@ tests/security-licensing.test.js:generic-api-key:146
 tests/security-licensing.test.js:generic-api-key:207
 tests/security-licensing.test.js:generic-api-key:260
 tests/real-purchase-flow.test.js:generic-api-key:93
+tests/real-purchase-flow.test.js:generic-api-key:144
+tests/real-purchase-flow.test.js:generic-api-key:238
+tests/real-purchase-flow.test.js:generic-api-key:285
+tests/real-purchase-flow.test.js:generic-api-key:300
+tests/real-purchase-flow.test.js:generic-api-key:331
 tests/real-purchase-flow.test.js:generic-api-key:347
+tests/real-purchase-flow.test.js:generic-api-key:363
+tests/tier-enforcement.test.js:generic-api-key:59
 tests/licensing.test.js:generic-api-key:151
 tests/licensing.test.js:generic-api-key:190
 tests/licensing.test.js:generic-api-key:267
