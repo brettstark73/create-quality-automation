@@ -80,7 +80,8 @@
     "eslint.config.ts.cjs",
     ".stylelintrc.json",
     ".editorconfig",
-    ".nvmrc"
+    ".nvmrc",
+    "public-key.pem"
   ],
   "repository": {
     "type": "git",
