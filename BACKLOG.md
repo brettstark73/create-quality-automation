@@ -282,11 +282,7 @@
 
 | ID  | Feature                      | Value Drivers      | Effort | Score | Tier | Status   |
 | --- | ---------------------------- | ------------------ | ------ | ----- | ---- | -------- |
-| Q2  | **Bundle size limits**       | Rev:3 Ret:4 Diff:4 | S      | 11.0  | Pro  | Pending  |
 | B1  | **Copy Stripe to live mode** | Rev:5 Ret:3 Diff:2 | S      | 10.0  | -    | 🔜 Ready |
-| Q5  | **Coverage thresholds**      | Rev:3 Ret:4 Diff:3 | S      | 10.0  | Pro  | Pending  |
-| Q3  | **axe-core accessibility**   | Rev:2 Ret:3 Diff:4 | S      | 9.0   | Free | Pending  |
-| Q4  | **Conventional commits**     | Rev:2 Ret:4 Diff:3 | S      | 9.0   | Free | Pending  |
 
 ## 📊 Medium Value - Worth Doing
 
@@ -312,6 +308,10 @@
 | ID  | Item                                                       | Type    | Completed  |
 | --- | ---------------------------------------------------------- | ------- | ---------- |
 | Q1  | Lighthouse CI (Free: basic, Pro: thresholds)               | Feature | 2026-01-16 |
+| Q2  | Bundle size limits (size-limit)                            | Feature | 2026-01-17 |
+| Q3  | axe-core accessibility (WCAG testing scaffolding)          | Feature | 2026-01-17 |
+| Q4  | Conventional commits (commitlint)                          | Feature | 2026-01-17 |
+| Q5  | Coverage thresholds enforcement                            | Feature | 2026-01-17 |
 | Q12 | GitHub Actions cost analyzer + workflow tiers (3 CI modes) | Feature | 2026-01-07 |
 | Q11 | Bash/Shell script support                                  | Feature | 2026-01-06 |
 | ✓   | SOTA audit: TD1-TD4 security/arch                          | Quality | 2025-12-30 |
@@ -334,7 +334,7 @@
 - Dead code detection (knip)
 - Changelog generation
 
-**Pro Tier** ($19/mo) - Advanced quality controls:
+**Pro Tier** ($49/mo) - Advanced quality controls:
 
 - Lighthouse CI with custom thresholds & budgets
 - Bundle size limits (size-limit)
