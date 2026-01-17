@@ -11,3 +11,8 @@ coverage/
 
 # QA Architect license files (never commit)
 .qa-architect/
+
+# License signing keys (never commit private key)
+private-key.pem
+legitimate-licenses.json
+legitimate-licenses.public.json

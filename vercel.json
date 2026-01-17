@@ -1,0 +1,26 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "webhook-handler.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/webhook",
+      "dest": "webhook-handler.js"
+    },
+    {
+      "src": "/status",
+      "dest": "webhook-handler.js"
+    },
+    {
+      "src": "/db/public",
+      "dest": "webhook-handler.js"
+    }
+  ],
+  "env": {
+    "NODE_ENV": "production"
+  }
+}
