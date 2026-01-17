@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.9.1] - 2026-01-17
+
+### Fixed
+
+- **Workflow Path Resolution**: Fixed quality.yml template to support both local and node_modules file paths
+  - Workflow now checks for files locally first (for qa-architect itself), then falls back to `node_modules/create-qa-architect/` (for projects using the tool)
+  - Fixes workflow failures in projects where `lib/project-maturity.js`, `setup.js`, and `scripts/check-docs.sh` were missing
+  - Affected workflow steps: detect-maturity, security checks, documentation validation
+  - No changes needed for existing projects - workflows will automatically work correctly
+
 ## [5.9.0] - 2026-01-16
 
 ### Changed
