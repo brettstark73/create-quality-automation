@@ -79,9 +79,24 @@ const PORT = process.env.PORT || 3000
 
 if (!STRIPE_SECRET_KEY || !STRIPE_WEBHOOK_SECRET) {
   console.error('❌ Required environment variables missing:')
-  console.error('   STRIPE_SECRET_KEY - Your Stripe secret key')
-  console.error('   STRIPE_WEBHOOK_SECRET - Your Stripe webhook secret')
+  console.error(
+    '   STRIPE_SECRET_KEY - Your Stripe secret key (sk_live_... for production)'
+  )
+  console.error(
+    '   STRIPE_WEBHOOK_SECRET - Your Stripe webhook secret (whsec_...)'
+  )
+  console.error('')
+  console.error('📖 See docs/STRIPE-LIVE-MODE-DEPLOYMENT.md for setup guide')
   process.exit(1)
+}
+
+// Warn if using test mode keys in production
+if (STRIPE_SECRET_KEY.startsWith('sk_test_')) {
+  console.warn('⚠️  WARNING: Using Stripe TEST mode key')
+  console.warn('   This will NOT process real payments')
+  console.warn('   For production, use sk_live_... key')
+  console.warn('   See docs/STRIPE-LIVE-MODE-DEPLOYMENT.md')
+  console.warn('')
 }
 
 if (!LICENSE_REGISTRY_PRIVATE_KEY) {

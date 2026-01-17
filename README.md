@@ -372,6 +372,29 @@ Want to improve this tool?
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
+## Pro Tier & Billing
+
+### Purchasing Pro
+
+Pro tier ($49/mo or $490/yr) includes:
+
+- Security scanning (Gitleaks + ESLint security rules)
+- Smart Test Strategy (risk-based pre-push validation)
+- Multi-language support (Python, Shell scripts)
+- Unlimited private repos and runs
+
+Purchase at [vibebuildlab.com/qa-architect](https://vibebuildlab.com/qa-architect)
+
+### Server-Side Setup (Maintainers Only)
+
+The billing system uses Stripe webhooks to manage licenses. If you're deploying your own instance:
+
+1. Set up webhook handler (see `webhook-handler.js`)
+2. Configure Stripe live mode keys
+3. Deploy to production server
+
+See [docs/STRIPE-LIVE-MODE-DEPLOYMENT.md](docs/STRIPE-LIVE-MODE-DEPLOYMENT.md) for complete setup guide.
+
 ## Support
 
 1. Review GitHub Actions logs
