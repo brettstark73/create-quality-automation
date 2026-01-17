@@ -220,13 +220,13 @@
 
 **Priority**: Critical for production readiness
 
-| ID   | Issue                                            | Type      | Effort | Priority | Status  |
-| ---- | ------------------------------------------------ | --------- | ------ | -------- | ------- |
-| TD32 | **Fix Python setup test failure**                | Bug       | S      | High     | Pending |
-| TD33 | **Improve test coverage to 75%**                 | Quality   | M      | High     | ✅ Done |
-| TD34 | **Add integration test for --analyze-ci**        | Testing   | S      | Medium   | ✅ Done |
-| MK1  | **Update landing-page.html with workflow tiers** | Marketing | S      | Medium   | ✅ Done |
-| MK2  | **Update vibebuildlab.com/qa-architect page**    | Marketing | M      | Medium   | Pending |
+| ID   | Issue                                                                | Type      | Effort | Priority | Status  |
+| ---- | -------------------------------------------------------------------- | --------- | ------ | -------- | ------- |
+| TD32 | **Fix Python setup test failure**                                    | Bug       | S      | High     | Pending |
+| TD33 | **Improve test coverage to 75%**                                     | Quality   | M      | High     | ✅ Done |
+| TD34 | **Add integration test for --analyze-ci**                            | Testing   | S      | Medium   | ✅ Done |
+| MK1  | **Update marketing/reference/landing-page.html with workflow tiers** | Marketing | S      | Medium   | ✅ Done |
+| MK2  | **Update vibebuildlab.com/qa-architect page**                        | Marketing | M      | Medium   | Pending |
 
 ### Details
 
@@ -256,9 +256,10 @@
 - **Tests cover**: Basic workflow, matrix detection, optimized workflow, error handling
 - **Part of**: TD33 coverage improvement
 
-**MK1: Update landing-page.html with workflow tiers** ✅ Done (2026-01-07)
+**MK1: Update marketing/reference/landing-page.html with workflow tiers** ✅ Done (2026-01-07)
 
 - **Completed**: Updated landing page with CI cost optimization messaging
+- **Note**: This is a reference copy for marketing team. Live site updates must be synced to vibebuildlab project.
 - **Changes**:
   - Hero section: "Cut GitHub Actions costs by 95% + reduce dependency PRs by 60%"
   - Stats bar: Added 95% CI cost reduction, $0-5/mo minimal tier cost

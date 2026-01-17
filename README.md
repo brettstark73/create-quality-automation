@@ -61,7 +61,7 @@ npx create-qa-architect@latest
 | Tier     | Price             | What You Get                                                                                       |
 | -------- | ----------------- | -------------------------------------------------------------------------------------------------- |
 | **Free** | $0                | CLI tool, basic linting/formatting, npm audit (capped: 1 private repo, 50 runs/mo)                 |
-| **Pro**  | $19/mo or $190/yr | **Security scanning (Gitleaks + ESLint security)**, Smart Test Strategy, multi-language, unlimited |
+| **Pro**  | $49/mo or $490/yr | **Security scanning (Gitleaks + ESLint security)**, Smart Test Strategy, multi-language, unlimited |
 
 > **Pro included in [VBL Starter Kit](https://vibebuildlab.com/starter-kit)**
 
