@@ -12,15 +12,23 @@ name: Quality Checks
 on:
   push:
     branches: [main, master, develop]
-    # PATH_FILTERS_PLACEHOLDER
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - 'LICENSE'
+      - '.gitignore'
+      - '.editorconfig'
   pull_request:
     branches: [main, master, develop]
-  # SECURITY_SCHEDULE_PLACEHOLDER
+  schedule:
+    - cron: '0 0 * * 0' # Weekly on Sunday (security scans)
+  workflow_dispatch: # Manual trigger
 
 # Prevent duplicate runs - cancel in-progress when new commit pushed
 concurrency:
   group: quality-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
+# WORKFLOW_MODE: minimal
 
 jobs:
   # Step 1: Detect project maturity level and package manager
@@ -156,8 +164,7 @@ jobs:
   security:
     runs-on: ubuntu-latest
     needs: detect-maturity
-    # SECURITY_CONDITION_PLACEHOLDER
-    if: needs.detect-maturity.outputs.has-deps == 'true'
+    if: (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && needs.detect-maturity.outputs.has-deps == 'true'
 
     steps:
       - name: Checkout code
@@ -276,8 +283,6 @@ jobs:
     runs-on: ubuntu-latest
     needs: detect-maturity
     if: fromJSON(needs.detect-maturity.outputs.test-count) > 0
-    # TESTS_CONDITION_PLACEHOLDER
-    # MATRIX_PLACEHOLDER
     strategy:
       fail-fast: false
       matrix:
@@ -534,6 +539,6 @@ jobs:
           else
             echo "- ⚠️ Documentation: $DOCS_RESULT" >> $GITHUB_STEP_SUMMARY
           fi
-      # PR_COMMENTS_PLACEHOLDER
+            # PR comment step not enabled (use --pr-comments to add)
 
-# ALERTS_PLACEHOLDER
+  # Slack alerts not enabled (use --alerts-slack to add)
