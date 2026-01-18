@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Security Configuration**: Added gitleaks configuration for secrets scanning
+- **Troubleshooting Documentation**: Added comprehensive quality troubleshooting guides and Stripe environment setup
+- **Test Infrastructure**: Added accessibility, E2E, and placeholder test files with proper TypeScript configuration
+
+### Changed
+
+- **Quality Workflow**: Updated GitHub Actions quality workflow and pre-push hooks
+- **Smart Test Strategy**: Enhanced test strategy script for better risk assessment
+- **Lint Configuration**: Fixed lint-staged TypeScript configuration to avoid project conflicts
+
+### Fixed
+
+- **Test Error Handling**: Fixed undefined stdout/stderr handling in deps-edge-cases test
+
 ## [5.9.1] - 2026-01-17
 
 ### Fixed
