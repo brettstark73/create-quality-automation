@@ -1,7 +1,16 @@
 const js = require('@eslint/js')
 const globals = require('globals')
 
+let tsPlugin = null
+let tsParser = null
 let security = null
+try {
+  tsPlugin = require('@typescript-eslint/eslint-plugin')
+  tsParser = require('@typescript-eslint/parser')
+} catch {
+  // TypeScript tooling not installed yet; fall back to JS-only config.
+}
+
 try {
   security = require('eslint-plugin-security')
 } catch {
@@ -10,41 +19,7 @@ try {
 
 const configs = [
   {
-    ignores: [
-      // Dependencies
-      '**/node_modules/**',
-      // Build outputs
-      '**/dist/**',
-      '**/build/**',
-      '**/out/**',
-      '**/.next/**',
-      // Test coverage
-      '**/coverage/**',
-      '**/.nyc_output/**',
-      // Cache directories
-      '**/.cache/**',
-      '**/.eslintcache',
-      '**/.stylelintcache',
-      // Package artifacts
-      '**/*.tgz',
-      '**/package/**',
-      // Logs
-      '**/*.log',
-      '**/npm-debug.log*',
-      // Environment files
-      '**/.env',
-      '**/.env.*',
-      // IDE
-      '**/.vscode/**',
-      '**/.idea/**',
-      // OS files
-      '**/.DS_Store',
-      '**/Thumbs.db',
-      // HTML files
-      '**/*.html',
-      // User config symlinks
-      '**/.claude-setup/**',
-    ],
+    ignores: ['**/node_modules/**', '**/dist/**', '**/build/**'],
   },
   js.configs.recommended,
 ]
@@ -61,15 +36,6 @@ const baseRules = {
   'no-implied-eval': 'error',
   'no-new-func': 'error',
   'no-script-url': 'error',
-  // Allow intentionally unused variables prefixed with underscore
-  'no-unused-vars': [
-    'error',
-    {
-      argsIgnorePattern: '^_',
-      varsIgnorePattern: '^_',
-      caughtErrorsIgnorePattern: '^_',
-    },
-  ],
 }
 
 // Security rules only if plugin is loaded
@@ -107,13 +73,27 @@ configs.push({
   },
 })
 
-// Override for test files - disable filesystem security warnings
-configs.push({
-  files: ['tests/**/*.js', 'scripts/**/*.js', 'lib/**/*.js', 'setup.js'],
-  rules: {
-    'security/detect-non-literal-fs-filename': 'off',
-    'security/detect-object-injection': 'off',
-  },
-})
+if (tsPlugin && tsParser) {
+  configs.push({
+    files: ['**/*.{ts,tsx}'],
+    languageOptions: {
+      parser: tsParser,
+      parserOptions: {
+        ecmaVersion: 2022,
+        sourceType: 'module',
+      },
+      globals: {
+        ...globals.browser,
+        ...globals.node,
+      },
+    },
+    plugins: {
+      '@typescript-eslint': tsPlugin,
+    },
+    rules: {
+      ...tsPlugin.configs.recommended.rules,
+    },
+  })
+}
 
 module.exports = configs
