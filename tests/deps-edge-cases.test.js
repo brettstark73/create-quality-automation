@@ -182,7 +182,9 @@ gem "pg", "~> 1.5"
     } catch (error) {
       const output = error.stderr
         ? error.stderr.toString()
-        : error.stdout.toString()
+        : error.stdout
+          ? error.stdout.toString()
+          : error.message || ''
       assert.ok(
         output.includes('Pro, Team, or Enterprise'),
         'Should require Pro tier'
