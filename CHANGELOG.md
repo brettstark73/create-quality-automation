@@ -7,20 +7,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.10.0] - 2026-01-19
+
 ### Added
 
+- **Development Workflow Documentation**: Added comprehensive `docs/DEVELOPMENT-WORKFLOW.md` explaining all stages from local dev to production
+- **Turborepo Support**: Added automatic Turborepo detection and integration in CI workflows
+  - Detects `turbo.json` and sets `is-turborepo` flag
+  - Adds `turbo-prefix` output for running tasks with `turbo run`
+  - Full documentation in `docs/TURBOREPO-SUPPORT.md`
 - **Security Configuration**: Added gitleaks configuration for secrets scanning
 - **Troubleshooting Documentation**: Added comprehensive quality troubleshooting guides and Stripe environment setup
 - **Test Infrastructure**: Added accessibility, E2E, and placeholder test files with proper TypeScript configuration
 
 ### Changed
 
+- **CI-Aware Husky**: Updated `prepare` script to automatically skip Husky in CI environments
+  - No more manual `HUSKY=0` env var needed
+  - Works in Vercel, GitHub Actions, and all CI platforms
+  - Applied to both `package.json` and `config/defaults.js` (template)
 - **Quality Workflow**: Updated GitHub Actions quality workflow and pre-push hooks
 - **Smart Test Strategy**: Enhanced test strategy script for better risk assessment
 - **Lint Configuration**: Fixed lint-staged TypeScript configuration to avoid project conflicts
 
 ### Fixed
 
+- **E2E Tests in Pre-push**: Fixed template divergence causing E2E tests to run in pre-push hooks
+  - Updated `templates/scripts/smart-test-strategy.sh` to exclude E2E tests
+  - Updated `lib/smart-strategy-generator.js` for all project types (cli, webapp, saas, api)
+  - E2E tests now only run in CI with proper infrastructure (dev server, browsers)
+  - Pre-push hooks now complete in < 2 minutes (was hanging for 5-10 minutes)
+  - Fixes: postrail, brettstark-about, and other web app projects
 - **Test Error Handling**: Fixed undefined stdout/stderr handling in deps-edge-cases test
 
 ## [5.9.1] - 2026-01-17
