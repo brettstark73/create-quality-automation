@@ -15,6 +15,10 @@ console.log('🧪 Testing deps.js edge cases...\n')
 
 const originalCwd = process.cwd()
 
+// Use temp license directory to avoid global developer marker file
+const TEST_LICENSE_DIR = path.join(os.tmpdir(), `cqa-deps-test-${Date.now()}`)
+fs.mkdirSync(TEST_LICENSE_DIR, { recursive: true })
+
 function createTestDir(name) {
   const testDir = path.join(os.tmpdir(), `cqa-test-${name}-${Date.now()}`)
   fs.mkdirSync(testDir, { recursive: true })
@@ -176,7 +180,11 @@ gem "pg", "~> 1.5"
         cwd: testDir,
         encoding: 'utf8',
         stdio: 'pipe',
-        env: { ...process.env, QAA_DEVELOPER: 'false' },
+        env: {
+          ...process.env,
+          QAA_DEVELOPER: 'false',
+          QAA_LICENSE_DIR: TEST_LICENSE_DIR,
+        },
       })
       assert.fail('Should have failed for Ruby-only in free tier')
     } catch (error) {

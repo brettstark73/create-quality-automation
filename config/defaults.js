@@ -12,6 +12,7 @@ const DEFAULT_STYLELINT_TARGET = `**/*.{${STYLELINT_EXTENSIONS.join(',')}}`
  */
 
 const baseScripts = {
+  prepare: '[ "$CI" = "true" ] && echo \'Skipping Husky in CI\' || husky',
   format: 'prettier --write .',
   'format:check': 'prettier --check .',
   test: 'vitest run --passWithNoTests',
