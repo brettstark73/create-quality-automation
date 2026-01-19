@@ -18,7 +18,8 @@ const baseScripts = {
   test: 'vitest run --passWithNoTests',
   'test:watch': 'vitest',
   'test:coverage': 'vitest run --coverage',
-  'security:audit': 'npm audit --audit-level high',
+  'security:audit':
+    '[ -f pnpm-lock.yaml ] && pnpm audit --audit-level high || [ -f yarn.lock ] && yarn audit || npm audit --audit-level high',
   'security:secrets':
     "node -e \"const fs=require('fs');const content=fs.readFileSync('package.json','utf8');if(/[\\\"\\'][a-zA-Z0-9+/]{20,}[\\\"\\']/.test(content)){console.error('❌ Potential hardcoded secrets in package.json');process.exit(1)}else{console.log('✅ No secrets detected in package.json')}\"",
   'security:config': 'npx create-qa-architect@latest --security-config',
