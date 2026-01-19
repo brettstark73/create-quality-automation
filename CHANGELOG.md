@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.10.2] - 2026-01-19
+
+### Fixed
+
+- **Package Manager Detection**: Auto-detect pnpm/yarn/npm for security audit commands
+  - Pre-push hook now detects lock file and uses correct audit command
+  - `security:audit` and `security:audit:fix` scripts now work with pnpm/yarn projects
+  - Fixes vibebuildlab pre-push hook regression from v5.10.1 --update
+  - Detection order: pnpm-lock.yaml → yarn.lock → npm (default)
+
 ## [5.10.1] - 2026-01-19
 
 ### Fixed
