@@ -19,7 +19,13 @@ try {
 
 const configs = [
   {
-    ignores: ['**/node_modules/**', '**/dist/**', '**/build/**'],
+    ignores: [
+      '**/node_modules/**',
+      '**/dist/**',
+      '**/build/**',
+      '**/coverage/**',
+      '**/*.html',
+    ],
   },
   js.configs.recommended,
 ]
@@ -58,7 +64,7 @@ const securityRules = security
   : {}
 
 configs.push({
-  files: ['**/*.{js,jsx,mjs,cjs,html}'],
+  files: ['**/*.{js,jsx,mjs,cjs}'],
   languageOptions: {
     ecmaVersion: 2022,
     sourceType: 'module',
