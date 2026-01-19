@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.10.1] - 2026-01-19
+
+### Fixed
+
+- **Workflow Mode Injection**: Fixed `injectWorkflowMode` to properly update existing WORKFLOW_MODE markers
+  - Standard mode now correctly adds main branch condition to tests job
+  - Comprehensive mode now correctly removes path filters and schedule triggers
+  - Fixes workflow-tiers test failure that blocked v5.10.0 npm publish
+
 ## [5.10.0] - 2026-01-19
 
 ### Added
