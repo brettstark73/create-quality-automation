@@ -25,10 +25,14 @@ jobs:
         run: npm install -g npm@latest
 
       - name: Install dependencies
-        run: npm ci
+        run: npm ci --no-audit
+        env:
+          CI: 'true'
 
       - name: Run pre-release checks
         run: npm run prerelease
+        env:
+          CI: 'true'
 
       - name: Publish to npm with provenance
         run: npm publish --provenance
