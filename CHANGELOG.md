@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.10.3] - 2026-01-19
+
+### Fixed
+
+- **Gitleaks Config TOML Syntax**: Fixed mixed allowlist syntax causing workflow failures
+  - Changed from mixed `[[rules.allowlist]]` and `[allowlist]` to consistent `[[allowlist]]`
+  - Fixes "AllowList expected a map, got slice" error that blocked GitHub Actions release workflow
+  - Release workflow will now properly publish npm packages automatically
+
 ## [5.10.2] - 2026-01-19
 
 ### Fixed
