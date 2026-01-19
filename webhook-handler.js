@@ -290,6 +290,7 @@ function saveLicenseDatabase(database) {
 
     // Compute integrity hash over licenses (excluding metadata)
     // DR30 fix: Use stableStringify for deterministic hash computation
+    // eslint-disable-next-line no-unused-vars -- destructuring to exclude _metadata from licenses
     const { _metadata, ...licenses } = database
     const sha = crypto
       .createHash('sha256')

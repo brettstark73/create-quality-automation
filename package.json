@@ -163,11 +163,11 @@
     "!(node_modules)/**/*.{json,md,yml,yaml}": [
       "prettier --write"
     ],
-    "!(node_modules)/**/*.{js,jsx,mjs,cjs,html}": [
+    "!(node_modules)/**/*.{js,jsx,mjs,cjs}": [
       "eslint --fix",
       "prettier --write"
     ],
-    "**/*.{js,jsx,mjs,cjs,html}": [
+    "**/*.{js,jsx,mjs,cjs}": [
       "eslint --fix",
       "prettier --write"
     ],
@@ -178,7 +178,7 @@
       "stylelint --fix",
       "prettier --write"
     ],
-    "**/*.{js,jsx,ts,tsx,mjs,cjs,html}": [
+    "**/*.{js,jsx,ts,tsx,mjs,cjs}": [
       "eslint --fix",
       "prettier --write"
     ],
