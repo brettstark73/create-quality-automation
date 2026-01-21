@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Workflow Dependency Installation**: Fixed maturity detection step to install dependencies first
+  - Added "Install dependencies for maturity detection" step before "Detect Project Maturity"
+  - Fixes workflow failure when `node_modules/create-qa-architect/lib/project-maturity.js` is accessed before dependencies are installed
+  - Affects projects without local `lib/project-maturity.js` (all projects except qa-architect itself)
+  - Test added to verify dependency installation order
+- **Workflow Package Manager Support**: Added pnpm and bun setup steps to all workflow jobs
+  - GitHub Actions runners only have npm and yarn 1.x pre-installed (pnpm and bun are missing)
+  - Added conditional "Setup pnpm" step (version 8.15.0) to all 6 jobs when pnpm is detected
+  - Added conditional "Setup Bun" step (version 1.0.0) to all 6 jobs when bun is detected
+  - Jobs: detect-maturity, core-checks, linting, security, tests, documentation
+  - Fixes "pnpm: command not found" and "bun: command not found" errors in workflows
+  - Test updated to verify all jobs have both pnpm and bun setup with correct version formats
+
 ## [5.10.3] - 2026-01-19
 
 ### Fixed
