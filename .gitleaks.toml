@@ -28,33 +28,33 @@ tags = ["env", "secret"]
 # Allowlist for test secrets in test files
 [[allowlist]]
 description = "Test secrets - test_secret pattern"
-regexes = ['''test_secret_.*''']
+regex = '''test_secret_.*'''
 paths = ['''tests/''', '''test/''', '''__tests__/''', '''examples/''', '''docs/''', '''.md$''']
 
 [[allowlist]]
 description = "Test secrets - example pattern"
-regexes = ['''example_.*''']
+regex = '''example_.*'''
 paths = ['''tests/''', '''test/''', '''__tests__/''', '''examples/''', '''docs/''', '''.md$''']
 
 [[allowlist]]
 description = "Test secrets - dummy pattern"
-regexes = ['''dummy_.*''']
+regex = '''dummy_.*'''
 paths = ['''tests/''', '''test/''', '''__tests__/''', '''examples/''', '''docs/''', '''.md$''']
 
 [[allowlist]]
 description = "Test secrets - fake pattern"
-regexes = ['''fake_.*''']
+regex = '''fake_.*'''
 paths = ['''tests/''', '''test/''', '''__tests__/''', '''examples/''', '''docs/''', '''.md$''']
 
 # Global allowlist for common false positives
 [[allowlist]]
 description = "False positives - EXAMPLE pattern"
-regexes = ['''EXAMPLE_.*''']
+regex = '''EXAMPLE_.*'''
 
 [[allowlist]]
 description = "False positives - placeholder patterns"
-regexes = ['''your_.*_here''', '''replace_with_.*''']
+regex = '''your_.*_here|replace_with_.*'''
 
 [[allowlist]]
 description = "False positives - TODO comments"
-regexes = ['''TODO:.*''']
+regex = '''TODO:.*'''
