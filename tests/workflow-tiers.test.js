@@ -376,4 +376,155 @@ jobs:
   }
 })()
 
+// Test 6: Workflow installs dependencies before maturity detection
+;(() => {
+  console.log(
+    'Test 6: Workflow installs dependencies before maturity detection (bug fix)'
+  )
+  const testDir = createTempGitRepo()
+
+  try {
+    const setupPath = path.join(__dirname, '../setup.js')
+    execSync(`QAA_DEVELOPER=true node ${setupPath}`, {
+      cwd: testDir,
+      stdio: 'pipe',
+    })
+
+    const workflowPath = path.join(
+      testDir,
+      '.github',
+      'workflows',
+      'quality.yml'
+    )
+    const workflowContent = fs.readFileSync(workflowPath, 'utf8')
+
+    // Check that dependency installation happens before maturity detection
+    assert(
+      workflowContent.includes(
+        '- name: Install dependencies for maturity detection'
+      ),
+      'Should have dependency installation step'
+    )
+
+    // Verify the step comes AFTER package manager detection
+    const pmDetectIndex = workflowContent.indexOf(
+      '- name: Detect Package Manager'
+    )
+    const installIndex = workflowContent.indexOf(
+      '- name: Install dependencies for maturity detection'
+    )
+    const maturityIndex = workflowContent.indexOf(
+      '- name: Detect Project Maturity'
+    )
+
+    assert(pmDetectIndex > 0, 'Should have package manager detection')
+    assert(installIndex > 0, 'Should have dependency installation')
+    assert(maturityIndex > 0, 'Should have maturity detection')
+
+    assert(
+      pmDetectIndex < installIndex,
+      'Package manager detection should come before dependency installation'
+    )
+    assert(
+      installIndex < maturityIndex,
+      'Dependency installation should come before maturity detection'
+    )
+
+    console.log(
+      '✅ PASS - Dependencies are installed before maturity detection\n'
+    )
+  } finally {
+    fs.rmSync(testDir, { recursive: true, force: true })
+  }
+})()
+
+// Test 7: Workflow includes package manager setup for all jobs
+;(() => {
+  console.log(
+    'Test 7: Workflow includes package manager setup (pnpm, bun) for all jobs (bug fix)'
+  )
+  const testDir = createTempGitRepo()
+
+  try {
+    const setupPath = path.join(__dirname, '../setup.js')
+    execSync(`QAA_DEVELOPER=true node ${setupPath}`, {
+      cwd: testDir,
+      stdio: 'pipe',
+    })
+
+    const workflowPath = path.join(
+      testDir,
+      '.github',
+      'workflows',
+      'quality.yml'
+    )
+    const workflowContent = fs.readFileSync(workflowPath, 'utf8')
+
+    // Count pnpm setup steps (should be 6: detect-maturity, core-checks, linting, security, tests, documentation)
+    const pnpmSetupMatches = workflowContent.match(/- name: Setup pnpm/g)
+    assert(
+      pnpmSetupMatches && pnpmSetupMatches.length === 6,
+      `Should have 6 pnpm setup steps, found ${pnpmSetupMatches ? pnpmSetupMatches.length : 0}`
+    )
+
+    // Count bun setup steps (should also be 6)
+    const bunSetupMatches = workflowContent.match(/- name: Setup Bun/g)
+    assert(
+      bunSetupMatches && bunSetupMatches.length === 6,
+      `Should have 6 Bun setup steps, found ${bunSetupMatches ? bunSetupMatches.length : 0}`
+    )
+
+    // Verify pnpm version format
+    const pnpmVersionMatches = workflowContent.match(/version: '8\.15\.0'/g)
+    assert(
+      pnpmVersionMatches && pnpmVersionMatches.length === 6,
+      `Should have 6 pnpm version: '8.15.0' entries, found ${pnpmVersionMatches ? pnpmVersionMatches.length : 0}`
+    )
+
+    // Verify bun version format
+    const bunVersionMatches = workflowContent.match(/bun-version: '1\.0\.0'/g)
+    assert(
+      bunVersionMatches && bunVersionMatches.length === 6,
+      `Should have 6 bun-version: '1.0.0' entries, found ${bunVersionMatches ? bunVersionMatches.length : 0}`
+    )
+
+    // Verify all pnpm setups are conditional
+    const pnpmConditionalMatches = workflowContent.match(
+      /if:.*package-manager == 'pnpm'/g
+    )
+    assert(
+      pnpmConditionalMatches && pnpmConditionalMatches.length >= 5,
+      `Should have at least 5 conditional pnpm checks, found ${pnpmConditionalMatches ? pnpmConditionalMatches.length : 0}`
+    )
+
+    // Verify all bun setups are conditional
+    const bunConditionalMatches = workflowContent.match(
+      /if:.*package-manager == 'bun'/g
+    )
+    assert(
+      bunConditionalMatches && bunConditionalMatches.length >= 5,
+      `Should have at least 5 conditional bun checks, found ${bunConditionalMatches ? bunConditionalMatches.length : 0}`
+    )
+
+    // Verify setup order: Node.js → pnpm → Bun
+    const setupNodeIndex = workflowContent.indexOf('- name: Setup Node.js')
+    const firstPnpmSetupIndex = workflowContent.indexOf('- name: Setup pnpm')
+    const firstBunSetupIndex = workflowContent.indexOf('- name: Setup Bun')
+    assert(
+      setupNodeIndex < firstPnpmSetupIndex,
+      'Setup Node.js should come before Setup pnpm'
+    )
+    assert(
+      firstPnpmSetupIndex < firstBunSetupIndex,
+      'Setup pnpm should come before Setup Bun'
+    )
+
+    console.log(
+      '✅ PASS - All jobs have pnpm and bun setup with correct versions\n'
+    )
+  } finally {
+    fs.rmSync(testDir, { recursive: true, force: true })
+  }
+})()
+
 console.log('✅ All workflow tier tests passed!\n')
