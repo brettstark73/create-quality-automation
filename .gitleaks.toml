@@ -25,30 +25,36 @@ id = "env-secret"
 regex = '''(?i)(api_key|secret|password|token)\s*=\s*['""][^'"\s]{10,}['""]'''
 tags = ["env", "secret"]
 
-# Allowlist for test files and examples
+# Allowlist for test secrets in test files
 [[allowlist]]
-description = "Test secrets and examples"
-regexes = [
-  '''test_secret_.*''',
-  '''example_.*''',
-  '''dummy_.*''',
-  '''fake_.*'''
-]
-paths = [
-  '''tests/''',
-  '''test/''',
-  '''__tests__/''',
-  '''examples/''',
-  '''docs/''',
-  '''.md$'''
-]
+description = "Test secrets - test_secret pattern"
+regexes = ['''test_secret_.*''']
+paths = ['''tests/''', '''test/''', '''__tests__/''', '''examples/''', '''docs/''', '''.md$''']
+
+[[allowlist]]
+description = "Test secrets - example pattern"
+regexes = ['''example_.*''']
+paths = ['''tests/''', '''test/''', '''__tests__/''', '''examples/''', '''docs/''', '''.md$''']
+
+[[allowlist]]
+description = "Test secrets - dummy pattern"
+regexes = ['''dummy_.*''']
+paths = ['''tests/''', '''test/''', '''__tests__/''', '''examples/''', '''docs/''', '''.md$''']
+
+[[allowlist]]
+description = "Test secrets - fake pattern"
+regexes = ['''fake_.*''']
+paths = ['''tests/''', '''test/''', '''__tests__/''', '''examples/''', '''docs/''', '''.md$''']
 
 # Global allowlist for common false positives
 [[allowlist]]
-description = "Common false positives"
-regexes = [
-  '''EXAMPLE_.*''',
-  '''your_.*_here''',
-  '''replace_with_.*''',
-  '''TODO:.*'''
-]
+description = "False positives - EXAMPLE pattern"
+regexes = ['''EXAMPLE_.*''']
+
+[[allowlist]]
+description = "False positives - placeholder patterns"
+regexes = ['''your_.*_here''', '''replace_with_.*''']
+
+[[allowlist]]
+description = "False positives - TODO comments"
+regexes = ['''TODO:.*''']
