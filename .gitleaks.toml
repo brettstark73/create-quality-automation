@@ -25,30 +25,8 @@ id = "env-secret"
 regex = '''(?i)(api_key|secret|password|token)\s*=\s*['""][^'"\s]{10,}['""]'''
 tags = ["env", "secret"]
 
-# Allowlist for test files and examples
+# Allowlist for test/example files (broad exclusion)
 [[allowlist]]
-description = "Test secrets and examples"
-regexes = [
-  '''test_secret_.*''',
-  '''example_.*''',
-  '''dummy_.*''',
-  '''fake_.*'''
-]
-paths = [
-  '''tests/''',
-  '''test/''',
-  '''__tests__/''',
-  '''examples/''',
-  '''docs/''',
-  '''.md$'''
-]
-
-# Global allowlist for common false positives
-[[allowlist]]
-description = "Common false positives"
-regexes = [
-  '''EXAMPLE_.*''',
-  '''your_.*_here''',
-  '''replace_with_.*''',
-  '''TODO:.*'''
-]
+description = "Test and example files"
+regex = '''test_secret_.*|example_.*|dummy_.*|fake_.*|EXAMPLE_.*|your_.*_here|replace_with_.*|TODO:.*'''
+path = '''(tests/|test/|__tests__/|examples/|docs/|\.md$)'''
