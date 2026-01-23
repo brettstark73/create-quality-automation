@@ -1,6 +1,6 @@
 # qa-architect - Backlog
 
-**Last Updated**: 2026-01-10 (Evening)
+**Last Updated**: 2026-01-23
 **Priority**: Value-based (Revenue + Retention + Differentiation) ÷ Effort
 
 ---
@@ -222,7 +222,7 @@
 
 | ID   | Issue                                                                | Type      | Effort | Priority | Status  |
 | ---- | -------------------------------------------------------------------- | --------- | ------ | -------- | ------- |
-| TD32 | **Fix Python setup test failure**                                    | Bug       | S      | High     | Pending |
+| TD32 | **Fix Python setup test failure**                                    | Bug       | S      | High     | ✅ Done |
 | TD33 | **Improve test coverage to 75%**                                     | Quality   | M      | High     | ✅ Done |
 | TD34 | **Add integration test for --analyze-ci**                            | Testing   | S      | Medium   | ✅ Done |
 | MK1  | **Update marketing/reference/landing-page.html with workflow tiers** | Marketing | S      | Medium   | ✅ Done |
@@ -230,13 +230,17 @@
 
 ### Details
 
-**TD32: Fix Python setup test failure**
+**TD32: Fix Python setup test failure** ✅ Done (2026-01-23)
 
-- **Issue**: `tests/setup.test.js` Python integration test fails, blocking full test suite
-- **Impact**: Cannot measure accurate test coverage (currently 43.35%, need 75%)
-- **Root cause**: Pre-existing bug unrelated to workflow tiers feature
-- **Location**: `tests/setup.test.js` Python project setup
-- **Effort**: 1-2 hours to debug and fix
+- **Resolution**: Python tests were already passing - backlog was stale
+- **Actual Issue Found**: Coverage at 74.48% (below 75% threshold)
+- **Fix Applied**: Enhanced `tests/lazy-loader.test.js` to test all 8 lazy loader functions
+- **Changes**:
+  - Added tests for `getDependencyMonitoringPremium`, `getTelemetry`, `getErrorReporter`, `getSetupEnhancements`
+  - Added test for global `lazyCache` export
+  - Added `lazy-loader.test.js` to main test script in package.json
+- **Result**: Coverage improved to 75.05% (threshold now passes)
+- **lazy-loader.js**: 0% → 100% coverage
 
 **TD33: Improve test coverage to 75%** ✅ Done (2026-01-07)
 
