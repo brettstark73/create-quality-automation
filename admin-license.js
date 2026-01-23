@@ -91,10 +91,7 @@ async function main() {
         licenseDir,
         'legitimate-licenses.json'
       )
-      /* Paths are fixed to the CLI config directory in the user's home and not user-controlled */
-      // eslint-disable-next-line security/detect-non-literal-fs-filename
       if (fs.existsSync(legitimateDBFile)) {
-        // eslint-disable-next-line security/detect-non-literal-fs-filename
         const database = JSON.parse(fs.readFileSync(legitimateDBFile, 'utf8'))
         const { _metadata, ...licenses } = database
         const sha = crypto
@@ -106,7 +103,6 @@ async function main() {
           sha256: sha,
           lastSave: new Date().toISOString(),
         }
-        // eslint-disable-next-line security/detect-non-literal-fs-filename
         fs.writeFileSync(legitimateDBFile, JSON.stringify(database, null, 2))
       }
 

@@ -1,5 +1,4 @@
 'use strict'
-/* eslint-disable security/detect-object-injection */
 
 const STYLELINT_EXTENSIONS = ['css', 'scss', 'sass', 'less', 'pcss']
 const DEFAULT_STYLELINT_TARGET = `**/*.{${STYLELINT_EXTENSIONS.join(',')}}`

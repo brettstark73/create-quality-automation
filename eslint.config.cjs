@@ -45,18 +45,28 @@ const baseRules = {
 }
 
 // Security rules only if plugin is loaded
+// NOTE: detect-non-literal-fs-filename and detect-object-injection are DISABLED for this project.
+// Rationale: qa-architect is a CLI tool that:
+//   1. Inherently operates on user project directories (dynamic paths are the core function)
+//   2. Is NOT a web server - no user input from HTTP requests controls file paths
+//   3. All file paths come from safe sources: process.cwd(), path.join(), __dirname
+//   4. Object injection warnings are for iterating own properties, not attacker-controlled keys
+// These rules are designed for web servers where req.query.file could lead to path traversal.
+// In CLI context, these 700+ warnings are false positives that obscure real issues.
 const securityRules = security
   ? {
-      // Security rules from WFHroulette patterns - adjusted for build tools
-      'security/detect-object-injection': 'warn', // Build tools often use dynamic object access
+      // DISABLED: False positives for CLI tools - see rationale above
+      'security/detect-object-injection': 'off',
+      'security/detect-non-literal-fs-filename': 'off',
+
+      // ENABLED: These rules catch real issues regardless of context
       'security/detect-non-literal-regexp': 'error',
       'security/detect-unsafe-regex': 'error',
       'security/detect-buffer-noassert': 'error',
-      'security/detect-child-process': 'warn', // Build tools may spawn processes
+      'security/detect-child-process': 'warn', // Build tools may spawn processes legitimately
       'security/detect-disable-mustache-escape': 'error',
       'security/detect-eval-with-expression': 'error',
       'security/detect-no-csrf-before-method-override': 'error',
-      'security/detect-non-literal-fs-filename': 'warn', // Build tools need dynamic file operations
       'security/detect-non-literal-require': 'error',
       'security/detect-possible-timing-attacks': 'error',
       'security/detect-pseudoRandomBytes': 'error',

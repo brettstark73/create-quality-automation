@@ -220,9 +220,7 @@ app.use(express.json())
 function loadLicenseDatabase() {
   try {
     // Path resolved once at startup; no untrusted user input is allowed here
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
     if (fs.existsSync(LICENSE_DATABASE_PATH)) {
-      // eslint-disable-next-line security/detect-non-literal-fs-filename
       const data = fs.readFileSync(LICENSE_DATABASE_PATH, 'utf8')
       const database = JSON.parse(data)
 
@@ -282,9 +280,7 @@ function saveLicenseDatabase(database) {
     // Ensure directory exists
     const dir = path.dirname(LICENSE_DATABASE_PATH)
     // Path resolved once at startup; no untrusted user input is allowed here
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
     if (!fs.existsSync(dir)) {
-      // eslint-disable-next-line security/detect-non-literal-fs-filename
       fs.mkdirSync(dir, { recursive: true })
     }
 
@@ -305,19 +301,15 @@ function saveLicenseDatabase(database) {
 
     const tempPath = `${LICENSE_DATABASE_PATH}.${process.pid}.${Date.now()}.tmp`
     // Path resolved once at startup; no untrusted user input is allowed here
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
     fs.writeFileSync(tempPath, JSON.stringify(database, null, 2))
     // Path resolved once at startup; no untrusted user input is allowed here
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
     fs.renameSync(tempPath, LICENSE_DATABASE_PATH)
 
     const publicRegistry = buildPublicRegistry(database)
     const publicTempPath = `${LICENSE_PUBLIC_DATABASE_PATH}.${process.pid}.${Date.now()}.tmp`
     // Path resolved once at startup; no untrusted user input is allowed here
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
     fs.writeFileSync(publicTempPath, JSON.stringify(publicRegistry, null, 2))
     // Path resolved once at startup; no untrusted user input is allowed here
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
     fs.renameSync(publicTempPath, LICENSE_PUBLIC_DATABASE_PATH)
     return true
   } catch (error) {
@@ -349,7 +341,6 @@ function buildPublicRegistry(database) {
     })
     const signature = signPayload(payload, LICENSE_REGISTRY_PRIVATE_KEY)
     // TD11: Safe - licenseKey is validated against LICENSE_KEY_PATTERN above
-    // eslint-disable-next-line security/detect-object-injection
     publicLicenses[licenseKey] = {
       tier: entry.tier,
       isFounder: entry.isFounder,
@@ -385,9 +376,7 @@ function buildPublicRegistry(database) {
 function loadPublicRegistry() {
   try {
     // Path resolved once at startup; no untrusted user input is allowed here
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
     if (fs.existsSync(LICENSE_PUBLIC_DATABASE_PATH)) {
-      // eslint-disable-next-line security/detect-non-literal-fs-filename
       return JSON.parse(fs.readFileSync(LICENSE_PUBLIC_DATABASE_PATH, 'utf8'))
     }
   } catch (error) {
@@ -398,9 +387,7 @@ function loadPublicRegistry() {
   const registry = buildPublicRegistry(privateDb)
   try {
     const publicTempPath = `${LICENSE_PUBLIC_DATABASE_PATH}.${process.pid}.${Date.now()}.tmp`
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
     fs.writeFileSync(publicTempPath, JSON.stringify(registry, null, 2))
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
     fs.renameSync(publicTempPath, LICENSE_PUBLIC_DATABASE_PATH)
   } catch (error) {
     console.error('Error saving public license registry:', error.message)
@@ -457,7 +444,6 @@ function addLicenseToDatabase(licenseKey, customerInfo) {
 
       const database = loadLicenseDatabase()
 
-      // eslint-disable-next-line security/detect-object-injection -- licenseKey validated by regex above (QAA-XXXX-XXXX-XXXX-XXXX format)
       database[licenseKey] = {
         customerId: customerInfo.customerId,
         tier: customerInfo.tier,
@@ -681,11 +667,8 @@ async function handleSubscriptionCanceled(subscription) {
 
     Object.keys(database).forEach(key => {
       if (key === '_metadata') return
-      // eslint-disable-next-line security/detect-object-injection -- key is from Object.keys(), safe
       if (database[key].subscriptionId === subscription.id) {
-        // eslint-disable-next-line security/detect-object-injection
         database[key].status = 'canceled'
-        // eslint-disable-next-line security/detect-object-injection
         database[key].canceledAt = new Date().toISOString()
         licenseFound = true
         console.log(`   Marking license ${key} as canceled`)
@@ -724,7 +707,6 @@ app.get('/health', healthRateLimiter.middleware(), (req, res) => {
     status: 'ok',
     timestamp: new Date().toISOString(),
     // Path resolved once at startup; no untrusted user input is allowed here
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
     database: fs.existsSync(LICENSE_DATABASE_PATH) ? 'exists' : 'missing',
   })
 })
