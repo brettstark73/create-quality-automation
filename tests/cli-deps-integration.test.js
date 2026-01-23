@@ -236,7 +236,7 @@ pytest-django = "^4.5.0"
  *
  * Validates:
  * - Command handles Rust-only projects gracefully
- * - Multi-language support requires Pro/Enterprise tier
+ * - Multi-language support requires Pro tier
  * - Clear upgrade messaging for FREE tier users
  *
  * Aligns with FREE tier policy: npm-only for free, multi-language for Pro
@@ -419,7 +419,7 @@ function testApiContractValidation() {
  *
  * Validates:
  * - Python-only projects handled gracefully in FREE tier
- * - Multi-language support requires Pro/Enterprise tier
+ * - Multi-language support requires Pro tier
  * - Command doesn't fail on hyphenated package names during detection
  *
  * Aligns with FREE tier policy: npm-only for free, multi-language for Pro

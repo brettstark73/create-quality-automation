@@ -296,10 +296,7 @@ _No items - All high-value work complete!_
 
 ## 📚 Low Value - When Needed
 
-| ID  | Feature                      | Value Drivers      | Effort | Score | Status  |
-| --- | ---------------------------- | ------------------ | ------ | ----- | ------- |
-| B3  | **Team tier implementation** | Rev:4 Ret:2 Diff:3 | L      | 3.0   | Pending |
-| B4  | **Enterprise tier**          | Rev:5 Ret:2 Diff:4 | XL     | 2.75  | Future  |
+_No items currently._
 
 ## Completed ✅
 
@@ -341,10 +338,3 @@ _No items - All high-value work complete!_
 - Semgrep advanced static analysis
 - License compliance checking
 - E2E test scaffolding (Playwright/Cypress)
-
-**Team/Enterprise** - Org-level features:
-
-- Dashboard & reporting
-- Slack/email alerts
-- Custom policies
-- SSO/SAML
