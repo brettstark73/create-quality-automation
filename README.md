@@ -26,7 +26,7 @@ Quality automation CLI for JavaScript/TypeScript, Python, and shell script proje
 - **Progressive Quality** - Adaptive checks based on project maturity
 - **Smart Test Strategy** - Risk-based pre-push validation (Pro feature)
 
-### Quality Tools (v5.2.0+)
+### Quality Tools
 
 - **Lighthouse CI** - Performance, accessibility, SEO audits (Free: basic, Pro: thresholds)
 - **Bundle Size Limits** - Enforce bundle budgets with size-limit (Pro)
@@ -34,7 +34,7 @@ Quality automation CLI for JavaScript/TypeScript, Python, and shell script proje
 - **Conventional Commits** - commitlint with commit-msg hook (Free)
 - **Coverage Thresholds** - Enforce code coverage minimums (Pro)
 
-### Pre-Launch Validation (v5.3.0+)
+### Pre-Launch Validation
 
 - **SEO Validation** - Sitemap, robots.txt, meta tags validation (Free)
 - **Link Validation** - Broken link detection with linkinator (Free)
