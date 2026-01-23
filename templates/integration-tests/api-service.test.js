@@ -12,7 +12,7 @@ import request from 'supertest'
 
 describe('API Service Integration Tests', () => {
   let testApp
-  let _testDb
+  // let testDb // Uncomment when integrating with real database
 
   beforeAll(async () => {
     // Setup test database with real connection

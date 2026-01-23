@@ -217,7 +217,7 @@ function normalizeRepoIdentifier(remoteUrl) {
     const repoPath = parsed.pathname.replace(/^\/+/, '').replace(/\.git$/, '')
     if (!host || !repoPath) return null
     return `${host}/${repoPath}`
-  } catch (_error) {
+  } catch {
     return null
   }
 }
@@ -289,7 +289,7 @@ const safeReadDir = dir => {
           directory: dir,
           errorCode: error.code,
         })
-      } catch (_error) {
+      } catch {
         // Don't fail if error reporting fails
       }
     }
@@ -901,7 +901,9 @@ HELP:
      * - Conventional commits (Free)
      * - Coverage thresholds (Pro only)
      */
-    async function setupQualityTools(_usesTypeScript, _packageJson) {
+    async function setupQualityTools(usesTypeScript, packageJson) {
+      void usesTypeScript // Reserved for TypeScript-specific quality tools
+      void packageJson // Reserved for package.json-based quality configuration
       const qualitySpinner = showProgress('Setting up quality tools...')
 
       try {
@@ -1081,7 +1083,7 @@ HELP:
       try {
         execSync('git status', { stdio: 'ignore' })
         gitSpinner.succeed('Git repository verified')
-      } catch (_error) {
+      } catch {
         gitSpinner.fail('Not a git repository')
         console.error('❌ This must be run in a git repository')
         console.log('Run "git init" first, then try again.')
@@ -1103,7 +1105,7 @@ HELP:
           }).trim()
           const normalized = normalizeRepoIdentifier(remoteUrl)
           repoId = hashRepoIdentifier(normalized || remoteUrl)
-        } catch (_error) {
+        } catch {
           // No remote - use absolute path as fallback
           repoId = hashRepoIdentifier(process.cwd())
         }

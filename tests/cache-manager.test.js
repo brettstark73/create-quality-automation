@@ -118,7 +118,7 @@ function testCacheManager() {
           if (clearResults.errors.length === 0) {
             console.log('  ⚠️  Expected some errors in clear results')
           }
-        } catch (_error) {
+        } catch {
           // Expected - cache directory might not exist
         }
         console.log('  ✅ Verbose error handling works')
