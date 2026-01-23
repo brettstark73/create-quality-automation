@@ -47,17 +47,6 @@
 - [ ] VS Code extension
 - [ ] Performance budgets (bundle size, Lighthouse, build time)
 
-**Team Features** (~1 day):
-
-- [ ] Team tier implementation (org dashboard, shared quotas, policy enforcement)
-- [ ] Slack/email alerts
-
-**Enterprise** (1-2 days):
-
-- [ ] SSO/SAML integration
-- [ ] Compliance pack (SOC2, GDPR templates)
-- [ ] On-prem license server for air-gapped environments
-
 ---
 
 See [BACKLOG.md](BACKLOG.md) for tactical work items.

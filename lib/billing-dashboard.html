@@ -325,102 +325,6 @@
               <li>Email support (24-48h response)</li>
             </ul>
           </div>
-
-          <!-- Team Tier -->
-          <div class="tier-card" data-tier="team" onclick="selectTier('team')">
-            <div class="tier-name">Team</div>
-            <div class="tier-price">Contact us</div>
-            <div style="color: #666; font-size: 0.9rem">Coming soon</div>
-
-            <ul class="tier-features">
-              <li>All PRO features included</li>
-              <li>Per-seat licensing for orgs</li>
-              <li>Shared quota & usage reporting</li>
-              <li>Team-wide config policies</li>
-              <li>Slack/email alerts for failures</li>
-              <li>Priority support (business hours)</li>
-            </ul>
-          </div>
-
-          <!-- Enterprise Tier -->
-          <div
-            class="tier-card"
-            data-tier="enterprise"
-            onclick="selectTier('enterprise')"
-          >
-            <div class="tier-name">Enterprise</div>
-            <div class="tier-price">Contact us</div>
-            <div style="color: #666; font-size: 0.9rem">Coming soon</div>
-
-            <ul class="tier-features">
-              <li>All TEAM features included</li>
-              <li>SSO/SAML integration</li>
-              <li>Custom risk patterns & policies</li>
-              <li>Audit logs export & compliance</li>
-              <li>Dedicated TAM + 24×5 SLA</li>
-              <li>Optional on-prem license server</li>
-            </ul>
-          </div>
-        </div>
-
-        <div
-          class="features-comparison"
-          style="grid-template-columns: 2fr 1fr 1fr 1fr"
-        >
-          <div class="header-row">Features</div>
-          <div class="header-row">Pro</div>
-          <div class="header-row">Team</div>
-          <div class="header-row">Enterprise</div>
-
-          <div
-            class="feature-row"
-            style="grid-template-columns: 2fr 1fr 1fr 1fr"
-          >
-            <div class="feature-name">Smart Test Strategy</div>
-            <div class="feature-value">✅</div>
-            <div class="feature-value">✅</div>
-            <div class="feature-value">✅</div>
-          </div>
-
-          <div
-            class="feature-row"
-            style="grid-template-columns: 2fr 1fr 1fr 1fr"
-          >
-            <div class="feature-name">Multi-language</div>
-            <div class="feature-value">✅</div>
-            <div class="feature-value">✅</div>
-            <div class="feature-value">✅</div>
-          </div>
-
-          <div
-            class="feature-row"
-            style="grid-template-columns: 2fr 1fr 1fr 1fr"
-          >
-            <div class="feature-name">Team Policies</div>
-            <div class="feature-value">❌</div>
-            <div class="feature-value">✅</div>
-            <div class="feature-value">✅</div>
-          </div>
-
-          <div
-            class="feature-row"
-            style="grid-template-columns: 2fr 1fr 1fr 1fr"
-          >
-            <div class="feature-name">SSO/SAML</div>
-            <div class="feature-value">❌</div>
-            <div class="feature-value">❌</div>
-            <div class="feature-value">✅</div>
-          </div>
-
-          <div
-            class="feature-row"
-            style="grid-template-columns: 2fr 1fr 1fr 1fr"
-          >
-            <div class="feature-name">Support SLA</div>
-            <div class="feature-value">48h</div>
-            <div class="feature-value">24h</div>
-            <div class="feature-value">4h</div>
-          </div>
         </div>
 
         <button
@@ -489,10 +393,6 @@
           checkoutBtn.textContent = isFounder
             ? 'Start Pro Subscription - $24.50/month (Founder Price)'
             : 'Start Pro Subscription - $49/month'
-        } else if (tier === 'enterprise') {
-          checkoutBtn.textContent = isFounder
-            ? 'Start Enterprise Subscription - $74.50/month (Founder Price)'
-            : 'Start Enterprise Subscription - $149/month'
         }
       }
 
