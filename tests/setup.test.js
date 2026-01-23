@@ -142,10 +142,7 @@ const normalizeArray = value => {
   return [...new Set(arr)].sort()
 }
 
-const STYLELINT_EXTENSION_GLOB = `*.{${STYLELINT_EXTENSIONS.join(',')}}`
 const DEFAULT_STYLELINT_TARGET = `**/*.{${STYLELINT_EXTENSIONS.join(',')}}`
-
-const makeStylelintTarget = dir => `${dir}/**/${STYLELINT_EXTENSION_GLOB}`
 
 const patternIncludesStylelintExtension = pattern => {
   const lower = pattern.toLowerCase()
@@ -405,10 +402,6 @@ try {
   runSetup(tsProjectDir, tsProLicense.env)
 
   const pkg = readJson(path.join(tsProjectDir, 'package.json'))
-  const _expectedScripts = mergeScripts(
-    tsInitial.scripts,
-    getDefaultScripts({ typescript: true })
-  )
   // Quality tools dependencies for TS project
   const tsQualityToolsDeps = getQualityToolsDependencies({
     lighthouse: true,
@@ -422,10 +415,6 @@ try {
       ...getDefaultDevDependencies({ typescript: true }),
       ...tsQualityToolsDeps,
     }
-  )
-  const _expectedLintStaged = mergeLintStaged(
-    tsInitial['lint-staged'],
-    getDefaultLintStaged({ typescript: true })
   )
 
   // Temporarily disable script assertion while fixing enhanced script integration
@@ -443,7 +432,6 @@ try {
   // Idempotency check (also validates TypeScript paths stay stable)
   runSetup(tsProjectDir, tsProLicense.env)
   const pkgSecond = readJson(path.join(tsProjectDir, 'package.json'))
-  const _lintStagedSecond = pkgSecond['lint-staged']
   const eslintConfigContentsTsSecond = fs.readFileSync(
     eslintConfigPathTs,
     'utf8'
@@ -469,8 +457,7 @@ const cssInitialPackageJson = {
   },
 }
 
-const { tempDir: cssProjectDir, initialPackageJson: cssInitial } =
-  createTempProject(cssInitialPackageJson)
+const { tempDir: cssProjectDir } = createTempProject(cssInitialPackageJson)
 
 fs.mkdirSync(path.join(cssProjectDir, 'public'), { recursive: true })
 fs.writeFileSync(
@@ -484,12 +471,6 @@ try {
   runSetup(cssProjectDir, cssFreeLicense.env)
 
   const pkg = readJson(path.join(cssProjectDir, 'package.json'))
-  const publicStylelintTarget = makeStylelintTarget('public')
-  const _expectedLintStaged = mergeLintStaged(
-    cssInitial['lint-staged'],
-    getDefaultLintStaged({ stylelintTargets: [publicStylelintTarget] }),
-    [publicStylelintTarget]
-  )
 
   // Temporarily skip enhanced lint-staged assertions - enhanced config adds CSS pattern
   // assertLintStagedEqual(pkg['lint-staged'], expectedLintStaged)
