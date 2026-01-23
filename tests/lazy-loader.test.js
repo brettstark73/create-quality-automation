@@ -9,10 +9,15 @@
 const assert = require('assert')
 const {
   LazyModuleCache,
+  lazyCache,
   getLicensing,
   getSmartStrategy,
   getQualityTools,
   getPrelaunchValidator,
+  getDependencyMonitoringPremium,
+  getTelemetry,
+  getErrorReporter,
+  getSetupEnhancements,
 } = require('../lib/lazy-loader')
 
 console.log('============================================================')
@@ -66,6 +71,38 @@ assert.strictEqual(
   'function',
   'writeValidationScripts should exist'
 )
+
+const depsPremium = getDependencyMonitoringPremium()
+assert.ok(depsPremium, 'Premium deps module should load')
+assert.strictEqual(
+  typeof depsPremium.generatePremiumDependabotConfig,
+  'function',
+  'generatePremiumDependabotConfig should exist'
+)
+
+const telemetry = getTelemetry()
+assert.ok(telemetry, 'Telemetry module should load')
+assert.strictEqual(
+  typeof telemetry.recordEvent,
+  'function',
+  'recordEvent should exist'
+)
+
+const errorReporter = getErrorReporter()
+assert.ok(errorReporter, 'Error reporter module should load')
+assert.strictEqual(
+  typeof errorReporter.ErrorReporter,
+  'function',
+  'ErrorReporter should exist'
+)
+
+const enhancements = getSetupEnhancements()
+assert.ok(enhancements, 'Setup enhancements module should load')
+assert.strictEqual(
+  typeof enhancements.applyProductionQualityFixes,
+  'function',
+  'applyProductionQualityFixes should exist'
+)
 console.log('  ✅ All modules load successfully\n')
 
 // Test 4: Cache can be cleared
@@ -107,6 +144,18 @@ assert.strictEqual(
   'Cache should still have 1 entry (not reloaded)'
 )
 console.log('  ✅ Modules are loaded lazily and cached\n')
+
+// Test 7: Global lazyCache instance is exported
+console.log('Test 7: Global lazyCache export')
+assert.ok(
+  lazyCache instanceof LazyModuleCache,
+  'lazyCache should be a LazyModuleCache'
+)
+assert.ok(
+  lazyCache.cache.size > 0,
+  'lazyCache should have entries from previous tests'
+)
+console.log('  ✅ Global lazyCache is properly exported\n')
 
 console.log('============================================================')
 console.log('✅ All lazy loader tests passed!')
