@@ -100,6 +100,25 @@ npx create-qa-architect@latest
 | ---------------------------- | ---- | ---- |
 | GitHub Actions cost analyzer | ❌   | ✅   |
 
+### Get Pro
+
+**Purchase:** [vibebuildlab.com/qa-architect](https://vibebuildlab.com/qa-architect)
+
+After purchase, you'll receive a license key via email (QAA-XXXX-XXXX-XXXX-XXXX).
+
+**Activate your license:**
+
+```bash
+npx create-qa-architect@latest --activate-license
+# Enter your license key when prompted
+```
+
+**Check license status:**
+
+```bash
+npx create-qa-architect@latest --license-status
+```
+
 ## Workflow Tiers (GitHub Actions Cost Optimization)
 
 qa-architect follows industry best practice: **"Fail fast locally, verify comprehensively remotely"**
