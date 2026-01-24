@@ -416,8 +416,8 @@ function mapPriceToTier(priceId) {
   // Configure these based on your Stripe price IDs (founder pricing retired)
   // Using Map to avoid object-injection warnings from eslint-plugin-security
   const priceMapping = new Map([
-    ['price_pro_monthly', { tier: 'PRO', isFounder: false }],
-    ['price_pro_annual', { tier: 'PRO', isFounder: false }],
+    ['price_1St9K2Gv7Su9XNJbdYoH3K32', { tier: 'PRO', isFounder: false }], // $49/mo
+    ['price_1St9KGGv7Su9XNJbrwKMsh1R', { tier: 'PRO', isFounder: false }], // $490/yr
   ])
 
   if (typeof priceId === 'string' && priceMapping.has(priceId)) {
