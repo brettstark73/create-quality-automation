@@ -1,0 +1,70 @@
+# QA Architect - Backlog
+
+**Last Updated**: 2026-01-24
+**Scoring**: (Revenue + Retention + Differentiation) ÷ Effort = Priority Score
+
+> See [ROADMAP.md](ROADMAP.md) for strategic direction and planned features.
+
+---
+
+## 🔥 High Value - Next Up
+
+| ID  | Item                        | Type    | Value Drivers      | Effort | Score | Status  |
+| --- | --------------------------- | ------- | ------------------ | ------ | ----- | ------- |
+| L-1 | Rust support                | Feature | Rev:3 Ret:4 Diff:4 | M      | 5.5   | Ready   |
+| L-2 | Go support                  | Feature | Rev:3 Ret:4 Diff:4 | M      | 5.5   | Ready   |
+| L-3 | Java support (Maven/Gradle) | Feature | Rev:4 Ret:4 Diff:3 | M      | 5.5   | Ready   |
+| T-1 | VS Code extension           | Feature | Rev:4 Ret:5 Diff:3 | M      | 6.0   | Backlog |
+| T-2 | Performance budgets         | Feature | Rev:3 Ret:4 Diff:4 | S      | 11.0  | Ready   |
+
+---
+
+## 📊 Medium Value - Worth Doing
+
+| ID  | Item | Type | Value Drivers | Effort | Score | Status |
+| --- | ---- | ---- | ------------- | ------ | ----- | ------ |
+
+---
+
+## 📚 Low Value - When Needed
+
+| ID  | Item | Type | Value Drivers | Effort | Score | Status |
+| --- | ---- | ---- | ------------- | ------ | ----- | ------ |
+
+---
+
+## ✅ Completed
+
+| ID  | Item                                     | Type    | Completed  |
+| --- | ---------------------------------------- | ------- | ---------- |
+| -   | ESLint 9 flat config support             | Feature | 2026-01-XX |
+| -   | Progressive quality (maturity detection) | Feature | 2026-01-XX |
+| -   | Python toolchain support                 | Feature | 2026-01-XX |
+| -   | Smart Test Strategy (Pro)                | Feature | 2026-01-XX |
+| -   | Monorepo support                         | Feature | 2026-01-XX |
+| -   | Interactive mode with guided setup       | Feature | 2026-01-XX |
+| -   | Custom template support                  | Feature | 2026-01-XX |
+| -   | License tier system                      | Feature | 2026-01-XX |
+| -   | Dependency monitoring                    | Feature | 2026-01-XX |
+| -   | Quality tools (Lighthouse CI, etc.)      | Feature | v5.2.0     |
+| -   | Pre-launch validation                    | Feature | v5.3.0     |
+| -   | Stripe payment flow                      | Feature | 2025-12-XX |
+
+---
+
+## Checkpoints
+
+Define milestones for `/bs:auto-dev --until checkpoint:<name>`:
+
+- [ ] multi-language: L-1, L-2, L-3 (Rust, Go, Java support)
+- [ ] tooling: T-1, T-2 (VS Code extension, performance budgets)
+- [x] v5.10: Current stable release ✅
+
+---
+
+## Notes
+
+- **Types:** Feature | Bug | Security | Perf | Docs | Refactor | Tech Debt
+- **Status:** Ready | Backlog | In Progress | Blocked | Planned
+- **Checkpoints:** Used by `/bs:auto-dev` for milestone-based stopping
+- Re-evaluate as new language requests come in from users
