@@ -15,9 +15,9 @@ Quality automation CLI for JavaScript/TypeScript, Python, and shell script proje
 ## Features
 
 - **Prettier Code Formatting** - Consistent code style across your project
-- **Husky Git Hooks** - Pre-commit (lint-staged) and pre-push (validation)
-- **lint-staged Processing** - Only process changed files for speed
-- **Pre-push Validation** - Prevents broken code from reaching CI
+- **Husky Git Hooks** - Pre-commit (lint + format) and pre-push (type check + tests)
+- **lint-staged Processing** - Only process staged files for speed
+- **Delta Testing** - Pre-push runs tests on changed files only (fast feedback)
 - **GitHub Actions** - Automated quality checks in CI/CD
 - **TypeScript Smart** - Auto-detects and configures TypeScript projects
 - **Python Support** - Complete Python toolchain with Black, Ruff, isort, mypy, pytest
@@ -102,7 +102,21 @@ npx create-qa-architect@latest
 
 ## Workflow Tiers (GitHub Actions Cost Optimization)
 
-qa-architect now defaults to **minimal CI** to avoid unexpected GitHub Actions bills. Choose the tier that matches your needs:
+qa-architect follows industry best practice: **"Fail fast locally, verify comprehensively remotely"**
+
+### The Testing Pyramid
+
+| Layer          | Time     | What Runs                          | Why                        |
+| -------------- | -------- | ---------------------------------- | -------------------------- |
+| **Pre-commit** | < 5s     | Lint + format (staged files)       | Instant feedback           |
+| **Pre-push**   | < 30s    | Type check + tests (changed files) | Catches bugs before push   |
+| **CI**         | 3-10 min | Full test suite + security         | Comprehensive verification |
+
+Note: CI does NOT re-run lint/format (pre-commit already did it). This avoids redundant work and reduces CI costs.
+
+### Workflow Tiers (GitHub Actions Cost)
+
+qa-architect defaults to **minimal CI** to avoid unexpected GitHub Actions bills. Choose the tier that matches your needs:
 
 ### Minimal (Default) - $0-5/month
 
@@ -147,6 +161,16 @@ npx create-qa-architect@latest --workflow-standard
 ```bash
 npx create-qa-architect@latest --workflow-comprehensive
 ```
+
+### Matrix Testing for Libraries
+
+**Publishing an npm package or CLI tool?** Use `--matrix` to test on multiple Node.js versions:
+
+```bash
+npx create-qa-architect@latest --matrix
+```
+
+This adds Node.js 20 + 22 matrix testing - recommended for published packages that support multiple runtime versions. Not needed for web apps you deploy (you control the Node version).
 
 ### Switching Between Tiers
 

@@ -17,6 +17,7 @@ const baseScripts = {
   test: 'vitest run --passWithNoTests',
   'test:watch': 'vitest',
   'test:coverage': 'vitest run --coverage',
+  'test:changed': 'vitest run --changed HEAD~1 --passWithNoTests',
   'security:audit':
     '[ -f pnpm-lock.yaml ] && pnpm audit --audit-level high || [ -f yarn.lock ] && yarn audit || npm audit --audit-level high',
   'security:secrets':
@@ -28,7 +29,7 @@ const baseScripts = {
   'validate:comprehensive': 'npx create-qa-architect@latest --comprehensive',
   'validate:all': 'npm run validate:comprehensive && npm run security:audit',
   'validate:pre-push':
-    'npm run test:patterns --if-present && npm run lint && npm run format:check && npm run test:commands --if-present && npm test --if-present',
+    'npm run test:patterns --if-present && npm run test:commands --if-present && npm run test:changed --if-present || npm test --if-present',
 }
 
 const normalizeStylelintTargets = stylelintTargets => {

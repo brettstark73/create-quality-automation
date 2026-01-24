@@ -126,6 +126,7 @@ const { TemplateLoader } = require('./lib/template-loader')
 const {
   detectExistingWorkflowMode,
   injectWorkflowMode,
+  injectMatrix,
 } = require('./lib/workflow-config')
 
 // Command handlers (extracted for maintainability)
@@ -490,6 +491,7 @@ function parseArguments(rawArgs) {
   const isWorkflowComprehensive = sanitizedArgs.includes(
     '--workflow-comprehensive'
   )
+  const isMatrixEnabled = sanitizedArgs.includes('--matrix')
   const ciProviderIndex = sanitizedArgs.findIndex(arg => arg === '--ci')
   const ciProvider =
     ciProviderIndex !== -1 && sanitizedArgs[ciProviderIndex + 1]
@@ -573,6 +575,7 @@ function parseArguments(rawArgs) {
     isWorkflowMinimal,
     isWorkflowStandard,
     isWorkflowComprehensive,
+    isMatrixEnabled,
   }
 }
 
@@ -616,6 +619,7 @@ function parseArguments(rawArgs) {
     isWorkflowMinimal,
     isWorkflowStandard,
     isWorkflowComprehensive,
+    isMatrixEnabled,
   } = parsedConfig
 
   // Initialize telemetry session (opt-in only, fails silently)
@@ -663,6 +667,7 @@ function parseArguments(rawArgs) {
       isWorkflowMinimal,
       isWorkflowStandard,
       isWorkflowComprehensive,
+      isMatrixEnabled,
     } = parsedConfig)
   }
 
@@ -702,6 +707,8 @@ WORKFLOW TIERS (GitHub Actions optimization):
                             ~15-20 min/commit, ~$5-20/mo for typical projects
   --workflow-comprehensive  Comprehensive CI - Matrix on every push, security inline
                             ~50-100 min/commit, ~$100-350/mo for typical projects
+  --matrix                 Enable Node.js version matrix testing (20 + 22)
+                            Use for npm libraries/CLI tools that support multiple Node versions
   --analyze-ci             Analyze GitHub Actions usage and get optimization tips (Pro)
 
 VALIDATION OPTIONS:
@@ -1625,6 +1632,9 @@ HELP:
           // Inject workflow mode configuration
           templateWorkflow = injectWorkflowMode(templateWorkflow, workflowMode)
 
+          // Inject matrix testing if enabled (for library authors)
+          templateWorkflow = injectMatrix(templateWorkflow, isMatrixEnabled)
+
           // Inject collaboration steps
           templateWorkflow = injectCollaborationSteps(templateWorkflow, {
             enableSlackAlerts,
@@ -1656,6 +1666,9 @@ HELP:
               templateWorkflow,
               workflowMode
             )
+
+            // Inject matrix testing if enabled (for library authors)
+            templateWorkflow = injectMatrix(templateWorkflow, isMatrixEnabled)
 
             // Inject collaboration steps (preserve from existing if present)
             const existingWorkflow = fs.readFileSync(workflowFile, 'utf8')
@@ -1915,6 +1928,10 @@ fs.writeFileSync(usageFile, JSON.stringify(usage, null, 2))
 console.log('🧮 Usage: ' + usage.prePushRuns + '/' + CAP + ' pre-push runs used this month')
 EOF
 
+# Best Practice: Pre-push runs checks NOT done in pre-commit
+# Pre-commit handles: lint, format (on staged files)
+# Pre-push handles: type check, tests on changed files
+
 # Validate command patterns (fast - catches deprecated patterns)
 if node -e "const pkg=require('./package.json');process.exit(pkg.scripts['test:patterns']?0:1)" 2>/dev/null; then
   echo "🔍 Validating command patterns..."
@@ -1924,19 +1941,14 @@ if node -e "const pkg=require('./package.json');process.exit(pkg.scripts['test:p
   }
 fi
 
-# Run lint (catches errors before CI)
-echo "📝 Linting..."
-npm run lint || {
-  echo "❌ Lint failed! Fix errors before pushing."
-  exit 1
-}
-
-# Run format check (ensures code style consistency)
-echo "✨ Checking formatting..."
-npm run format:check || {
-  echo "❌ Format check failed! Run 'npm run format' to fix."
-  exit 1
-}
+# Type check (if TypeScript - not done in pre-commit because it's slow)
+if [ -f tsconfig.json ]; then
+  echo "📐 Type checking..."
+  npx tsc --noEmit || {
+    echo "❌ Type check failed! Fix type errors before pushing."
+    exit 1
+  }
+fi
 
 # Test command execution (CRITICAL - prevents command generation bugs)
 if node -e "const pkg=require('./package.json');process.exit(pkg.scripts['test:commands']?0:1)" 2>/dev/null; then
@@ -1947,8 +1959,15 @@ if node -e "const pkg=require('./package.json');process.exit(pkg.scripts['test:c
   }
 fi
 
-# Run tests if they exist
-if node -e "const pkg=require('./package.json');process.exit(pkg.scripts.test?0:1)" 2>/dev/null; then
+# Run tests on changed files only (delta testing - much faster)
+# Falls back to full test suite if test:changed doesn't exist
+if node -e "const pkg=require('./package.json');process.exit(pkg.scripts['test:changed']?0:1)" 2>/dev/null; then
+  echo "🧪 Running tests on changed files..."
+  npm run test:changed || {
+    echo "❌ Tests failed! Fix failing tests before pushing."
+    exit 1
+  }
+elif node -e "const pkg=require('./package.json');process.exit(pkg.scripts.test?0:1)" 2>/dev/null; then
   echo "🧪 Running unit tests..."
   npm test || {
     echo "❌ Tests failed! Fix failing tests before pushing."

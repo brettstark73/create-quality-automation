@@ -147,9 +147,9 @@ function createTempGitRepo() {
       'Should have schedule trigger'
     )
 
-    // Check for matrix on main branch only
+    // Check for matrix on main branch only (supports both single-line and multi-line if: formats)
     assert(
-      workflowContent.includes("if: github.ref == 'refs/heads/main'"),
+      workflowContent.includes("github.ref == 'refs/heads/main'"),
       'Matrix should only run on main'
     )
     assert(
@@ -376,16 +376,17 @@ jobs:
   }
 })()
 
-// Test 6: Workflow installs dependencies before maturity detection
+// Test 6: Minimal mode skips expensive maturity detection
 ;(() => {
   console.log(
-    'Test 6: Workflow installs dependencies before maturity detection (bug fix)'
+    'Test 6: Minimal mode skips expensive dependency install and maturity detection'
   )
   const testDir = createTempGitRepo()
 
   try {
     const setupPath = path.join(__dirname, '../setup.js')
-    execSync(`QAA_DEVELOPER=true node ${setupPath}`, {
+    // Use child_process.execSync for legitimate test CLI invocation
+    execSync(`QAA_DEVELOPER=true node ${setupPath} --workflow-minimal`, {
       cwd: testDir,
       stdio: 'pipe',
     })
@@ -398,40 +399,50 @@ jobs:
     )
     const workflowContent = fs.readFileSync(workflowPath, 'utf8')
 
-    // Check that dependency installation happens before maturity detection
+    // Verify expensive steps are REMOVED in minimal mode
     assert(
-      workflowContent.includes(
+      !workflowContent.includes(
         '- name: Install dependencies for maturity detection'
       ),
-      'Should have dependency installation step'
-    )
-
-    // Verify the step comes AFTER package manager detection
-    const pmDetectIndex = workflowContent.indexOf(
-      '- name: Detect Package Manager'
-    )
-    const installIndex = workflowContent.indexOf(
-      '- name: Install dependencies for maturity detection'
-    )
-    const maturityIndex = workflowContent.indexOf(
-      '- name: Detect Project Maturity'
-    )
-
-    assert(pmDetectIndex > 0, 'Should have package manager detection')
-    assert(installIndex > 0, 'Should have dependency installation')
-    assert(maturityIndex > 0, 'Should have maturity detection')
-
-    assert(
-      pmDetectIndex < installIndex,
-      'Package manager detection should come before dependency installation'
+      'Minimal mode should NOT have dependency installation step'
     )
     assert(
-      installIndex < maturityIndex,
-      'Dependency installation should come before maturity detection'
+      !workflowContent.includes('- name: Detect Project Maturity'),
+      'Minimal mode should NOT have maturity detection step'
+    )
+
+    // Verify maturity outputs are hardcoded
+    assert(
+      workflowContent.includes("maturity: 'minimal'"),
+      'Minimal mode should have hardcoded maturity output'
+    )
+    assert(
+      workflowContent.includes("source-count: '10'"),
+      'Minimal mode should have hardcoded source-count output'
+    )
+    assert(
+      workflowContent.includes("test-count: '1'"),
+      'Minimal mode should have hardcoded test-count output'
+    )
+    assert(
+      workflowContent.includes("has-deps: 'true'"),
+      'Minimal mode should have hardcoded has-deps output'
+    )
+
+    // Verify package manager detection is preserved (fast lockfile check)
+    assert(
+      workflowContent.includes('- name: Detect Package Manager'),
+      'Minimal mode should still have package manager detection'
+    )
+
+    // Verify simplified detection report
+    assert(
+      workflowContent.includes('Minimal Mode'),
+      'Should have simplified report indicating minimal mode'
     )
 
     console.log(
-      '✅ PASS - Dependencies are installed before maturity detection\n'
+      '✅ PASS - Minimal mode skips expensive steps, uses hardcoded outputs\n'
     )
   } finally {
     fs.rmSync(testDir, { recursive: true, force: true })
@@ -460,32 +471,33 @@ jobs:
     )
     const workflowContent = fs.readFileSync(workflowPath, 'utf8')
 
-    // Count pnpm setup steps (should be 6: detect-maturity, core-checks, linting, security, tests, documentation)
+    // Count pnpm setup steps (should be 4: detect-maturity, security, tests, documentation)
+    // Note: core-checks and linting jobs were removed (pre-commit handles lint/format locally)
     const pnpmSetupMatches = workflowContent.match(/- name: Setup pnpm/g)
     assert(
-      pnpmSetupMatches && pnpmSetupMatches.length === 6,
-      `Should have 6 pnpm setup steps, found ${pnpmSetupMatches ? pnpmSetupMatches.length : 0}`
+      pnpmSetupMatches && pnpmSetupMatches.length === 4,
+      `Should have 4 pnpm setup steps, found ${pnpmSetupMatches ? pnpmSetupMatches.length : 0}`
     )
 
-    // Count bun setup steps (should also be 6)
+    // Count bun setup steps (should also be 4)
     const bunSetupMatches = workflowContent.match(/- name: Setup Bun/g)
     assert(
-      bunSetupMatches && bunSetupMatches.length === 6,
-      `Should have 6 Bun setup steps, found ${bunSetupMatches ? bunSetupMatches.length : 0}`
+      bunSetupMatches && bunSetupMatches.length === 4,
+      `Should have 4 Bun setup steps, found ${bunSetupMatches ? bunSetupMatches.length : 0}`
     )
 
     // Verify pnpm version format
     const pnpmVersionMatches = workflowContent.match(/version: '8\.15\.0'/g)
     assert(
-      pnpmVersionMatches && pnpmVersionMatches.length === 6,
-      `Should have 6 pnpm version: '8.15.0' entries, found ${pnpmVersionMatches ? pnpmVersionMatches.length : 0}`
+      pnpmVersionMatches && pnpmVersionMatches.length === 4,
+      `Should have 4 pnpm version: '8.15.0' entries, found ${pnpmVersionMatches ? pnpmVersionMatches.length : 0}`
     )
 
     // Verify bun version format
     const bunVersionMatches = workflowContent.match(/bun-version: '1\.0\.0'/g)
     assert(
-      bunVersionMatches && bunVersionMatches.length === 6,
-      `Should have 6 bun-version: '1.0.0' entries, found ${bunVersionMatches ? bunVersionMatches.length : 0}`
+      bunVersionMatches && bunVersionMatches.length === 4,
+      `Should have 4 bun-version: '1.0.0' entries, found ${bunVersionMatches ? bunVersionMatches.length : 0}`
     )
 
     // Verify all pnpm setups are conditional
@@ -493,8 +505,8 @@ jobs:
       /if:.*package-manager == 'pnpm'/g
     )
     assert(
-      pnpmConditionalMatches && pnpmConditionalMatches.length >= 5,
-      `Should have at least 5 conditional pnpm checks, found ${pnpmConditionalMatches ? pnpmConditionalMatches.length : 0}`
+      pnpmConditionalMatches && pnpmConditionalMatches.length >= 3,
+      `Should have at least 3 conditional pnpm checks, found ${pnpmConditionalMatches ? pnpmConditionalMatches.length : 0}`
     )
 
     // Verify all bun setups are conditional
@@ -502,8 +514,8 @@ jobs:
       /if:.*package-manager == 'bun'/g
     )
     assert(
-      bunConditionalMatches && bunConditionalMatches.length >= 5,
-      `Should have at least 5 conditional bun checks, found ${bunConditionalMatches ? bunConditionalMatches.length : 0}`
+      bunConditionalMatches && bunConditionalMatches.length >= 3,
+      `Should have at least 3 conditional bun checks, found ${bunConditionalMatches ? bunConditionalMatches.length : 0}`
     )
 
     // Verify setup order: Node.js → pnpm → Bun
@@ -522,6 +534,91 @@ jobs:
     console.log(
       '✅ PASS - All jobs have pnpm and bun setup with correct versions\n'
     )
+  } finally {
+    fs.rmSync(testDir, { recursive: true, force: true })
+  }
+})()
+
+// Test 8: Standard/comprehensive modes retain full maturity detection
+;(() => {
+  console.log(
+    'Test 8: Standard/comprehensive modes retain full maturity detection'
+  )
+  const testDir = createTempGitRepo()
+
+  try {
+    const setupPath = path.join(__dirname, '../setup.js')
+    // Use child_process.execSync for legitimate test CLI invocation
+    execSync(`QAA_DEVELOPER=true node ${setupPath} --workflow-standard`, {
+      cwd: testDir,
+      stdio: 'pipe',
+    })
+
+    const workflowPath = path.join(
+      testDir,
+      '.github',
+      'workflows',
+      'quality.yml'
+    )
+    const workflowContent = fs.readFileSync(workflowPath, 'utf8')
+
+    // Verify expensive steps are PRESENT in standard mode
+    assert(
+      workflowContent.includes(
+        '- name: Install dependencies for maturity detection'
+      ),
+      'Standard mode should have dependency installation step'
+    )
+    assert(
+      workflowContent.includes('- name: Detect Project Maturity'),
+      'Standard mode should have maturity detection step'
+    )
+
+    // Verify outputs reference step outputs (not hardcoded)
+    assert(
+      workflowContent.includes(
+        'maturity: ${{ steps.detect.outputs.maturity }}'
+      ),
+      'Standard mode should have dynamic maturity output'
+    )
+    assert(
+      workflowContent.includes(
+        'source-count: ${{ steps.detect.outputs.source-count }}'
+      ),
+      'Standard mode should have dynamic source-count output'
+    )
+
+    // Verify package manager detection is preserved
+    assert(
+      workflowContent.includes('- name: Detect Package Manager'),
+      'Standard mode should have package manager detection'
+    )
+
+    // Verify the step order: PM detection → install → maturity
+    const pmDetectIndex = workflowContent.indexOf(
+      '- name: Detect Package Manager'
+    )
+    const installIndex = workflowContent.indexOf(
+      '- name: Install dependencies for maturity detection'
+    )
+    const maturityIndex = workflowContent.indexOf(
+      '- name: Detect Project Maturity'
+    )
+
+    assert(pmDetectIndex > 0, 'Should have package manager detection')
+    assert(installIndex > 0, 'Should have dependency installation')
+    assert(maturityIndex > 0, 'Should have maturity detection')
+
+    assert(
+      pmDetectIndex < installIndex,
+      'Package manager detection should come before dependency installation'
+    )
+    assert(
+      installIndex < maturityIndex,
+      'Dependency installation should come before maturity detection'
+    )
+
+    console.log('✅ PASS - Standard mode retains full maturity detection\n')
   } finally {
     fs.rmSync(testDir, { recursive: true, force: true })
   }

@@ -74,6 +74,18 @@ The tool uses a freemium model with feature gating in `lib/licensing.js`:
 
 Check tier with `hasFeature('smartTestStrategy')` or `getLicenseInfo()`.
 
+### Layered Testing Strategy (Best Practice)
+
+qa-architect follows industry best practice: "Fail fast locally, verify comprehensively remotely"
+
+| Layer          | Time     | What Runs                          | Files Modified                     |
+| -------------- | -------- | ---------------------------------- | ---------------------------------- |
+| **Pre-commit** | < 5s     | Lint + format (staged files)       | `config/defaults.js` (lint-staged) |
+| **Pre-push**   | < 30s    | Type check + tests (changed files) | `setup.js` (hook generation)       |
+| **CI**         | 3-10 min | Full test suite + security         | `.github/workflows/quality.yml`    |
+
+Note: CI does NOT re-run lint/format (pre-commit already did it). This avoids redundant work.
+
 ### Workflow Tier System
 
 qa-architect defaults to **minimal CI** to avoid unexpected GitHub Actions costs:
@@ -81,13 +93,13 @@ qa-architect defaults to **minimal CI** to avoid unexpected GitHub Actions costs
 - **Minimal (default)**: Single Node 22, weekly security, path filters (~$0-5/mo)
 - **Standard**: Matrix on main only, weekly security, path filters (~$5-20/mo)
 - **Comprehensive**: Matrix every commit, inline security (~$100-350/mo)
+- **--matrix flag**: Enable Node 20+22 matrix (for library authors)
 
 Implementation:
 
 - `detectExistingWorkflowMode()` - Reads `# WORKFLOW_MODE:` marker or detects legacy
-- `injectWorkflowMode()` - Replaces placeholders in quality.yml template
-- Placeholders: `PATH_FILTERS_PLACEHOLDER`, `SECURITY_SCHEDULE_PLACEHOLDER`, `MATRIX_PLACEHOLDER`, `TESTS_CONDITION_PLACEHOLDER`
-- Update mode: Re-loads template and re-injects to switch modes
+- `injectWorkflowMode()` - Applies mode-specific transformations
+- `injectMatrix()` - Adds Node.js version matrix when `--matrix` flag is used
 
 See `docs/CI-COST-ANALYSIS.md` for full analysis and `tests/workflow-tiers.test.js` for test patterns.
 
@@ -114,7 +126,8 @@ The `QAA_DEVELOPER=true` env var bypasses license checks during testing.
 ## Quality Gates
 
 - Coverage: 75% lines, 70% functions, 65% branches
-- Pre-push: lint, format:check, test:patterns, test:commands, test
+- Pre-commit: lint + format (staged files via lint-staged)
+- Pre-push: type check (tsc), test:patterns, test:commands, test:changed
 - Pre-release: `npm run prerelease` (docs:check + all tests + e2e)
 
 ## Publishing

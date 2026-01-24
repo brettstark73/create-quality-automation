@@ -1,13 +1,13 @@
 name: Quality Checks
 
-# Progressive quality automation - adapts checks based on project maturity
-# Minimal projects: Only Prettier
-# Bootstrap projects: + ESLint
-# Development projects: + Tests + Security
-# Production-ready: All checks enabled
+# Industry best practice: "Fail fast locally, verify comprehensively remotely"
 #
-# Note: Core checks and tests run on Node.js 20 and 22 matrix to catch runtime differences
-# and ensure compatibility across Node.js versions
+# Local (pre-commit): Lint + format (staged files) - instant feedback
+# Local (pre-push): Type check + tests (changed files) - catches logic bugs
+# CI (this workflow): Full test suite + E2E + security - comprehensive verification
+#
+# Note: Lint/format NOT duplicated here - pre-commit already did it
+# This avoids redundant work and reduces CI costs
 
 on:
   push:
@@ -124,87 +124,12 @@ jobs:
           echo "Has documentation: ${{ steps.detect.outputs.has-docs }}"
           echo "Has CSS files: ${{ steps.detect.outputs.has-css }}"
 
-  # Step 2: Core checks - ALWAYS run (all maturity levels)
-  # Note: Runs on Node 22 only - Prettier formatting is not sensitive to Node version
-  core-checks:
-    runs-on: ubuntu-latest
-    needs: detect-maturity
+  # Note: Lint/format jobs REMOVED - pre-commit already does this locally
+  # This follows industry best practice: "Each layer does unique work"
+  # Pre-commit = lint + format on staged files
+  # CI = full tests + E2E + security (things that can't be done locally)
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v5
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: '22'
-          cache: ${{ needs.detect-maturity.outputs.package-manager }}
-
-      - name: Setup pnpm
-        if: needs.detect-maturity.outputs.package-manager == 'pnpm'
-        uses: pnpm/action-setup@v4
-        with:
-          version: '8.15.0'
-
-      - name: Setup Bun
-        if: needs.detect-maturity.outputs.package-manager == 'bun'
-        uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: '1.0.0'
-
-      - name: Install dependencies
-        run: ${{ needs.detect-maturity.outputs.install-cmd }}
-
-      - name: Prettier check
-        run: |
-          echo "✨ Running Prettier formatting check (required for all projects)"
-          npm run format:check
-
-  # Step 3: Linting - run if source files exist (bootstrap+)
-  # Note: Runs on Node 20 only - linting tools are less sensitive to Node version differences
-  # Core runtime compatibility is tested via matrix in tests job when enabled
-  linting:
-    runs-on: ubuntu-latest
-    needs: detect-maturity
-    if: fromJSON(needs.detect-maturity.outputs.source-count) > 0
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v5
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: '20'
-          cache: ${{ needs.detect-maturity.outputs.package-manager }}
-
-      - name: Setup pnpm
-        if: needs.detect-maturity.outputs.package-manager == 'pnpm'
-        uses: pnpm/action-setup@v4
-        with:
-          version: '8.15.0'
-
-      - name: Setup Bun
-        if: needs.detect-maturity.outputs.package-manager == 'bun'
-        uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: '1.0.0'
-
-      - name: Install dependencies
-        run: ${{ needs.detect-maturity.outputs.install-cmd }}
-
-      - name: ESLint
-        run: |
-          echo "🔍 Linting ${{ needs.detect-maturity.outputs.source-count }} source files..."
-          npx eslint .
-
-      - name: Stylelint
-        if: needs.detect-maturity.outputs.has-css == 'true'
-        run: |
-          echo "🎨 Linting CSS files..."
-          npx stylelint "**/*.{css,scss,sass,less,pcss}" --allow-empty-input
-
-  # Step 4: Security checks - run if dependencies exist
+  # Step 2: Security checks - run if dependencies exist
   #
   # Optional Enhanced Token Configuration:
   # - GITLEAKS_TOKEN: Enhanced GitHub token for gitleaks (fallback: GITHUB_TOKEN)
@@ -342,11 +267,14 @@ jobs:
           SEMGREP_VERSION: '1.85.0'
           SEMGREP_ENABLE_VERSION_CHECK: 'false'
 
-  # Step 5: Tests - run if test files exist (development+)
+  # Step 3: Tests - run if test files exist (development+)
+  # Smart skip: Draft PRs skip tests (saves CI costs during WIP)
   tests:
     runs-on: ubuntu-latest
     needs: detect-maturity
-    if: fromJSON(needs.detect-maturity.outputs.test-count) > 0
+    if: |
+      fromJSON(needs.detect-maturity.outputs.test-count) > 0 &&
+      (github.event.pull_request.draft != true || github.event_name != 'pull_request')
     strategy:
       fail-fast: false
       matrix:
@@ -415,7 +343,7 @@ jobs:
           echo "🔐 Running real gitleaks binary verification test..."
           QAA_DEVELOPER=true RUN_REAL_BINARY_TEST=1 node tests/gitleaks-real-binary-test.js
 
-  # Step 6: Documentation - run for production-ready projects
+  # Step 4: Documentation - run for production-ready projects
   documentation:
     runs-on: ubuntu-latest
     needs: detect-maturity
@@ -555,13 +483,11 @@ jobs:
           # Teams can enforce by adding 'error' level assertions in their lighthouserc
           echo "::notice::Lighthouse failures are warnings. Add 'error' assertions in .lighthouserc.js to enforce."
 
-  # Step 7: Summary - report what checks ran
+  # Step 5: Summary - report what checks ran
   summary:
     runs-on: ubuntu-latest
     needs:
       - detect-maturity
-      - core-checks
-      - linting
       - security
       - tests
       - documentation
@@ -570,8 +496,6 @@ jobs:
     steps:
       - name: Generate Check Summary
         env:
-          CORE_RESULT: ${{ needs.core-checks.result }}
-          LINTING_RESULT: ${{ needs.linting.result }}
           SECURITY_RESULT: ${{ needs.security.result }}
           TESTS_RESULT: ${{ needs.tests.result }}
           DOCS_RESULT: ${{ needs.documentation.result }}
@@ -587,26 +511,9 @@ jobs:
           echo "- Has documentation: ${{ needs.detect-maturity.outputs.has-docs }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Checks Executed" >> $GITHUB_STEP_SUMMARY
-
-          # Core checks
-          if [ "$CORE_RESULT" == "success" ]; then
-            echo "- ✅ Core checks: Passed" >> $GITHUB_STEP_SUMMARY
-          elif [ "$CORE_RESULT" == "failure" ]; then
-            echo "- ❌ Core checks: Failed" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "- ⚠️ Core checks: $CORE_RESULT" >> $GITHUB_STEP_SUMMARY
-          fi
-
-          # Linting
-          if [ "$LINTING_RESULT" == "success" ]; then
-            echo "- ✅ Linting: Passed" >> $GITHUB_STEP_SUMMARY
-          elif [ "$LINTING_RESULT" == "failure" ]; then
-            echo "- ❌ Linting: Failed" >> $GITHUB_STEP_SUMMARY
-          elif [ "$LINTING_RESULT" == "skipped" ]; then
-            echo "- ⏭️ Linting: Skipped (no source files)" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "- ⚠️ Linting: $LINTING_RESULT" >> $GITHUB_STEP_SUMMARY
-          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Note: Lint/format checks run locally in pre-commit (not duplicated here)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
 
           # Security
           if [ "$SECURITY_RESULT" == "success" ]; then
@@ -614,7 +521,7 @@ jobs:
           elif [ "$SECURITY_RESULT" == "failure" ]; then
             echo "- ❌ Security: Failed" >> $GITHUB_STEP_SUMMARY
           elif [ "$SECURITY_RESULT" == "skipped" ]; then
-            echo "- ⏭️ Security: Skipped (no dependencies)" >> $GITHUB_STEP_SUMMARY
+            echo "- ⏭️ Security: Skipped (runs on schedule/manual trigger)" >> $GITHUB_STEP_SUMMARY
           else
             echo "- ⚠️ Security: $SECURITY_RESULT" >> $GITHUB_STEP_SUMMARY
           fi

@@ -17,3 +17,4 @@ private-key.pem
 legitimate-licenses.json
 legitimate-licenses.public.json
 .vercel
+.serena/
